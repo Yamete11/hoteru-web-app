@@ -1,25 +1,25 @@
 <template>
   <div class="app">
-    <div class="login-container">
-      <h1>HOTERU ホテル</h1>
-
-    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
+  components:{
 
-    };
   },
-  methods: {
-
-  }
+  name: "App"
 }
 </script>
 
 <style>
-
+body{
+  background-color: #252525;
+  margin: 0;
+  height: 100%;
+}
+h1{
+  color: #FFFFFF;
+}
 </style>

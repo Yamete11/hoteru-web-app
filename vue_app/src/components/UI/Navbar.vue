@@ -1,0 +1,65 @@
+<template>
+  <div class="navbar">
+    <div class="navbar-title">
+      <h1>HOTERU ホテル</h1>
+      <h2>"Company name"</h2>
+    </div>
+    <div class="navbar-links">
+      <router-link class="navbar-btn" to="/new-reservation">New Reservation</router-link>
+      <div class="right-links">
+        <router-link class="navbar-btn" to="/settings">Settings</router-link>
+        <router-link class="navbar-btn" to="/">Log out</router-link>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+<script>
+export default {
+  name: "Navbar"
+}
+</script>
+
+<style scoped>
+.navbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background-color: #715d47;
+  color: white;
+  height: 8vh;
+  box-sizing: border-box;
+}
+
+.navbar-title{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 25%
+}
+
+.navbar-links{
+  display: flex;
+  justify-content: space-between;
+  width: 40%
+}
+
+.right-links{
+  display: flex;
+  justify-content: space-around;
+  width: 20%;
+}
+
+.navbar-btn{
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+}
+
+.navbar h1, .navbar h2 {
+  margin: 0;
+}
+</style>
