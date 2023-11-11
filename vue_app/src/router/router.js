@@ -6,6 +6,7 @@ import Guest from "../pages/Guest.vue";
 import Room from "../pages/Room.vue";
 import Service from "../pages/Service.vue";
 import History from "../pages/History.vue";
+import Registration from "../pages/Registration.vue";
 
 
 const routes = [
@@ -16,6 +17,10 @@ const routes = [
     {
         path: '/reservations',
         component: Reservation
+    },
+    {
+        path: '/registration',
+        component: Registration
     },
     {
         path: '/arrivals',

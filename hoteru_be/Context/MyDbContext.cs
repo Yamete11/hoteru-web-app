@@ -7,6 +7,12 @@ namespace hoteru_be.Context
     {
 
         public virtual DbSet<Person> Persons { get; set; }
+        public virtual DbSet<Hotel> Hotels { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
+
+        public virtual DbSet<Room> Rooms { get; set; }
+        public virtual DbSet<RoomType> RoomTypes { get; set; }
+        public virtual DbSet<RoomStatus> RoomStatuses { get; set; }
 
         public MyDbContext()
         {
@@ -20,6 +26,15 @@ namespace hoteru_be.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<RoomStatus>(t =>
+            {
+                t.HasData(
+                    new RoomStatus { IdRoomStatus = 1, Title = "Out of service" },
+                    new RoomStatus { IdRoomStatus = 2, Title = "Occupied" },
+                    new RoomStatus { IdRoomStatus = 3, Title = "Ready" });
+
+            });
         }
     }
 }

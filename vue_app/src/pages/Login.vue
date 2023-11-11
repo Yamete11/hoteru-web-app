@@ -1,4 +1,7 @@
 <template>
+  <div class="registration">
+    <router-link class="registration-btn" @click="login" to="/registration">New Company</router-link>
+  </div>
   <div class="login">
     <h1>HOTERU ホテル</h1>
     <form @submit.prevent class="login-form">
@@ -43,7 +46,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 98vh;
+  height: 95vh;
 }
 
 .login-form {
@@ -75,6 +78,27 @@ export default {
   border-radius: 5px;
   font-weight: bold;
   color: white;
+}
+
+.registration{
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.registration-btn{
+  text-decoration: none;
+  background-color: #8D7B68;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+  margin-top: 10px;
+  margin-right: 10px;
+  width: 10vw;
+  display: flex;
+  justify-content: center;
 }
 </style>
 
