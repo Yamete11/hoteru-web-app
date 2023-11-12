@@ -1,4 +1,6 @@
 using hoteru_be.Context;
+using hoteru_be.Services.Implementations;
+using hoteru_be.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +34,8 @@ namespace hoteru_be
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IHotelService, HotelService>();
+            services.AddScoped<IRoomService, RoomService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

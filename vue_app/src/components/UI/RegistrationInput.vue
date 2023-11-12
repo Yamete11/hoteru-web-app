@@ -1,7 +1,14 @@
 <template>
   <div class="input-form">
-    <label><slot></slot></label>
-    <input :value="modelValue" @input="updateInput" class="input" type="text">
+    <label :for="inputId"><slot></slot></label>
+    <input
+        :id="inputId"
+        :value="value"
+        @input="updateInput($event.target.value)"
+        class="input"
+        type="text"
+        :placeholder="placeholder"
+    >
   </div>
 </template>
 
@@ -9,11 +16,16 @@
 export default {
   name: "RegistrationInput",
   props:{
-    modelValue: [String, Number]
+    value: {
+      type: [String, Number],
+      default: ""
+    },
+    placeholder: String,
+    inputId: String
   },
   methods:{
-    updateInput(event){
-      this.$emit('update:modelValue', event.target.value)
+    updateInput(value){
+      this.$emit('input', value);
     }
   }
 }
@@ -22,25 +34,20 @@ export default {
 <style scoped>
 .input-form {
   display: flex;
-  align-items: center;
-  padding: 5px;
+  flex-direction: column;
   margin: 5px;
-  width: 50px;
 }
 
 .input-form label {
-  margin-right: 10px;
+  margin-bottom: 5px;
   font-weight: bold;
-  color: white;
+  color: #FFFFFF;
 }
 
 .input-form input[type="text"] {
-  flex-grow: 1;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 150px;
+  margin-bottom: 10px; /* Space after the input for any potential error messages */
 }
 </style>
-
-
