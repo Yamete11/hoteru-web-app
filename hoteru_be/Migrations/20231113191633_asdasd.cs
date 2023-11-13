@@ -2,7 +2,7 @@
 
 namespace hoteru_be.Migrations
 {
-    public partial class sdf : Migration
+    public partial class asdasd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,7 @@ namespace hoteru_be.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Postalcode = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Postcode = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -87,7 +87,7 @@ namespace hoteru_be.Migrations
                 {
                     IdRoom = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     IdRoomStatus = table.Column<int>(type: "int", nullable: false),
@@ -164,6 +164,11 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "RoomTypes",
+                columns: new[] { "IdRoomType", "Title" },
+                values: new object[] { 1, "Regular" });
+
+            migrationBuilder.InsertData(
                 table: "UserTypes",
                 columns: new[] { "IdUserType", "Title" },
                 values: new object[,]
@@ -171,6 +176,17 @@ namespace hoteru_be.Migrations
                     { 1, "Superadmin" },
                     { 2, "Admin" },
                     { 3, "Employee" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "IdRoom", "Capacity", "IdRoomStatus", "IdRoomType", "Number", "Price" },
+                values: new object[,]
+                {
+                    { 1, 4, 1, 1, "101", 3.5f },
+                    { 2, 2, 2, 1, "201", 3.5f },
+                    { 3, 2, 3, 1, "203", 3.5f },
+                    { 4, 1, 1, 1, "305", 3.5f }
                 });
 
             migrationBuilder.CreateIndex(

@@ -9,8 +9,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231113145616_sdf")]
-    partial class sdf
+    [Migration("20231113191633_asdasd")]
+    partial class asdasd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,7 +33,7 @@ namespace hoteru_be.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Postalcode")
+                    b.Property<string>("Postcode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
@@ -107,8 +107,8 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdRoomType")
                         .HasColumnType("int");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
+                    b.Property<string>("Number")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -120,6 +120,44 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdRoomType");
 
                     b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            IdRoom = 1,
+                            Capacity = 4,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "101",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 2,
+                            Capacity = 2,
+                            IdRoomStatus = 2,
+                            IdRoomType = 1,
+                            Number = "201",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 3,
+                            Capacity = 2,
+                            IdRoomStatus = 3,
+                            IdRoomType = 1,
+                            Number = "203",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 4,
+                            Capacity = 1,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "305",
+                            Price = 3.5f
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.RoomStatus", b =>
@@ -167,6 +205,13 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdRoomType");
 
                     b.ToTable("RoomTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            IdRoomType = 1,
+                            Title = "Regular"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.User", b =>

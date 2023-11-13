@@ -105,8 +105,8 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdRoomType")
                         .HasColumnType("int");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
+                    b.Property<string>("Number")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -118,6 +118,44 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdRoomType");
 
                     b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            IdRoom = 1,
+                            Capacity = 4,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "101",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 2,
+                            Capacity = 2,
+                            IdRoomStatus = 2,
+                            IdRoomType = 1,
+                            Number = "201",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 3,
+                            Capacity = 2,
+                            IdRoomStatus = 3,
+                            IdRoomType = 1,
+                            Number = "203",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 4,
+                            Capacity = 1,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "305",
+                            Price = 3.5f
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.RoomStatus", b =>
@@ -165,6 +203,13 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdRoomType");
 
                     b.ToTable("RoomTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            IdRoomType = 1,
+                            Title = "Regular"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.User", b =>

@@ -44,6 +44,23 @@ namespace hoteru_be.Context
                     new UserType { IdUserType = 3, Title = "Employee" });
 
             });
+
+            modelBuilder.Entity<RoomType>(t =>
+            {
+                t.HasData(
+                    new RoomType { IdRoomType = 1, Title = "Regular" });
+
+            });
+
+            modelBuilder.Entity<Room>(t =>
+            {
+                t.HasData(
+                    new Room { IdRoom = 1, Number = "101", Capacity = 4, Price = 3.5f, IdRoomType = 1, IdRoomStatus = 1 },
+                    new Room { IdRoom = 2, Number = "201", Capacity = 2, Price = 3.5f, IdRoomType = 1, IdRoomStatus = 2 },
+                    new Room { IdRoom = 3, Number = "203", Capacity = 2, Price = 3.5f, IdRoomType = 1, IdRoomStatus = 3 },
+                    new Room { IdRoom = 4, Number = "305", Capacity = 1, Price = 3.5f, IdRoomType = 1, IdRoomStatus = 1 });
+
+            });
         }
     }
 }

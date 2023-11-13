@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using hoteru_be.DTOs;
+using hoteru_be.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
@@ -7,5 +11,17 @@ namespace hoteru_be.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
+        private readonly IRoomService _service;
+
+        public RoomController(IRoomService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IEnumerable<RoomDTO>> GetRooms()
+        {
+            return await _service.GetRooms();
+        }
     }
 }
