@@ -2,16 +2,96 @@
   <div class="registration">
     <h1>HOTERU ホテル</h1>
     <form @submit.prevent class="registration-form">
-      <registration-input v-model="formData.firstName" placeholder="Enter your first name">First name: </registration-input>
-      <registration-input v-model="formData.lastName" placeholder="Enter your last name">Last name: </registration-input>
-      <registration-input v-model="formData.email" placeholder="Enter your email">Email: </registration-input>
-      <registration-input v-model="formData.login" placeholder="Enter your login">Login: </registration-input>
-      <registration-input v-model="formData.password" placeholder="Enter your password">Password: </registration-input>
-      <registration-input v-model="formData.companyName" placeholder="Enter your company name">Company name: </registration-input>
-      <registration-input v-model="formData.country" placeholder="Enter your country">Country: </registration-input>
-      <registration-input v-model="formData.city" placeholder="Enter tour city">City: </registration-input>
-      <registration-input v-model="formData.street" placeholder="Enter your address">Address: </registration-input>
-      <registration-input v-model="formData.postCode" placeholder="Enter your postal code">Postal code: </registration-input>
+      <div class="input-form">
+        <label>First name: </label>
+        <input
+            v-model="formData.Name"
+            class="input"
+            type="text"
+            placeholder="Enter your First name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Last name: </label>
+        <input
+            v-model="formData.Surname"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Email: </label>
+        <input
+            v-model="formData.Email"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Login: </label>
+        <input
+            v-model="formData.LoginName"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Password: </label>
+        <input
+            v-model="formData.Password"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Company name: </label>
+        <input
+            v-model="formData.Title"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Country: </label>
+        <input
+            v-model="formData.Country"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>City: </label>
+        <input
+            v-model="formData.City"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Address: </label>
+        <input
+            v-model="formData.Street"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
+      <div class="input-form">
+        <label>Postcode: </label>
+        <input
+            v-model="formData.Postcode"
+            class="input"
+            type="text"
+            placeholder="Enter your last name"
+        >
+      </div>
 
     </form>
     <div class="registration-class">
@@ -31,26 +111,27 @@ export default {
   data() {
     return {
       formData: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        login: '',
-        password: '',
-        companyName: '',
-        country: '',
-        city: '',
-        street: '',
-        postCode: ''
+        Name: '',
+        Surname: '',
+        Email: '',
+        LoginName: '',
+        Password: '',
+        Title: '',
+        City: '',
+        Country: '',
+        Street: '',
+        Postcode: ''
       }
     }
   },
   methods:{
     async create(){
+      console.log(this.formData)
       try {
         const response = await axios.post('https://localhost:44384/api/Hotel', this.formData);
         console.log('Success:', response.data);
       } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
       }
     }
   }
@@ -89,4 +170,24 @@ export default {
   align-items: center;
   width: 10vw;
 }
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.input-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.input-form input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
 </style>
+

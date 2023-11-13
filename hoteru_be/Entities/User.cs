@@ -7,7 +7,7 @@ namespace hoteru_be.Entities
     {
         [Key]
         public int IdUser { get; set; }
-        public string Login { get; set; }
+        public string LoginName { get; set; }
         public string Password { get; set; }
 
         public int IdUserType { get; set; }

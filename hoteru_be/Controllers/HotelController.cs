@@ -18,7 +18,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPost]
-        public async Task<MethodResultDTO> PostOrder(HotelDTO hotelDTO)
+        public async Task<MethodResultDTO> PostOrder([FromBody] HotelDTO hotelDTO)
         {
             return await _service.PostHotel(hotelDTO);
         }

@@ -1,6 +1,8 @@
 <template>
-  <navbar></navbar>
-  <sidebar></sidebar>
+  <div class="room-component">
+    <navbar></navbar>
+    <sidebar></sidebar>
+  </div>
 </template>
 
 <script>
@@ -10,5 +12,7 @@ export default {
 </script>
 
 <style scoped>
-
+.room-component {
+  background-color: #F1DEC9;
+}
 </style>

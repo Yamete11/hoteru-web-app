@@ -2,7 +2,7 @@
 
 namespace hoteru_be.Migrations
 {
-    public partial class asd : Migration
+    public partial class sdf : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -23,7 +23,7 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoomStatus",
+                name: "RoomStatuses",
                 columns: table => new
                 {
                     IdRoomStatus = table.Column<int>(type: "int", nullable: false)
@@ -32,11 +32,11 @@ namespace hoteru_be.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoomStatus", x => x.IdRoomStatus);
+                    table.PrimaryKey("PK_RoomStatuses", x => x.IdRoomStatus);
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoomType",
+                name: "RoomTypes",
                 columns: table => new
                 {
                     IdRoomType = table.Column<int>(type: "int", nullable: false)
@@ -45,7 +45,20 @@ namespace hoteru_be.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoomType", x => x.IdRoomType);
+                    table.PrimaryKey("PK_RoomTypes", x => x.IdRoomType);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTypes",
+                columns: table => new
+                {
+                    IdUserType = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTypes", x => x.IdUserType);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +82,7 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Room",
+                name: "Rooms",
                 columns: table => new
                 {
                     IdRoom = table.Column<int>(type: "int", nullable: false)
@@ -82,18 +95,39 @@ namespace hoteru_be.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Room", x => x.IdRoom);
+                    table.PrimaryKey("PK_Rooms", x => x.IdRoom);
                     table.ForeignKey(
-                        name: "FK_Room_RoomStatus_IdRoomStatus",
+                        name: "FK_Rooms_RoomStatuses_IdRoomStatus",
                         column: x => x.IdRoomStatus,
-                        principalTable: "RoomStatus",
+                        principalTable: "RoomStatuses",
                         principalColumn: "IdRoomStatus",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Room_RoomType_IdRoomType",
+                        name: "FK_Rooms_RoomTypes_IdRoomType",
                         column: x => x.IdRoomType,
-                        principalTable: "RoomType",
+                        principalTable: "RoomTypes",
                         principalColumn: "IdRoomType",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    IdUser = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LoginName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdUserType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.IdUser);
+                    table.ForeignKey(
+                        name: "FK_Users_UserTypes_IdUserType",
+                        column: x => x.IdUserType,
+                        principalTable: "UserTypes",
+                        principalColumn: "IdUserType",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -120,19 +154,24 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "RoomStatus",
+                table: "RoomStatuses",
                 columns: new[] { "IdRoomStatus", "Title" },
-                values: new object[] { 1, "Out of service" });
+                values: new object[,]
+                {
+                    { 1, "Out of service" },
+                    { 2, "Occupied" },
+                    { 3, "Ready" }
+                });
 
             migrationBuilder.InsertData(
-                table: "RoomStatus",
-                columns: new[] { "IdRoomStatus", "Title" },
-                values: new object[] { 2, "Occupied" });
-
-            migrationBuilder.InsertData(
-                table: "RoomStatus",
-                columns: new[] { "IdRoomStatus", "Title" },
-                values: new object[] { 3, "Ready" });
+                table: "UserTypes",
+                columns: new[] { "IdUserType", "Title" },
+                values: new object[,]
+                {
+                    { 1, "Superadmin" },
+                    { 2, "Admin" },
+                    { 3, "Employee" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Hotels_IdAddress",
@@ -146,14 +185,20 @@ namespace hoteru_be.Migrations
                 column: "IdHotel");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Room_IdRoomStatus",
-                table: "Room",
+                name: "IX_Rooms_IdRoomStatus",
+                table: "Rooms",
                 column: "IdRoomStatus");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Room_IdRoomType",
-                table: "Room",
+                name: "IX_Rooms_IdRoomType",
+                table: "Rooms",
                 column: "IdRoomType");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_IdUserType",
+                table: "Users",
+                column: "IdUserType",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -162,16 +207,22 @@ namespace hoteru_be.Migrations
                 name: "Persons");
 
             migrationBuilder.DropTable(
-                name: "Room");
+                name: "Rooms");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Hotels");
 
             migrationBuilder.DropTable(
-                name: "RoomStatus");
+                name: "RoomStatuses");
 
             migrationBuilder.DropTable(
-                name: "RoomType");
+                name: "RoomTypes");
+
+            migrationBuilder.DropTable(
+                name: "UserTypes");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

@@ -9,8 +9,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231112115101_xzcz")]
-    partial class xzcz
+    [Migration("20231113145616_sdf")]
+    partial class sdf
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -179,7 +179,7 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdUserType")
                         .HasColumnType("int");
 
-                    b.Property<string>("Login")
+                    b.Property<string>("LoginName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")

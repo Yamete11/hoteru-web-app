@@ -9,8 +9,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231111114123_asd")]
-    partial class asd
+    [Migration("20231113152128_xvxcvc")]
+    partial class xvxcvc
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,7 +33,7 @@ namespace hoteru_be.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Postalcode")
+                    b.Property<string>("Postcode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
@@ -119,7 +119,7 @@ namespace hoteru_be.Migrations
 
                     b.HasIndex("IdRoomType");
 
-                    b.ToTable("Room");
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.RoomStatus", b =>
@@ -134,7 +134,7 @@ namespace hoteru_be.Migrations
 
                     b.HasKey("IdRoomStatus");
 
-                    b.ToTable("RoomStatus");
+                    b.ToTable("RoomStatuses");
 
                     b.HasData(
                         new
@@ -166,7 +166,63 @@ namespace hoteru_be.Migrations
 
                     b.HasKey("IdRoomType");
 
-                    b.ToTable("RoomType");
+                    b.ToTable("RoomTypes");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.User", b =>
+                {
+                    b.Property<int>("IdUser")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("IdUserType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LoginName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdUser");
+
+                    b.HasIndex("IdUserType")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.UserType", b =>
+                {
+                    b.Property<int>("IdUserType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdUserType");
+
+                    b.ToTable("UserTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            IdUserType = 1,
+                            Title = "Superadmin"
+                        },
+                        new
+                        {
+                            IdUserType = 2,
+                            Title = "Admin"
+                        },
+                        new
+                        {
+                            IdUserType = 3,
+                            Title = "Employee"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
@@ -210,6 +266,17 @@ namespace hoteru_be.Migrations
                     b.Navigation("RoomType");
                 });
 
+            modelBuilder.Entity("hoteru_be.Entities.User", b =>
+                {
+                    b.HasOne("hoteru_be.Entities.UserType", "UserType")
+                        .WithOne("User")
+                        .HasForeignKey("hoteru_be.Entities.User", "IdUserType")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserType");
+                });
+
             modelBuilder.Entity("hoteru_be.Entities.Address", b =>
                 {
                     b.Navigation("Hotel");
@@ -223,6 +290,11 @@ namespace hoteru_be.Migrations
             modelBuilder.Entity("hoteru_be.Entities.RoomType", b =>
                 {
                     b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.UserType", b =>
+                {
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

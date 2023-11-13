@@ -31,7 +31,7 @@ namespace hoteru_be.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Postalcode")
+                    b.Property<string>("Postcode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
@@ -177,7 +177,7 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdUserType")
                         .HasColumnType("int");
 
-                    b.Property<string>("Login")
+                    b.Property<string>("LoginName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")

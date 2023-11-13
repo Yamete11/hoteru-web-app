@@ -24,7 +24,7 @@ namespace hoteru_be.Services.Implementations
                 Country = hotelDTO.Country,
                 City = hotelDTO.City,
                 Street = hotelDTO.Street,
-                Postalcode = hotelDTO.Postalcode
+                Postcode = hotelDTO.Postcode
             };
 
             _context.Addresses.Add(address);
