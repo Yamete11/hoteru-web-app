@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using hoteru_be.Context;
 
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231114185954_asdfsdf")]
+    partial class asdfsdf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -342,96 +344,6 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 24,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 25,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 26,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 27,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 28,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 29,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 30,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 31,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 32,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 33,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 34,
                             Capacity = 1,
                             IdRoomStatus = 1,
                             IdRoomType = 1,

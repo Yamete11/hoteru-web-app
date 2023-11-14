@@ -17,9 +17,10 @@ export default {
 <style scoped>
 .button-link {
   display: inline-block;
-  padding: 30px 40px;
+  padding-top: 30px;
+  padding-bottom: 30px;
   margin: 10px;
-  width: 100px;
+  width: 90%;
   height: 20px;
   background-color: #776B5D;
   color: white;

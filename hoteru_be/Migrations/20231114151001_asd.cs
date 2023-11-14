@@ -2,7 +2,7 @@
 
 namespace hoteru_be.Migrations
 {
-    public partial class asdasd : Migration
+    public partial class asd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -186,7 +186,11 @@ namespace hoteru_be.Migrations
                     { 1, 4, 1, 1, "101", 3.5f },
                     { 2, 2, 2, 1, "201", 3.5f },
                     { 3, 2, 3, 1, "203", 3.5f },
-                    { 4, 1, 1, 1, "305", 3.5f }
+                    { 4, 1, 1, 1, "305", 3.5f },
+                    { 5, 4, 1, 1, "101", 3.5f },
+                    { 6, 2, 2, 1, "201", 3.5f },
+                    { 7, 2, 3, 1, "203", 3.5f },
+                    { 8, 1, 1, 1, "305", 3.5f }
                 });
 
             migrationBuilder.CreateIndex(

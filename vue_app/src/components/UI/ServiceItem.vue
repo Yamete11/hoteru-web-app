@@ -1,14 +1,13 @@
 <template>
   <div class="item-div">
-    <span class="item number">{{ room.number }}</span>
-    <span class="item capacity">{{ room.capacity }}</span>
-    <span class="item type">{{ room.type }}</span>
-    <span class="item status">{{ room.status }}</span>
+    <span class="item title">{{ service.title }}</span>
+    <span class="item sum">{{ service.sum }}</span>
+    <span class="item description">{{ service.description }}</span>
     <div class="item-btns">
       <button class="btn" type="button">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteRoom(room.idRoom)">
+      <button class="btn" type="button" @click="deleteService(service.idService)">
         Delete
       </button>
     </div>
@@ -19,18 +18,18 @@
 import axios from "axios";
 
 export default {
-  name: "RoomItem",
+  name: "ServiceItem",
   props:{
-    room:{
+    service:{
       type: Object,
       required: true
     }
   },
   methods: {
-    deleteRoom(idRoom) {
-      axios.delete(`https://localhost:44384/api/Room/${idRoom}`)
+    deleteService(idService) {
+      axios.delete(`https://localhost:44384/api/Service/${idService}`)
           .then(() => {
-            this.$emit('deleteRoom', idRoom);
+            this.$emit('deleteService', idService);
           })
           .catch(error => {
             console.error(error);
@@ -40,8 +39,6 @@ export default {
   }
 }
 </script>
-
-
 
 <style scoped>
 .item-div{
@@ -73,23 +70,18 @@ export default {
   color: #FFFFFF;
 }
 
-.item.number {
+.item.title {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
-.item.capacity {
+.item.sum {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
-.item.type {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-.item.status {
+.item.description {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
@@ -99,5 +91,4 @@ export default {
   justify-content: center;
   flex-basis: 10%;
 }
-
 </style>

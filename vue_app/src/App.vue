@@ -15,7 +15,7 @@ export default {
 
 <style>
 body{
-  background-color: #252525;
+  background-color: #F1DEC9;
   margin: 0;
   height: 100%;
 }

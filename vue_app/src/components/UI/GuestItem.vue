@@ -1,14 +1,14 @@
 <template>
   <div class="item-div">
-    <span class="item number">{{ room.number }}</span>
-    <span class="item capacity">{{ room.capacity }}</span>
-    <span class="item type">{{ room.type }}</span>
-    <span class="item status">{{ room.status }}</span>
+    <span class="item name">{{ guest.name }}</span>
+    <span class="item surname">{{ guest.surname }}</span>
+    <span class="item telNumber">{{ guest.telNumber }}</span>
+    <span class="item email">{{ guest.email }}</span>
     <div class="item-btns">
       <button class="btn" type="button">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteRoom(room.idRoom)">
+      <button class="btn" type="button" @click="deleteGuest(guest.idGuest)">
         Delete
       </button>
     </div>
@@ -19,18 +19,18 @@
 import axios from "axios";
 
 export default {
-  name: "RoomItem",
+  name: "GuestItem",
   props:{
-    room:{
+    guest:{
       type: Object,
       required: true
     }
   },
   methods: {
-    deleteRoom(idRoom) {
-      axios.delete(`https://localhost:44384/api/Room/${idRoom}`)
+    deleteGuest(idGuest) {
+      axios.delete(`https://localhost:44384/api/Room/${idGuest}`)
           .then(() => {
-            this.$emit('deleteRoom', idRoom);
+            this.$emit('deleteGuest', idGuest);
           })
           .catch(error => {
             console.error(error);
@@ -40,8 +40,6 @@ export default {
   }
 }
 </script>
-
-
 
 <style scoped>
 .item-div{
@@ -73,23 +71,23 @@ export default {
   color: #FFFFFF;
 }
 
-.item.number {
+.item.name {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
-.item.capacity {
+.item.surname {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
-.item.type {
+.item.telNumber {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
-.item.status {
+.item.email {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
@@ -99,5 +97,4 @@ export default {
   justify-content: center;
   flex-basis: 10%;
 }
-
 </style>

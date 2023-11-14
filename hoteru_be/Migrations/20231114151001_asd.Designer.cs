@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using hoteru_be.Context;
 
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231114151001_asd")]
+    partial class asd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,18 +42,6 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdAddress");
 
                     b.ToTable("Addresses");
-                });
-
-            modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
-                {
-                    b.Property<int>("IdGuest")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.HasKey("IdGuest");
-
-                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
@@ -203,240 +193,6 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             Number = "305",
                             Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 9,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 10,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 11,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 12,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 13,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 14,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 15,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 16,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 17,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 18,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 19,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 20,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 21,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 22,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 23,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 24,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 25,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 26,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 27,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 28,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 29,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 30,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 31,
-                            Capacity = 4,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "101",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 32,
-                            Capacity = 2,
-                            IdRoomStatus = 2,
-                            IdRoomType = 1,
-                            Number = "201",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 33,
-                            Capacity = 2,
-                            IdRoomStatus = 3,
-                            IdRoomType = 1,
-                            Number = "203",
-                            Price = 3.5f
-                        },
-                        new
-                        {
-                            IdRoom = 34,
-                            Capacity = 1,
-                            IdRoomStatus = 1,
-                            IdRoomType = 1,
-                            Number = "305",
-                            Price = 3.5f
                         });
                 });
 
@@ -491,50 +247,6 @@ namespace hoteru_be.Migrations
                         {
                             IdRoomType = 1,
                             Title = "Regular"
-                        });
-                });
-
-            modelBuilder.Entity("hoteru_be.Entities.Service", b =>
-                {
-                    b.Property<int>("IdService")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Sum")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdService");
-
-                    b.ToTable("Services");
-
-                    b.HasData(
-                        new
-                        {
-                            IdService = 1,
-                            Description = "None",
-                            Sum = 355.5f,
-                            Title = "Breakfast"
-                        },
-                        new
-                        {
-                            IdService = 2,
-                            Description = "None",
-                            Sum = 120.5f,
-                            Title = "Spa"
-                        },
-                        new
-                        {
-                            IdService = 3,
-                            Description = "None",
-                            Sum = 248.5f,
-                            Title = "Assistent"
                         });
                 });
 

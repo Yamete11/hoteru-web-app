@@ -36,6 +36,8 @@ namespace hoteru_be
             });
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IServiceService, ServiceService>();
+            services.AddScoped<IGuestService, GuestService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

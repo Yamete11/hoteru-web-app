@@ -5,7 +5,7 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" placeholder="Search ..." />
+          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..." />
           <router-link to="/new-room" class="new-room-button">New Room</router-link>
         </div>
         <div class="main-bot">
@@ -17,7 +17,7 @@
             <span class="header action">Action</span>
           </div>
           <div>
-            <room-list :rooms="rooms" />
+            <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
           </div>
         </div>
       </div>
@@ -34,11 +34,19 @@ export default {
 
   data() {
     return {
-      rooms: []
+      rooms: [],
+      searchQuery: '',
+      roomPerPage: 15
     };
   },
   mounted() {
     this.fetchRooms();
+    console.log()
+  },
+  computed:{
+    sortedAndSearchedPosts(){
+      return this.rooms.filter(room => room.number.toLowerCase().includes(this.searchQuery.toLowerCase()));
+    }
   },
   methods: {
     async fetchRooms() {
@@ -48,6 +56,9 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+    deleteRoom(idRoom) {
+      this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
     }
   }
 }
@@ -55,10 +66,13 @@ export default {
 
 
 <style scoped>
+
+
 .room-component {
   display: flex;
   flex-direction: column;
   background-color: #F1DEC9;
+  height: 100vh;
 }
 
 .content {
@@ -70,6 +84,8 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  padding-top: 8vh;
+  padding-left: 8%;
 }
 
 .main-top {
@@ -121,11 +137,25 @@ export default {
   font-size: 20px;
 }
 .header.number {
-  flex-basis: 20%;
+  display: flex;
+  justify-content: center;
+  flex-basis: 10%;
 
 }
-.header.capacity { flex-basis: 20%; }
-.header.type { flex-basis: 20%; }
-.header.status { flex-basis: 20%; }
-.header.action { flex-basis: 10%; }
+.header.capacity {
+  display: flex;
+  justify-content: center;
+  flex-basis: 10%; }
+.header.type {
+  display: flex;
+  justify-content: center;
+  flex-basis: 10%; }
+.header.status {
+  display: flex;
+  justify-content: center;
+  flex-basis: 10%; }
+.header.action {
+  display: flex;
+  justify-content: center;
+  flex-basis: 10%; }
 </style>

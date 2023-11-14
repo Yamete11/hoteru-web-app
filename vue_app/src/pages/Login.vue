@@ -1,25 +1,27 @@
 <template>
-  <div class="registration">
-    <router-link class="registration-btn" @click="login" to="/registration">New Company</router-link>
-  </div>
-  <div class="login">
-    <h1>HOTERU ホテル</h1>
-    <form @submit.prevent class="login-form">
-      <my-input
-          class="login-input"
-          v-model="login"
-          type="text"
-          placeholder="login"
-      />
-      <my-input
-          class="login-input"
-          v-model="password"
-          type="password"
-      placeholder="password"
-      />
-      <router-link class="login-btn" @click="login" to="/arrivals">LOGIN</router-link>
+  <div class="main-login">
+    <div class="registration">
+      <router-link class="registration-btn" @click="login" to="/registration">New Company</router-link>
+    </div>
+    <div class="login">
+      <h1>HOTERU ホテル</h1>
+      <form @submit.prevent class="login-form">
+        <my-input
+            class="login-input"
+            v-model="login"
+            type="text"
+            placeholder="login"
+        />
+        <my-input
+            class="login-input"
+            v-model="password"
+            type="password"
+            placeholder="password"
+        />
+        <router-link class="login-btn" @click="login" to="/arrivals">LOGIN</router-link>
 
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -41,12 +43,16 @@ export default {
 </script>
 
 <style scoped>
+.main-login{
+  background-color: #252525;
+  height: 100vh;
+}
 .login {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 95vh;
+  height: 70vh;
 }
 
 .login-form {
@@ -84,6 +90,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   width: 100%;
+  height: 4vh;
 }
 
 .registration-btn{
@@ -94,8 +101,7 @@ export default {
   border-radius: 5px;
   font-weight: bold;
   color: white;
-  margin-top: 10px;
-  margin-right: 10px;
+  margin: 10px 10px 0 10px;
   width: 10vw;
   display: flex;
   justify-content: center;

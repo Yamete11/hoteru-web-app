@@ -144,7 +144,8 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 95vh;
+  height: 100vh;
+  background-color: #252525;
 }
 
 .registration-form {

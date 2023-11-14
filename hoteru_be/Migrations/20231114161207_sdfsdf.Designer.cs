@@ -9,8 +9,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231113191633_asdasd")]
-    partial class asdasd
+    [Migration("20231114161207_sdfsdf")]
+    partial class sdfsdf
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,18 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdAddress");
 
                     b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
+                {
+                    b.Property<int>("IdGuest")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasKey("IdGuest");
+
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
@@ -157,6 +169,42 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             Number = "305",
                             Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 5,
+                            Capacity = 4,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "101",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 6,
+                            Capacity = 2,
+                            IdRoomStatus = 2,
+                            IdRoomType = 1,
+                            Number = "201",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 7,
+                            Capacity = 2,
+                            IdRoomStatus = 3,
+                            IdRoomType = 1,
+                            Number = "203",
+                            Price = 3.5f
+                        },
+                        new
+                        {
+                            IdRoom = 8,
+                            Capacity = 1,
+                            IdRoomStatus = 1,
+                            IdRoomType = 1,
+                            Number = "305",
+                            Price = 3.5f
                         });
                 });
 
@@ -211,6 +259,50 @@ namespace hoteru_be.Migrations
                         {
                             IdRoomType = 1,
                             Title = "Regular"
+                        });
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.Service", b =>
+                {
+                    b.Property<int>("IdService")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Sum")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdService");
+
+                    b.ToTable("Services");
+
+                    b.HasData(
+                        new
+                        {
+                            IdService = 1,
+                            Description = "None",
+                            Sum = 355.5f,
+                            Title = "Breakfast"
+                        },
+                        new
+                        {
+                            IdService = 2,
+                            Description = "None",
+                            Sum = 120.5f,
+                            Title = "Spa"
+                        },
+                        new
+                        {
+                            IdService = 3,
+                            Description = "None",
+                            Sum = 248.5f,
+                            Title = "Assistent"
                         });
                 });
 

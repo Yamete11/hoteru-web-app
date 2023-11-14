@@ -43,6 +43,9 @@ export default {
 
 <style scoped>
 .sidebar {
+  position: fixed;
+  top: 8vh;
+  left: 0;
   display: flex;
   align-items: center;
   flex-direction: column;

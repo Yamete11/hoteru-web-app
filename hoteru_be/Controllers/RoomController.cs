@@ -19,9 +19,15 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<RoomDTO>> GetRooms()
+        public async Task<IEnumerable<RoomDTO>> GetRooms([FromQuery] int offset = 0, [FromQuery] int limit = 15)
         {
-            return await _service.GetRooms();
+            return await _service.GetRooms(offset, limit);
+        }
+
+        [HttpDelete("{IdRoom}")]
+        public async Task<MethodResultDTO> DeleteRoom(int IdRoom)
+        {
+            return await _service.DeleteRoom(IdRoom);
         }
     }
 }
