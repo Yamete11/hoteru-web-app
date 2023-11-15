@@ -9,8 +9,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231114200605_sdfsdfdfsd")]
-    partial class sdfsdfdfsd
+    [Migration("20231114222212_asd")]
+    partial class asd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

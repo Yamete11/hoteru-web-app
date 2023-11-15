@@ -6,7 +6,7 @@
       <div class="main">
         <div class="main-top">
           <input type="text" class="search-input" placeholder="Search ..." />
-          <router-link to="/new-reservation" class="new-reservation-button">New R</router-link>
+          <router-link to="/new-reservation" class="new-reservation-button">New Reservation</router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">

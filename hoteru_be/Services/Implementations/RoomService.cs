@@ -44,11 +44,11 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<RoomDTO>> GetRooms(int offset, int limit)
+        public async Task<IEnumerable<RoomDTO>> GetRooms(int page, int limit)
         {
             return await _context.Rooms
                 .OrderBy(r => r.IdRoom)
-                .Skip(offset)
+                .Skip((page - 1) * limit)
                 .Take(limit)
                 .Select(x => new RoomDTO
                 {

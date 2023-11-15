@@ -135,7 +135,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 1,
-                            Capacity = 4,
+                            Capacity = 1,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -153,7 +153,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 3,
-                            Capacity = 2,
+                            Capacity = 3,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -162,7 +162,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 4,
-                            Capacity = 1,
+                            Capacity = 4,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -171,7 +171,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 5,
-                            Capacity = 4,
+                            Capacity = 5,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -180,7 +180,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 6,
-                            Capacity = 2,
+                            Capacity = 6,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -189,7 +189,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 7,
-                            Capacity = 2,
+                            Capacity = 7,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -198,7 +198,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 8,
-                            Capacity = 1,
+                            Capacity = 8,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -207,7 +207,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 9,
-                            Capacity = 4,
+                            Capacity = 9,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -216,7 +216,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 10,
-                            Capacity = 2,
+                            Capacity = 10,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -225,7 +225,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 11,
-                            Capacity = 2,
+                            Capacity = 11,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -234,7 +234,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 12,
-                            Capacity = 1,
+                            Capacity = 12,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -243,7 +243,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 13,
-                            Capacity = 4,
+                            Capacity = 13,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -252,7 +252,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 14,
-                            Capacity = 2,
+                            Capacity = 14,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -261,7 +261,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 15,
-                            Capacity = 2,
+                            Capacity = 15,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -270,7 +270,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 16,
-                            Capacity = 1,
+                            Capacity = 16,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -279,7 +279,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 17,
-                            Capacity = 4,
+                            Capacity = 17,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -288,7 +288,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 18,
-                            Capacity = 2,
+                            Capacity = 18,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -297,7 +297,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 19,
-                            Capacity = 2,
+                            Capacity = 19,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -306,7 +306,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 20,
-                            Capacity = 1,
+                            Capacity = 20,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -315,7 +315,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 21,
-                            Capacity = 4,
+                            Capacity = 21,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -324,7 +324,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 22,
-                            Capacity = 2,
+                            Capacity = 22,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -333,7 +333,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 23,
-                            Capacity = 2,
+                            Capacity = 23,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -342,7 +342,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 24,
-                            Capacity = 1,
+                            Capacity = 24,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -351,7 +351,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 25,
-                            Capacity = 2,
+                            Capacity = 25,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -360,7 +360,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 26,
-                            Capacity = 1,
+                            Capacity = 26,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -369,7 +369,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 27,
-                            Capacity = 4,
+                            Capacity = 27,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -378,7 +378,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 28,
-                            Capacity = 2,
+                            Capacity = 28,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -387,7 +387,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 29,
-                            Capacity = 2,
+                            Capacity = 29,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -396,7 +396,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 30,
-                            Capacity = 1,
+                            Capacity = 30,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -405,7 +405,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 31,
-                            Capacity = 4,
+                            Capacity = 31,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "101",
@@ -414,7 +414,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 32,
-                            Capacity = 2,
+                            Capacity = 32,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
@@ -423,7 +423,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 33,
-                            Capacity = 2,
+                            Capacity = 33,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
@@ -432,7 +432,7 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdRoom = 34,
-                            Capacity = 1,
+                            Capacity = 34,
                             IdRoomStatus = 1,
                             IdRoomType = 1,
                             Number = "305",
@@ -491,6 +491,11 @@ namespace hoteru_be.Migrations
                         {
                             IdRoomType = 1,
                             Title = "Regular"
+                        },
+                        new
+                        {
+                            IdRoomType = 2,
+                            Title = "Luxury"
                         });
                 });
 

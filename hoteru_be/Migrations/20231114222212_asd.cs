@@ -23,6 +23,18 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Guests",
+                columns: table => new
+                {
+                    IdGuest = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Guests", x => x.IdGuest);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoomStatuses",
                 columns: table => new
                 {
@@ -46,6 +58,21 @@ namespace hoteru_be.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RoomTypes", x => x.IdRoomType);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    IdService = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sum = table.Column<float>(type: "real", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.IdService);
                 });
 
             migrationBuilder.CreateTable(
@@ -169,6 +196,16 @@ namespace hoteru_be.Migrations
                 values: new object[] { 1, "Regular" });
 
             migrationBuilder.InsertData(
+                table: "Services",
+                columns: new[] { "IdService", "Description", "Sum", "Title" },
+                values: new object[,]
+                {
+                    { 1, "None", 355.5f, "Breakfast" },
+                    { 2, "None", 120.5f, "Spa" },
+                    { 3, "None", 248.5f, "Assistent" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "UserTypes",
                 columns: new[] { "IdUserType", "Title" },
                 values: new object[,]
@@ -184,13 +221,39 @@ namespace hoteru_be.Migrations
                 values: new object[,]
                 {
                     { 1, 4, 1, 1, "101", 3.5f },
+                    { 32, 2, 2, 1, "201", 3.5f },
+                    { 31, 4, 1, 1, "101", 3.5f },
+                    { 30, 1, 1, 1, "305", 3.5f },
+                    { 29, 2, 3, 1, "203", 3.5f },
+                    { 28, 2, 2, 1, "201", 3.5f },
+                    { 27, 4, 1, 1, "101", 3.5f },
+                    { 26, 1, 1, 1, "305", 3.5f },
+                    { 25, 2, 3, 1, "203", 3.5f },
+                    { 24, 1, 1, 1, "305", 3.5f },
+                    { 23, 2, 3, 1, "203", 3.5f },
+                    { 22, 2, 2, 1, "201", 3.5f },
+                    { 21, 4, 1, 1, "101", 3.5f },
+                    { 20, 1, 1, 1, "305", 3.5f },
+                    { 19, 2, 3, 1, "203", 3.5f },
+                    { 18, 2, 2, 1, "201", 3.5f },
+                    { 17, 4, 1, 1, "101", 3.5f },
+                    { 16, 1, 1, 1, "305", 3.5f },
                     { 2, 2, 2, 1, "201", 3.5f },
                     { 3, 2, 3, 1, "203", 3.5f },
                     { 4, 1, 1, 1, "305", 3.5f },
                     { 5, 4, 1, 1, "101", 3.5f },
                     { 6, 2, 2, 1, "201", 3.5f },
                     { 7, 2, 3, 1, "203", 3.5f },
-                    { 8, 1, 1, 1, "305", 3.5f }
+                    { 33, 2, 3, 1, "203", 3.5f },
+                    { 8, 1, 1, 1, "305", 3.5f },
+                    { 10, 2, 2, 1, "201", 3.5f },
+                    { 11, 2, 3, 1, "203", 3.5f },
+                    { 12, 1, 1, 1, "305", 3.5f },
+                    { 13, 4, 1, 1, "101", 3.5f },
+                    { 14, 2, 2, 1, "201", 3.5f },
+                    { 15, 2, 3, 1, "203", 3.5f },
+                    { 9, 4, 1, 1, "101", 3.5f },
+                    { 34, 1, 1, 1, "305", 3.5f }
                 });
 
             migrationBuilder.CreateIndex(
@@ -224,10 +287,16 @@ namespace hoteru_be.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Guests");
+
+            migrationBuilder.DropTable(
                 name: "Persons");
 
             migrationBuilder.DropTable(
                 name: "Rooms");
+
+            migrationBuilder.DropTable(
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -7,6 +7,7 @@ import Room from "../pages/Room.vue";
 import Service from "../pages/Service.vue";
 import History from "../pages/History.vue";
 import Registration from "../pages/Registration.vue";
+import NewRoom from "../pages/NewRoom.vue";
 
 
 const routes = [
@@ -32,7 +33,11 @@ const routes = [
     },
     {
         path: '/rooms',
-        component: Room
+        component: Room,
+    },
+    {
+        path: '/new-room',
+        component: NewRoom
     },
     {
         path: '/services',

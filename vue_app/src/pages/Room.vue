@@ -18,6 +18,7 @@
           </div>
           <div>
             <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
+            <div v-intersection="loadMoreRooms" class="observer"></div>
           </div>
         </div>
       </div>
@@ -36,7 +37,9 @@ export default {
     return {
       rooms: [],
       searchQuery: '',
-      roomPerPage: 15
+      page: 1,
+      limit: 15,
+      totalPages: 0
     };
   },
   mounted() {
@@ -49,17 +52,40 @@ export default {
     }
   },
   methods: {
+    deleteRoom(idRoom) {
+      this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
+    },
     async fetchRooms() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Room');
+        const response = await axios.get('https://localhost:44384/api/Room', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
         this.rooms = response.data;
+        console.log(this.rooms)
       } catch (error) {
         console.error(error);
       }
     },
-    deleteRoom(idRoom) {
-      this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
-    }
+    async loadMoreRooms() {
+      this.page += 1;
+      try {
+        const response = await axios.get('https://localhost:44384/api/Room', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
+        this.rooms = [...this.rooms, ...response.data];
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
   }
 }
 </script>

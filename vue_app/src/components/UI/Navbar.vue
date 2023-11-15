@@ -27,7 +27,6 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  /*z-index: 1000;*/
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,7 +47,7 @@ export default {
 .navbar-links{
   display: flex;
   justify-content: space-between;
-  width: 40%
+  width: 40%;
 }
 
 .right-links{
@@ -62,6 +61,9 @@ export default {
   font-weight: bold;
   font-size: 20px;
   color: white;
+  border: solid 2px white;
+  border-radius: 5px;
+  padding: 10px;
 }
 
 .navbar h1, .navbar h2 {
