@@ -29,5 +29,11 @@ namespace hoteru_be.Controllers
         {
             return await _service.DeleteRoom(IdRoom);
         }
+
+        [HttpPost]
+        public async Task<MethodResultDTO> PostRoom([FromBody] RoomDTO roomDTO)
+        {
+            return await _service.PostRoom(roomDTO);
+        }
     }
 }

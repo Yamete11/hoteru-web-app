@@ -8,5 +8,7 @@ namespace hoteru_be.Services.Interfaces
     {
         public Task<IEnumerable<RoomDTO>> GetRooms(int page, int limit);
         public Task<MethodResultDTO> DeleteRoom(int IdRoom);
+
+        public Task<MethodResultDTO> PostRoom(RoomDTO roomDTO);
     }
 }

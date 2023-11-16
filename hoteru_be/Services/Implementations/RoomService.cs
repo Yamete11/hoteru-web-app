@@ -61,5 +61,25 @@ namespace hoteru_be.Services.Implementations
                 })
                 .ToListAsync();
         }
+
+        public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO)
+        {
+            Room room = new Room
+            {
+                Number = roomDTO.Number,
+                Capacity = roomDTO.Capacity,
+                Price = roomDTO.Price,
+                IdRoomType = int.Parse(roomDTO.Type),
+                IdRoomStatus= int.Parse(roomDTO.Status)
+            };
+            _context.Rooms.Add(room);
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Created"
+            };
+        }
     }
 }

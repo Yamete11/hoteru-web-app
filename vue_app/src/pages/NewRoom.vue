@@ -52,7 +52,7 @@
         </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/rooms">Cancel</router-link>
-          <router-link class="registration-btn" to="/rooms">Confirm</router-link>
+          <router-link class="registration-btn" @click="addRoom" to="/rooms">Confirm</router-link>
         </div>
       </form>
     </div>
@@ -76,13 +76,21 @@ export default {
       }
     }
   },
-  method:{
+  methods:{
     async fetchRoomTypes(){
       try{
         const response = await axios.get('https://localhost:44384/api/RoomType');
         this.roomTypes = response.data;
       } catch (error) {
         console.error(error);
+      }
+    },
+    async addRoom() {
+      try {
+        const response = await axios.post('https://localhost:44384/api/Room', this.formData);
+        console.log('Success:', response.data);
+      } catch (error) {
+        console.log('Error:', error);
       }
     }
   },
