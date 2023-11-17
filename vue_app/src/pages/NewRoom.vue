@@ -36,7 +36,8 @@
           <label>Type: </label>
           <select v-model="formData.Type">
             <option disabled value="">Select type</option>
-            <option v-for="roomType in roomTypes" :key="roomType.idRoomType" :value="roomType.idRoomType">{{ roomType.title }}</option>
+            <option v-for="roomType in roomTypes" :key="roomType.idRoomType" :value="String(roomType.idRoomType)">{{ roomType.title }}</option>
+
           </select>
 
         </div>
@@ -44,7 +45,8 @@
           <label>Status: </label>
           <select v-model="formData.Status">
             <option disabled value="">Select status</option>
-            <option v-for="roomStatus in roomStatuses" :key="roomStatus.idRoomStatus" :value="roomStatus.idRoomStatus">{{ roomStatus.title }}</option>
+            <option v-for="roomStatus in roomStatuses" :key="roomStatus.idRoomStatus" :value="String(roomStatus.idRoomStatus)">{{ roomStatus.title }}</option>
+
           </select>
 
         </div>
@@ -79,6 +81,7 @@ export default {
   },
   methods:{
     async fetchRoomTypes(){
+      console.log(this.formData)
       try{
         const response = await axios.get('https://localhost:44384/api/RoomType');
         this.roomTypes = response.data;
@@ -168,4 +171,14 @@ h1 {
   justify-content: center;
   color: black;
 }
+
+.input-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: white;
+  color: black;
+}
+
 </style>
