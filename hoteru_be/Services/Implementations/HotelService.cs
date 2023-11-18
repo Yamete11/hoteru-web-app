@@ -11,10 +11,12 @@ namespace hoteru_be.Services.Implementations
     public class HotelService : IHotelService
     {
         private readonly MyDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public HotelService(MyDbContext context)
+        public HotelService(MyDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<MethodResultDTO> PostHotel(HotelDTO hotelDTO)
@@ -38,6 +40,10 @@ namespace hoteru_be.Services.Implementations
             _context.Hotels.Add(hotel);
 
             await _context.SaveChangesAsync();
+
+            await _emailService.SendEmail(hotelDTO.Email, "Welcome to Our Hotel", "Your message here.");
+
+
             return new MethodResultDTO
             {
                 HttpStatusCode = HttpStatusCode.OK,
