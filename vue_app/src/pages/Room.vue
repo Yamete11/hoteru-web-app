@@ -5,7 +5,7 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..." />
+          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
           <router-link to="/new-room" class="new-room-button">New Room</router-link>
         </div>
         <div class="main-bot">
@@ -18,7 +18,7 @@
           </div>
           <div>
             <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
-            <div v-intersection="loadMoreRooms" class="observer"></div>
+            <div v-intersection="loadMoreRooms"  class="observer"></div>
           </div>
         </div>
       </div>
@@ -39,15 +39,13 @@ export default {
       searchQuery: '',
       page: 1,
       limit: 15,
-      totalPages: 0
     };
   },
   mounted() {
     this.fetchRooms();
-    console.log()
   },
-  computed:{
-    sortedAndSearchedPosts(){
+  computed: {
+    sortedAndSearchedPosts() {
       return this.rooms.filter(room => room.number.toLowerCase().includes(this.searchQuery.toLowerCase()));
     }
   },
@@ -63,7 +61,6 @@ export default {
             limit: this.limit
           }
         });
-        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
         this.rooms = response.data;
         console.log(this.rooms)
       } catch (error) {
@@ -71,15 +68,15 @@ export default {
       }
     },
     async loadMoreRooms() {
-      this.page += 1;
       try {
+        this.page += 1;
+        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Room', {
           params: {
             page: this.page,
             limit: this.limit
           }
         });
-        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
         this.rooms = [...this.rooms, ...response.data];
       } catch (error) {
         console.error(error);
@@ -162,26 +159,35 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
+
 .header.number {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
+
 .header.capacity {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
+
 .header.type {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
+
 .header.status {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
+
 .header.action {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
 </style>

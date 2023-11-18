@@ -45,7 +45,7 @@ export default {
 
 <style scoped>
 .item-div{
-  padding: 0.5rem 0.5rem 0.5rem 3rem;
+  padding: 0.7rem 0.5rem 0.7rem 3rem;
   margin: 1rem;
   display: flex;
   align-items: center;

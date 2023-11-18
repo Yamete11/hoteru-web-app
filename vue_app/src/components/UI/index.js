@@ -10,7 +10,6 @@ import ServiceItem from "./ServiceItem.vue";
 import ServiceList from "./ServiceList.vue";
 import ReservationItem from "./ReservationItem.vue";
 import ReservationList from "./ReservationList.vue";
-import MySelect from "./MySelect.vue";
 
 
 export default [
@@ -26,5 +25,4 @@ export default [
     ServiceList,
     ReservationItem,
     ReservationList,
-    MySelect
 ]

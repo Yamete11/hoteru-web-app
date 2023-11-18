@@ -8,6 +8,7 @@ import Service from "../pages/Service.vue";
 import History from "../pages/History.vue";
 import Registration from "../pages/Registration.vue";
 import NewRoom from "../pages/NewRoom.vue";
+import NewService from "../pages/NewService.vue";
 
 
 const routes = [
@@ -42,6 +43,10 @@ const routes = [
     {
         path: '/services',
         component: Service
+    },
+    {
+        path: '/new-service',
+        component: NewService
     },
     {
         path: '/history',
