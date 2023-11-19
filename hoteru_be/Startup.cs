@@ -54,6 +54,8 @@ namespace hoteru_be
                                       .AllowAnyHeader()
                                       .AllowAnyMethod());
             });
+
+ 
         }
 
         

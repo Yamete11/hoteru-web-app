@@ -41,7 +41,7 @@ namespace hoteru_be.Services.Implementations
 
             await _context.SaveChangesAsync();
 
-            await _emailService.SendEmail(hotelDTO.Email, "Welcome to Our Hotel", "Your message here.");
+            await _emailService.SendEmailAsync("glebasher11@gmail.com", "Subject", "Email body in HTML");
 
 
             return new MethodResultDTO

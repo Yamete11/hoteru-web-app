@@ -1,42 +1,40 @@
 ﻿using hoteru_be.Services.Interfaces;
-using System;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-public class EmailService : IEmailService
+namespace hoteru_be.Services.Implementations
 {
-    private readonly SmtpClient _smtpClient;
-
-    public EmailService()
+    public class EmailService : IEmailService
     {
-        _smtpClient = new SmtpClient("smtp.example.com")
-        {
-            Port = 587,
-            Credentials = new NetworkCredential("username@example.com", "password"),
-            EnableSsl = true,
-        };
-    }
+        private readonly IConfiguration _configuration;
 
-    public async Task SendEmail(string to, string subject, string body)
-    {
-        var mailMessage = new MailMessage
+        public EmailService(IConfiguration configuration)
         {
-            From = new MailAddress("noreply@example.com"),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
-
-        mailMessage.To.Add(to);
-
-        try
-        {
-            await _smtpClient.SendMailAsync(mailMessage);
+            _configuration = configuration;
         }
-        catch (SmtpException ex)
+
+        public async Task SendEmailAsync(string toEmail, string subject, string content)
         {
-            throw new InvalidOperationException("Failed to send email.", ex);
+            var emailSettings = _configuration.GetSection("EmailSettings");
+            var client = new SmtpClient(emailSettings["MailServer"])
+            {
+                Port = int.Parse(emailSettings["MailPort"]),
+                Credentials = new NetworkCredential(emailSettings["Sender"], emailSettings["Password"]),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(emailSettings["Sender"], emailSettings["SenderName"]),
+                Subject = subject,
+                Body = content,
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(toEmail);
+
+            await client.SendMailAsync(mailMessage);
         }
     }
 }
