@@ -39,9 +39,15 @@ namespace hoteru_be.Services.Implementations
 
             _context.Hotels.Add(hotel);
 
+
             await _context.SaveChangesAsync();
 
-            await _emailService.SendEmailAsync("glebasher11@gmail.com", "Subject", "Email body in HTML");
+            await _emailService.SendEmailAsync(hotelDTO.Email, "Welcom to HOTERU", 
+                $"You have created your own hotel {hotelDTO.Title}\n\n" +
+                $"Your login: {hotelDTO.LoginName}\n" +
+                $"Your password: {hotelDTO.Password} \n\n" +
+                "Good luck!!");
+
 
 
             return new MethodResultDTO

@@ -40,7 +40,7 @@ namespace hoteru_be
             services.AddScoped<IGuestService, GuestService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
             services.AddScoped<IRoomStatusService, RoomStatusService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

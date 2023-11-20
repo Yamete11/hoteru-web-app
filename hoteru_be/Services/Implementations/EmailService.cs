@@ -8,33 +8,23 @@ namespace hoteru_be.Services.Implementations
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
 
-        public EmailService(IConfiguration configuration)
+        public Task SendEmailAsync(string email, string subject, string message)
         {
-            _configuration = configuration;
-        }
+            var mail = "vasya.developer11@outlook.com";
+            var pw = "Urahara1!";
 
-        public async Task SendEmailAsync(string toEmail, string subject, string content)
-        {
-            var emailSettings = _configuration.GetSection("EmailSettings");
-            var client = new SmtpClient(emailSettings["MailServer"])
+            var client = new SmtpClient("smtp-mail.outlook.com", 587)
             {
-                Port = int.Parse(emailSettings["MailPort"]),
-                Credentials = new NetworkCredential(emailSettings["Sender"], emailSettings["Password"]),
                 EnableSsl = true,
+                Credentials = new NetworkCredential(mail, pw)
             };
 
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(emailSettings["Sender"], emailSettings["SenderName"]),
-                Subject = subject,
-                Body = content,
-                IsBodyHtml = true,
-            };
-            mailMessage.To.Add(toEmail);
+            return client.SendMailAsync(
+                new MailMessage(from: mail,
+                to: email,
+                subject, message));
 
-            await client.SendMailAsync(mailMessage);
         }
     }
 }
