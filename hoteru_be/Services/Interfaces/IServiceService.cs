@@ -10,5 +10,7 @@ namespace hoteru_be.Services.Interfaces
         public Task<MethodResultDTO> DeleteService(int IdService);
 
         public Task<MethodResultDTO> PostService(ServiceDTO serviceDTO);
+
+        public Task<MethodResultDTO> UpdateService(ServiceDTO serviceDTO);
     }
 }

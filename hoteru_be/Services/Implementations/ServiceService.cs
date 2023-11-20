@@ -62,5 +62,32 @@ namespace hoteru_be.Services.Implementations
                 Message = "Created"
             };
         }
+
+        public async Task<MethodResultDTO> UpdateService(ServiceDTO serviceDTO)
+        {
+            var service = await _context.Services
+                             .FirstOrDefaultAsync(r => r.IdService == serviceDTO.IdService);
+
+            if (service == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Service not found"
+                };
+            }
+
+            service.Title = serviceDTO.Title;
+            service.Sum = serviceDTO.Sum;
+            service.Description = serviceDTO.Description;
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Updated"
+            };
+
+        }
     }
 }

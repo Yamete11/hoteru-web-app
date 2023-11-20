@@ -35,5 +35,11 @@ namespace hoteru_be.Controllers
         {
             return await _service.PostService(serviceDTO);
         }
+
+        [HttpPut]
+        public async Task<MethodResultDTO> UpdateService([FromBody] ServiceDTO serviceDTO)
+        {
+            return await _service.UpdateService(serviceDTO);
+        }
     }
 }
