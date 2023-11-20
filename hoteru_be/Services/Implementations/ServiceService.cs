@@ -44,5 +44,23 @@ namespace hoteru_be.Services.Implementations
                 Description = x.Description
             }).ToListAsync();
         }
+
+        public async Task<MethodResultDTO> PostService(ServiceDTO serviceDTO)
+        {
+            Service service = new Service
+            {
+                Title = serviceDTO.Title,
+                Sum = serviceDTO.Sum,
+                Description= serviceDTO.Description
+            };
+            _context.Services.Add(service);
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Created"
+            };
+        }
     }
 }

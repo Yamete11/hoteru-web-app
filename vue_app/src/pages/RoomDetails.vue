@@ -4,7 +4,7 @@
     <sidebar></sidebar>
     <div class="main">
       <h1>Room Details</h1>
-      <form @submit.prevent="saveRoomDetails" class="creating-form">
+      <form @submit.prevent class="creating-form">
         <div class="input-form">
           <label>Number: </label>
           <input v-model="room.number" class="input" type="text" placeholder="Enter room number" :readonly="!isEditing">

@@ -8,5 +8,7 @@ namespace hoteru_be.Services.Interfaces
     {
         public Task<IEnumerable<ServiceDTO>> GetServices();
         public Task<MethodResultDTO> DeleteService(int IdService);
+
+        public Task<MethodResultDTO> PostService(ServiceDTO serviceDTO);
     }
 }
