@@ -24,10 +24,22 @@ namespace hoteru_be.Controllers
             return await _service.GetRooms(page, limit);
         }
 
+        [HttpGet("{IdRoom}")]
+        public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)
+        {
+            return await _service.GetSpecificRoom(IdRoom);
+        }
+
         [HttpDelete("{IdRoom}")]
         public async Task<MethodResultDTO> DeleteRoom(int IdRoom)
         {
             return await _service.DeleteRoom(IdRoom);
+        }
+
+        [HttpPut]
+        public async Task<MethodResultDTO> UpdateRoom([FromBody] SpecificRoomDTO roomDTO)
+        {
+            return await _service.UpdateRoom(roomDTO);
         }
 
         [HttpPost]

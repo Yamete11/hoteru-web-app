@@ -5,9 +5,10 @@
     <span class="item type">{{ room.type }}</span>
     <span class="item status">{{ room.status }}</span>
     <div class="item-btns">
-      <button class="btn" type="button">
+      <button class="btn" type="button" @click="viewRoomDetails(room.idRoom)">
         Details
       </button>
+
       <button class="btn" type="button" @click="deleteRoom(room.idRoom)">
         Delete
       </button>
@@ -27,6 +28,9 @@ export default {
     }
   },
   methods: {
+    viewRoomDetails(idRoom) {
+      this.$router.push({ name: 'RoomDetails', params: { idRoom: idRoom } });
+    },
     deleteRoom(idRoom) {
       axios.delete(`https://localhost:44384/api/Room/${idRoom}`)
           .then(() => {

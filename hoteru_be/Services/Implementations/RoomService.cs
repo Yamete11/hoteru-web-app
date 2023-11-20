@@ -62,6 +62,24 @@ namespace hoteru_be.Services.Implementations
                 .ToListAsync();
         }
 
+        public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)
+        {
+            var room = await _context.Rooms
+            .Include(r => r.RoomStatus) 
+            .Include(r => r.RoomType)
+            .FirstOrDefaultAsync(x => x.IdRoom == IdRoom);
+
+            return new SpecificRoomDTO
+            {
+                IdRoom = room.IdRoom,
+                Number = room.Number,
+                Capacity = room.Capacity,
+                Price = room.Price,
+                Status = room.IdRoomStatus,
+                Type = room.IdRoomType 
+            };
+        }
+
         public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO)
         {
             Room room = new Room
@@ -80,6 +98,37 @@ namespace hoteru_be.Services.Implementations
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Created"
             };
+        }
+
+        public async Task<MethodResultDTO> UpdateRoom(SpecificRoomDTO roomDTO)
+        {
+            var room = await _context.Rooms
+                             .Include(r => r.RoomStatus)
+                             .Include(r => r.RoomType)
+                             .FirstOrDefaultAsync(r => r.IdRoom == roomDTO.IdRoom);
+
+            if (room == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Room not found"
+                };
+            }
+
+            room.Number = roomDTO.Number;
+            room.Capacity = roomDTO.Capacity;
+            room.Price = roomDTO.Price;
+            room.IdRoomStatus = roomDTO.Status;
+            room.IdRoomType = roomDTO.Type;
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Updated"
+            };
+
         }
     }
 }

@@ -16,6 +16,9 @@ namespace hoteru_be.Context
         public virtual DbSet<UserType> UserTypes { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<Guest> Guests { get; set; }
+        public virtual DbSet<DepositType> DepositTypes { get; set; }
+        public virtual DbSet<Deposit> Deposits { get; set; }
+        public virtual DbSet<GuestStatus> GuestStatuses { get; set; }
 
         public MyDbContext()
         {
@@ -44,6 +47,15 @@ namespace hoteru_be.Context
                     new UserType { IdUserType = 1, Title = "Superadmin" },
                     new UserType { IdUserType = 2, Title = "Admin" },
                     new UserType { IdUserType = 3, Title = "Employee" });
+
+            });
+
+            modelBuilder.Entity<DepositType>(t =>
+            {
+                t.HasData(
+                    new DepositType { IdDepositType = 1, Title = "Card" },
+                    new DepositType { IdDepositType = 2, Title = "Cash" });
+                   
 
             });
 

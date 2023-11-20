@@ -9,6 +9,7 @@ import History from "../pages/History.vue";
 import Registration from "../pages/Registration.vue";
 import NewRoom from "../pages/NewRoom.vue";
 import NewService from "../pages/NewService.vue";
+import RoomDetails from "../pages/RoomDetails.vue";
 
 
 const routes = [
@@ -31,6 +32,12 @@ const routes = [
     {
         path: '/guests',
         component: Guest
+    },
+    {
+        path: '/rooms/:idRoom',
+        component: RoomDetails,
+        name: 'RoomDetails',
+        props: true
     },
     {
         path: '/rooms',

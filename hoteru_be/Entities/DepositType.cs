@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace hoteru_be.Entities
 {
-    public class UserType
+    public class DepositType
     {
         [Key]
-        public int IdUserType { get; set; }
+        public int IdDepositType { get; set; }
         public string Title { get; set; }
-        public ICollection<User> Users { get; set; }
+
+        public ICollection<Deposit> Deposits { get; set; }
     }
 }
