@@ -10,6 +10,7 @@ import Registration from "../pages/Registration.vue";
 import NewRoom from "../pages/NewRoom.vue";
 import NewService from "../pages/NewService.vue";
 import RoomDetails from "../pages/RoomDetails.vue";
+import ServiceDetails from "../pages/ServiceDetails.vue";
 
 
 const routes = [
@@ -46,6 +47,12 @@ const routes = [
     {
         path: '/new-room',
         component: NewRoom
+    },
+    {
+        path: '/services/:idService',
+        component: ServiceDetails,
+        name: 'ServiceDetails',
+        props: true
     },
     {
         path: '/services',

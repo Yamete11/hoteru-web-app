@@ -8,7 +8,7 @@
         <div class="input-form">
           <label>Title: </label>
           <input
-              v-model="formData.Title"
+              v-model="service.title"
               class="input"
               type="text"
               placeholder="Enter room number"
@@ -18,7 +18,7 @@
         <div class="input-form">
           <label>Price: </label>
           <input
-              v-model="formData.Price"
+              v-model="service.sum"
               class="input"
               type="text"
               placeholder="Enter room capacity"
@@ -28,7 +28,7 @@
         <div class="input-form">
           <label>Description: </label>
           <input
-              v-model="formData.Description"
+              v-model="service.description"
               class="input"
               type="text"
               placeholder="Enter room price"
@@ -49,15 +49,38 @@
 import axios from 'axios';
 export default {
   name: "ServiceDetails",
+  props: {
+    idService: {
+      type: Number,
+      required: true
+    }
+  },
   data(){
     return {
       isEditing: false,
+      service: {
+        idService: '',
+        title: '',
+        sum: '',
+        description: ''
+      }
     }
   },
   methods:{
     async toggleEdit() {
       this.isEditing = !this.isEditing;
-    }
+    },
+    async fetchSpecificService(idService) {
+      try {
+        const response = await axios.get('https://localhost:44384/api/Service/' + idService);
+        this.service = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchSpecificService(this.idService);
   }
 }
 </script>

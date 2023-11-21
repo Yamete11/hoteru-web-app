@@ -24,6 +24,12 @@ namespace hoteru_be.Controllers
             return await _service.GetServices();
         }
 
+        [HttpGet("{idService}")]
+        public async Task<ServiceDTO> GetSpecificService(int idService)
+        {
+            return await _service.GetSpecificService(idService);
+        }
+
         [HttpDelete("{IdService}")]
         public async Task<MethodResultDTO> DeleteService(int IdService)
         {

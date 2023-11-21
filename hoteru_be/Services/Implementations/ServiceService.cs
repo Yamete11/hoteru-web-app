@@ -19,9 +19,9 @@ namespace hoteru_be.Services.Implementations
             _context = context;
         }
 
-        public async Task<MethodResultDTO> DeleteService(int IdService)
+        public async Task<MethodResultDTO> DeleteService(int idService)
         {
-            Service service = _context.Services.SingleOrDefault(x => x.IdService == IdService);
+            Service service = _context.Services.SingleOrDefault(x => x.IdService == idService);
 
             _context.Services.Remove(service);
 
@@ -43,6 +43,19 @@ namespace hoteru_be.Services.Implementations
                 Sum = x.Sum,
                 Description = x.Description
             }).ToListAsync();
+        }
+
+        public async Task<ServiceDTO> GetSpecificService(int idService)
+        {
+            var service = await _context.Services.FirstOrDefaultAsync(x => x.IdService == idService);
+
+            return new ServiceDTO
+            {
+                IdService = service.IdService,
+                Title= service.Title,
+                Sum= service.Sum,
+                Description= service.Description
+            };
         }
 
         public async Task<MethodResultDTO> PostService(ServiceDTO serviceDTO)

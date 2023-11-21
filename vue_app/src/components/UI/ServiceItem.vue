@@ -4,7 +4,7 @@
     <span class="item sum">{{ service.sum }}</span>
     <span class="item description">{{ service.description }}</span>
     <div class="item-btns">
-      <button class="btn" type="button">
+      <button class="btn" type="button" @click="viewServiceDetails(service.idService)">
         Details
       </button>
       <button class="btn" type="button" @click="deleteService(service.idService)">
@@ -26,6 +26,9 @@ export default {
     }
   },
   methods: {
+    viewServiceDetails(idService) {
+      this.$router.push({ name: 'ServiceDetails', params: { idService: idService } });
+    },
     deleteService(idService) {
       axios.delete(`https://localhost:44384/api/Service/${idService}`)
           .then(() => {
