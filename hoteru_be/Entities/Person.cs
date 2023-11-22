@@ -17,5 +17,9 @@ namespace hoteru_be.Entities
         [Required]
         [ForeignKey(nameof(IdHotel))]
         public Hotel Hotel { get; set; }
+
+        public User? User { get; set; }
+
+        public Guest? Guest { get; set; }
     }
 }

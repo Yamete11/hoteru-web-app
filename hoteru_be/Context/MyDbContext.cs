@@ -19,6 +19,9 @@ namespace hoteru_be.Context
         public virtual DbSet<DepositType> DepositTypes { get; set; }
         public virtual DbSet<Deposit> Deposits { get; set; }
         public virtual DbSet<GuestStatus> GuestStatuses { get; set; }
+        public virtual DbSet<Reservation> Reservation { get; set; }
+        public virtual DbSet<ReservationService> ReservationService { get; set; }
+        public virtual DbSet<GuestReservation> GuestReservation { get; set; }
 
         public MyDbContext()
         {

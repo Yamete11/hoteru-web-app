@@ -1,10 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hoteru_be.Entities
 {
     public class Guest
     {
         [Key]
-        public int IdGuest { get; set; }
+        public int IdPerson { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(IdPerson))]
+        public Person Person { get; set; }
+
+        public string Passport { get; set; }
+        public string TelNumber { get; set; }
+
+        public virtual ICollection<GuestReservation> GuestReservations { get; set; }
     }
 }

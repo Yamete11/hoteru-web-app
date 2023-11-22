@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hoteru_be.Entities
@@ -24,5 +25,7 @@ namespace hoteru_be.Entities
         [Required]
         [ForeignKey(nameof(IdRoomType))]
         public RoomType RoomType { get; set; }
+
+        public ICollection<Reservation> Reservations { get; set; }
     }
 }

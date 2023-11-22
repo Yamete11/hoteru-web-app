@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace hoteru_be.Entities
 {
@@ -9,6 +10,8 @@ namespace hoteru_be.Entities
         public string Title { get; set; }
         public float Sum { get; set; }
         public string Description { get; set; }
+
+        public virtual ICollection<ReservationService> ReservationServices { get; set; }
 
     }
 }

@@ -13,5 +13,7 @@ namespace hoteru_be.Entities
         [Required]
         [ForeignKey(nameof(IdDepositType))]
         public DepositType DepositType { get; set; }
+
+        public Reservation Reservation { get; set; }
     }
 }
