@@ -18,8 +18,8 @@ namespace hoteru_be.Entities
         [ForeignKey(nameof(IdHotel))]
         public Hotel Hotel { get; set; }
 
-        public User? User { get; set; }
+        public virtual User? User { get; set; }
 
-        public Guest? Guest { get; set; }
+        public virtual Guest? Guest { get; set; }
     }
 }

@@ -5,7 +5,7 @@ namespace hoteru_be.Context
 {
     public class MyDbContext : DbContext
     {
-
+        
         public virtual DbSet<Person> Persons { get; set; }
         public virtual DbSet<Hotel> Hotels { get; set; }
         public virtual DbSet<Address> Addresses { get; set; }
@@ -19,9 +19,11 @@ namespace hoteru_be.Context
         public virtual DbSet<DepositType> DepositTypes { get; set; }
         public virtual DbSet<Deposit> Deposits { get; set; }
         public virtual DbSet<GuestStatus> GuestStatuses { get; set; }
-        public virtual DbSet<Reservation> Reservation { get; set; }
+        public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<ReservationService> ReservationService { get; set; }
-        public virtual DbSet<GuestReservation> GuestReservation { get; set; }
+        public virtual DbSet<GuestReservation> GuestReservations { get; set; }
+
+
 
         public MyDbContext()
         {
@@ -34,7 +36,10 @@ namespace hoteru_be.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             base.OnModelCreating(modelBuilder);
+
+            
 
             modelBuilder.Entity<RoomStatus>(t =>
             {

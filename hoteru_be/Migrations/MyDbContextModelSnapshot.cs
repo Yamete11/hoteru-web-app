@@ -95,7 +95,7 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdPerson")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GuestStatusIdGuestStatus")
+                    b.Property<int>("IdGuestStatus")
                         .HasColumnType("int");
 
                     b.Property<string>("Passport")
@@ -106,7 +106,7 @@ namespace hoteru_be.Migrations
 
                     b.HasKey("IdPerson");
 
-                    b.HasIndex("GuestStatusIdGuestStatus");
+                    b.HasIndex("IdGuestStatus");
 
                     b.ToTable("Guests");
                 });
@@ -130,7 +130,7 @@ namespace hoteru_be.Migrations
 
                     b.HasIndex("IdReservation");
 
-                    b.ToTable("GuestReservation");
+                    b.ToTable("GuestReservations");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestStatus", b =>
@@ -232,7 +232,7 @@ namespace hoteru_be.Migrations
 
                     b.HasIndex("IdUser");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.ReservationService", b =>
@@ -768,15 +768,19 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
                 {
-                    b.HasOne("hoteru_be.Entities.GuestStatus", null)
+                    b.HasOne("hoteru_be.Entities.GuestStatus", "GuestStatus")
                         .WithMany("Guests")
-                        .HasForeignKey("GuestStatusIdGuestStatus");
+                        .HasForeignKey("IdGuestStatus")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Person", "Person")
                         .WithOne("Guest")
                         .HasForeignKey("hoteru_be.Entities.Guest", "IdPerson")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GuestStatus");
 
                     b.Navigation("Person");
                 });

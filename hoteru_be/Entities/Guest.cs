@@ -16,6 +16,12 @@ namespace hoteru_be.Entities
         public string Passport { get; set; }
         public string TelNumber { get; set; }
 
+        public int IdGuestStatus { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(IdGuestStatus))]
+        public GuestStatus GuestStatus { get; set; }
+
         public virtual ICollection<GuestReservation> GuestReservations { get; set; }
     }
 }

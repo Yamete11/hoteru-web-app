@@ -10,8 +10,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231122223655_dfg")]
-    partial class dfg
+    [Migration("20231123133519_asd")]
+    partial class asd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -97,7 +97,7 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdPerson")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GuestStatusIdGuestStatus")
+                    b.Property<int>("IdGuestStatus")
                         .HasColumnType("int");
 
                     b.Property<string>("Passport")
@@ -108,7 +108,7 @@ namespace hoteru_be.Migrations
 
                     b.HasKey("IdPerson");
 
-                    b.HasIndex("GuestStatusIdGuestStatus");
+                    b.HasIndex("IdGuestStatus");
 
                     b.ToTable("Guests");
                 });
@@ -123,9 +123,16 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdGuest")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdReservation")
+                        .HasColumnType("int");
+
                     b.HasKey("IdGuestReservation");
 
-                    b.ToTable("GuestReservation");
+                    b.HasIndex("IdGuest");
+
+                    b.HasIndex("IdReservation");
+
+                    b.ToTable("GuestReservations");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestStatus", b =>
@@ -227,7 +234,7 @@ namespace hoteru_be.Migrations
 
                     b.HasIndex("IdUser");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.ReservationService", b =>
@@ -763,9 +770,11 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
                 {
-                    b.HasOne("hoteru_be.Entities.GuestStatus", null)
+                    b.HasOne("hoteru_be.Entities.GuestStatus", "GuestStatus")
                         .WithMany("Guests")
-                        .HasForeignKey("GuestStatusIdGuestStatus");
+                        .HasForeignKey("IdGuestStatus")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Person", "Person")
                         .WithOne("Guest")
@@ -773,7 +782,28 @@ namespace hoteru_be.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("GuestStatus");
+
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
+                {
+                    b.HasOne("hoteru_be.Entities.Guest", "Guest")
+                        .WithMany("GuestReservations")
+                        .HasForeignKey("IdGuest")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("hoteru_be.Entities.Reservation", "Reservation")
+                        .WithMany("GuestReservations")
+                        .HasForeignKey("IdReservation")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guest");
+
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
@@ -897,6 +927,11 @@ namespace hoteru_be.Migrations
                     b.Navigation("Deposits");
                 });
 
+            modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
+                {
+                    b.Navigation("GuestReservations");
+                });
+
             modelBuilder.Entity("hoteru_be.Entities.GuestStatus", b =>
                 {
                     b.Navigation("Guests");
@@ -911,6 +946,8 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Reservation", b =>
                 {
+                    b.Navigation("GuestReservations");
+
                     b.Navigation("ReservationServices");
                 });
 

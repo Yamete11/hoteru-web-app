@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace hoteru_be.Migrations
 {
-    public partial class dfg : Migration
+    public partial class asd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,19 +34,6 @@ namespace hoteru_be.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DepositTypes", x => x.IdDepositType);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GuestReservation",
-                columns: table => new
-                {
-                    IdGuestReservation = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IdGuest = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GuestReservation", x => x.IdGuestReservation);
                 });
 
             migrationBuilder.CreateTable(
@@ -214,17 +201,17 @@ namespace hoteru_be.Migrations
                     IdPerson = table.Column<int>(type: "int", nullable: false),
                     Passport = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TelNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GuestStatusIdGuestStatus = table.Column<int>(type: "int", nullable: true)
+                    IdGuestStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Guests", x => x.IdPerson);
                     table.ForeignKey(
-                        name: "FK_Guests_GuestStatuses_GuestStatusIdGuestStatus",
-                        column: x => x.GuestStatusIdGuestStatus,
+                        name: "FK_Guests_GuestStatuses_IdGuestStatus",
+                        column: x => x.IdGuestStatus,
                         principalTable: "GuestStatuses",
                         principalColumn: "IdGuestStatus",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Guests_Persons_IdPerson",
                         column: x => x.IdPerson,
@@ -260,7 +247,7 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reservation",
+                name: "Reservations",
                 columns: table => new
                 {
                     IdReservation = table.Column<int>(type: "int", nullable: false)
@@ -275,24 +262,50 @@ namespace hoteru_be.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservation", x => x.IdReservation);
+                    table.PrimaryKey("PK_Reservations", x => x.IdReservation);
                     table.ForeignKey(
-                        name: "FK_Reservation_Deposits_IdDeposit",
+                        name: "FK_Reservations_Deposits_IdDeposit",
                         column: x => x.IdDeposit,
                         principalTable: "Deposits",
                         principalColumn: "IdDeposit",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reservation_Rooms_IdRoom",
+                        name: "FK_Reservations_Rooms_IdRoom",
                         column: x => x.IdRoom,
                         principalTable: "Rooms",
                         principalColumn: "IdRoom",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reservation_Users_IdUser",
+                        name: "FK_Reservations_Users_IdUser",
                         column: x => x.IdUser,
                         principalTable: "Users",
                         principalColumn: "IdPerson",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GuestReservations",
+                columns: table => new
+                {
+                    IdGuestReservation = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdReservation = table.Column<int>(type: "int", nullable: false),
+                    IdGuest = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuestReservations", x => x.IdGuestReservation);
+                    table.ForeignKey(
+                        name: "FK_GuestReservations_Guests_IdGuest",
+                        column: x => x.IdGuest,
+                        principalTable: "Guests",
+                        principalColumn: "IdPerson",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GuestReservations_Reservations_IdReservation",
+                        column: x => x.IdReservation,
+                        principalTable: "Reservations",
+                        principalColumn: "IdReservation",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -310,9 +323,9 @@ namespace hoteru_be.Migrations
                 {
                     table.PrimaryKey("PK_ReservationService", x => x.IdReservationService);
                     table.ForeignKey(
-                        name: "FK_ReservationService_Reservation_IdReservation",
+                        name: "FK_ReservationService_Reservations_IdReservation",
                         column: x => x.IdReservation,
-                        principalTable: "Reservation",
+                        principalTable: "Reservations",
                         principalColumn: "IdReservation",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -418,9 +431,19 @@ namespace hoteru_be.Migrations
                 column: "IdDepositType");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Guests_GuestStatusIdGuestStatus",
+                name: "IX_GuestReservations_IdGuest",
+                table: "GuestReservations",
+                column: "IdGuest");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuestReservations_IdReservation",
+                table: "GuestReservations",
+                column: "IdReservation");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Guests_IdGuestStatus",
                 table: "Guests",
-                column: "GuestStatusIdGuestStatus");
+                column: "IdGuestStatus");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Hotels_IdAddress",
@@ -434,19 +457,19 @@ namespace hoteru_be.Migrations
                 column: "IdHotel");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservation_IdDeposit",
-                table: "Reservation",
+                name: "IX_Reservations_IdDeposit",
+                table: "Reservations",
                 column: "IdDeposit",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservation_IdRoom",
-                table: "Reservation",
+                name: "IX_Reservations_IdRoom",
+                table: "Reservations",
                 column: "IdRoom");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservation_IdUser",
-                table: "Reservation",
+                name: "IX_Reservations_IdUser",
+                table: "Reservations",
                 column: "IdUser");
 
             migrationBuilder.CreateIndex(
@@ -478,22 +501,22 @@ namespace hoteru_be.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GuestReservation");
-
-            migrationBuilder.DropTable(
-                name: "Guests");
+                name: "GuestReservations");
 
             migrationBuilder.DropTable(
                 name: "ReservationService");
 
             migrationBuilder.DropTable(
-                name: "GuestStatuses");
+                name: "Guests");
 
             migrationBuilder.DropTable(
-                name: "Reservation");
+                name: "Reservations");
 
             migrationBuilder.DropTable(
                 name: "Services");
+
+            migrationBuilder.DropTable(
+                name: "GuestStatuses");
 
             migrationBuilder.DropTable(
                 name: "Deposits");
