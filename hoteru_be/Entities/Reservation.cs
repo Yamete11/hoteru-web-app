@@ -34,6 +34,10 @@ namespace hoteru_be.Entities
         [ForeignKey(nameof(IdUser))]
         public User User { get; set; }
 
+        public int? IdBill { get; set; }
+        [ForeignKey(nameof(IdBill))]
+        public Bill Bill { get; set; }
+
         public virtual ICollection<GuestReservation> GuestReservations { get; set; }
         public virtual ICollection<ReservationService> ReservationServices { get; set; }
 

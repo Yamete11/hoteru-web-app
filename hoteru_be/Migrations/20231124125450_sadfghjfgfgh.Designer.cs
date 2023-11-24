@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using hoteru_be.Context;
 
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231124125450_sadfghjfgfgh")]
+    partial class sadfghjfgfgh
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -778,7 +780,7 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.DepositType", "DepositType")
                         .WithMany("Deposits")
                         .HasForeignKey("IdDepositType")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("DepositType");
@@ -789,13 +791,13 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.GuestStatus", "GuestStatus")
                         .WithMany("Guests")
                         .HasForeignKey("IdGuestStatus")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Person", "Person")
                         .WithOne("Guest")
                         .HasForeignKey("hoteru_be.Entities.Guest", "IdPerson")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("GuestStatus");
@@ -827,7 +829,7 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.Address", "Address")
                         .WithOne("Hotel")
                         .HasForeignKey("hoteru_be.Entities.Hotel", "IdAddress")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Address");
@@ -838,7 +840,7 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.Hotel", "Hotel")
                         .WithMany()
                         .HasForeignKey("IdHotel")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Hotel");
@@ -848,25 +850,24 @@ namespace hoteru_be.Migrations
                 {
                     b.HasOne("hoteru_be.Entities.Bill", "Bill")
                         .WithOne("Reservation")
-                        .HasForeignKey("hoteru_be.Entities.Reservation", "IdBill")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("hoteru_be.Entities.Reservation", "IdBill");
 
                     b.HasOne("hoteru_be.Entities.Deposit", "Deposit")
                         .WithOne("Reservation")
                         .HasForeignKey("hoteru_be.Entities.Reservation", "IdDeposit")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Room", "Room")
                         .WithMany("Reservations")
                         .HasForeignKey("IdRoom")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.User", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Bill");
@@ -883,13 +884,13 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.Reservation", "Reservation")
                         .WithMany("ReservationServices")
                         .HasForeignKey("IdReservation")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Service", "Service")
                         .WithMany("ReservationServices")
                         .HasForeignKey("IdService")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Reservation");
@@ -902,13 +903,13 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.RoomStatus", "RoomStatus")
                         .WithMany("Rooms")
                         .HasForeignKey("IdRoomStatus")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.RoomType", "RoomType")
                         .WithMany("Rooms")
                         .HasForeignKey("IdRoomType")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("RoomStatus");
@@ -921,13 +922,13 @@ namespace hoteru_be.Migrations
                     b.HasOne("hoteru_be.Entities.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("hoteru_be.Entities.User", "IdPerson")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.UserType", "UserType")
                         .WithMany("Users")
                         .HasForeignKey("IdUserType")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Person");

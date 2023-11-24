@@ -1,5 +1,6 @@
 ﻿using hoteru_be.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace hoteru_be.Context
 {
@@ -22,6 +23,7 @@ namespace hoteru_be.Context
         public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<ReservationService> ReservationService { get; set; }
         public virtual DbSet<GuestReservation> GuestReservations { get; set; }
+        public virtual DbSet<Bill> Bills { get; set; }
 
 
 
@@ -39,7 +41,6 @@ namespace hoteru_be.Context
 
             base.OnModelCreating(modelBuilder);
 
-            
 
             modelBuilder.Entity<RoomStatus>(t =>
             {

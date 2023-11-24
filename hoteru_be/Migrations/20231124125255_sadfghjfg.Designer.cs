@@ -10,8 +10,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231123133519_asd")]
-    partial class asd
+    [Migration("20231124125255_sadfghjfg")]
+    partial class sadfghjfg
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,6 +43,24 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdAddress");
 
                     b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.Bill", b =>
+                {
+                    b.Property<int>("IdBill")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Creating")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("Sum")
+                        .HasColumnType("real");
+
+                    b.HasKey("IdBill");
+
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Deposit", b =>
@@ -115,22 +133,15 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
                 {
-                    b.Property<int>("IdGuestReservation")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("IdGuest")
+                    b.Property<int>("Id_Guest")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdReservation")
+                    b.Property<int>("Id_Reservation")
                         .HasColumnType("int");
 
-                    b.HasKey("IdGuestReservation");
+                    b.HasKey("Id_Guest", "Id_Reservation");
 
-                    b.HasIndex("IdGuest");
-
-                    b.HasIndex("IdReservation");
+                    b.HasIndex("Id_Reservation");
 
                     b.ToTable("GuestReservations");
                 });
@@ -207,6 +218,9 @@ namespace hoteru_be.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<int?>("IdBill")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdDeposit")
                         .HasColumnType("int");
 
@@ -226,6 +240,10 @@ namespace hoteru_be.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("IdReservation");
+
+                    b.HasIndex("IdBill")
+                        .IsUnique()
+                        .HasFilter("[IdBill] IS NOT NULL");
 
                     b.HasIndex("IdDeposit")
                         .IsUnique();
@@ -791,13 +809,13 @@ namespace hoteru_be.Migrations
                 {
                     b.HasOne("hoteru_be.Entities.Guest", "Guest")
                         .WithMany("GuestReservations")
-                        .HasForeignKey("IdGuest")
+                        .HasForeignKey("Id_Guest")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Reservation", "Reservation")
                         .WithMany("GuestReservations")
-                        .HasForeignKey("IdReservation")
+                        .HasForeignKey("Id_Reservation")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -830,6 +848,10 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Reservation", b =>
                 {
+                    b.HasOne("hoteru_be.Entities.Bill", "Bill")
+                        .WithOne("Reservation")
+                        .HasForeignKey("hoteru_be.Entities.Reservation", "IdBill");
+
                     b.HasOne("hoteru_be.Entities.Deposit", "Deposit")
                         .WithOne("Reservation")
                         .HasForeignKey("hoteru_be.Entities.Reservation", "IdDeposit")
@@ -847,6 +869,8 @@ namespace hoteru_be.Migrations
                         .HasForeignKey("IdUser")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Bill");
 
                     b.Navigation("Deposit");
 
@@ -915,6 +939,11 @@ namespace hoteru_be.Migrations
             modelBuilder.Entity("hoteru_be.Entities.Address", b =>
                 {
                     b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.Bill", b =>
+                {
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Deposit", b =>
