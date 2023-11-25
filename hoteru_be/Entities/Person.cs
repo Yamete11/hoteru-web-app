@@ -20,6 +20,6 @@ namespace hoteru_be.Entities
 
         public virtual User? User { get; set; }
 
-        public virtual Guest? Guest { get; set; }
+        /*public virtual Guest? Guest { get; set; }*/
     }
 }

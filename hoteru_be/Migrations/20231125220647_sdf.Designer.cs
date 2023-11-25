@@ -10,8 +10,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231124125255_sadfghjfg")]
-    partial class sadfghjfg
+    [Migration("20231125220647_sdf")]
+    partial class sdf
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -112,8 +112,10 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
                 {
-                    b.Property<int>("IdPerson")
-                        .HasColumnType("int");
+                    b.Property<int>("IdGuest")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("IdGuestStatus")
                         .HasColumnType("int");
@@ -124,7 +126,7 @@ namespace hoteru_be.Migrations
                     b.Property<string>("TelNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdPerson");
+                    b.HasKey("IdGuest");
 
                     b.HasIndex("IdGuestStatus");
 
@@ -133,15 +135,22 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
                 {
-                    b.Property<int>("Id_Guest")
+                    b.Property<int>("IdGuestReservation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("IdGuest")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id_Reservation")
+                    b.Property<int>("IdReservation")
                         .HasColumnType("int");
 
-                    b.HasKey("Id_Guest", "Id_Reservation");
+                    b.HasKey("IdGuestReservation");
 
-                    b.HasIndex("Id_Reservation");
+                    b.HasIndex("IdGuest");
+
+                    b.HasIndex("IdReservation");
 
                     b.ToTable("GuestReservations");
                 });
@@ -794,28 +803,20 @@ namespace hoteru_be.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("hoteru_be.Entities.Person", "Person")
-                        .WithOne("Guest")
-                        .HasForeignKey("hoteru_be.Entities.Guest", "IdPerson")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("GuestStatus");
-
-                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
                 {
                     b.HasOne("hoteru_be.Entities.Guest", "Guest")
                         .WithMany("GuestReservations")
-                        .HasForeignKey("Id_Guest")
+                        .HasForeignKey("IdGuest")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("hoteru_be.Entities.Reservation", "Reservation")
                         .WithMany("GuestReservations")
-                        .HasForeignKey("Id_Reservation")
+                        .HasForeignKey("IdReservation")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -968,8 +969,6 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Person", b =>
                 {
-                    b.Navigation("Guest");
-
                     b.Navigation("User");
                 });
 
