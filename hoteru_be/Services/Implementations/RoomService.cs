@@ -82,13 +82,61 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO)
         {
+            Dictionary<string, string> validationErrors = new Dictionary<string, string>();
+
+            if (string.IsNullOrWhiteSpace(roomDTO.Number))
+            {
+                validationErrors.Add("Number", "Room number is required");
+            }
+            else if (roomDTO.Number.Length < 1)
+            {
+                validationErrors.Add("Number", "Room number is required");
+            } 
+            else if (roomDTO.Number.Length > 3)
+            {
+                validationErrors.Add("Number", "Room number must be at most 3 characters");
+            }
+
+
+
+            if (!roomDTO.Capacity.HasValue || roomDTO.Capacity.Value < 1 || roomDTO.Capacity.Value > 10)
+            {
+                validationErrors.Add("Capacity", "Room capacity should be between 1 and 10.");
+            }
+
+
+
+            if (!roomDTO.Price.HasValue)
+            {
+                validationErrors.Add("Price", "Room price is required");
+            }
+
+
+            if (string.IsNullOrWhiteSpace(roomDTO.Status))
+            {
+                validationErrors.Add("Status", "Room status is required");
+            }
+            if (string.IsNullOrWhiteSpace(roomDTO.Type))
+            {
+                validationErrors.Add("Type", "Room type is required");
+            }
+
+            if (validationErrors.Count > 0)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    ValidationErrors = validationErrors
+                };
+            }
+
             Room room = new Room
             {
                 Number = roomDTO.Number,
-                Capacity = roomDTO.Capacity,
-                Price = roomDTO.Price,
+                Capacity = (int)roomDTO.Capacity,
+                Price = (int)roomDTO.Price,
                 IdRoomType = int.Parse(roomDTO.Type),
-                IdRoomStatus= int.Parse(roomDTO.Status)
+                IdRoomStatus = int.Parse(roomDTO.Status)
             };
             _context.Rooms.Add(room);
 

@@ -43,6 +43,7 @@ const routes = [
     {
         path: '/rooms',
         component: Room,
+        name: 'Rooms'
     },
     {
         path: '/new-room',

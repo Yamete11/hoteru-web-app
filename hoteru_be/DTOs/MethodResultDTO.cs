@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace hoteru_be.DTOs
 {
@@ -6,5 +7,7 @@ namespace hoteru_be.DTOs
     {
         public HttpStatusCode HttpStatusCode { get; set; }
         public string Message { get; set; }
+        public Dictionary<string, string> ValidationErrors { get; set; }
+
     }
 }

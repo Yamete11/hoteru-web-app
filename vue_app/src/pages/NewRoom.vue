@@ -13,6 +13,7 @@
               type="text"
               placeholder="Enter room number"
           >
+          <span class="error-message" v-if="errorMessages.Number">{{ errorMessages.Number }}</span>
         </div>
         <div class="input-form">
           <label>Capacity: </label>
@@ -22,6 +23,7 @@
               type="text"
               placeholder="Enter room capacity"
           >
+          <span class="error-message" v-if="errorMessages.Capacity">{{ errorMessages.Capacity }}</span>
         </div>
         <div class="input-form">
           <label>Price: </label>
@@ -31,28 +33,27 @@
               type="text"
               placeholder="Enter room price"
           >
+          <span class="error-message" v-if="errorMessages.Price">{{ errorMessages.Price }}</span>
         </div>
         <div class="input-form">
           <label>Type: </label>
           <select v-model="formData.Type">
             <option disabled value="">Select type</option>
             <option v-for="roomType in roomTypes" :key="roomType.idRoomType" :value="String(roomType.idRoomType)">{{ roomType.title }}</option>
-
           </select>
-
+          <span class="error-message" v-if="errorMessages.Type">{{ errorMessages.Type }}</span>
         </div>
         <div class="input-form">
           <label>Status: </label>
           <select v-model="formData.Status">
             <option disabled value="">Select status</option>
             <option v-for="roomStatus in roomStatuses" :key="roomStatus.idRoomStatus" :value="String(roomStatus.idRoomStatus)">{{ roomStatus.title }}</option>
-
           </select>
-
+          <span class="error-message" v-if="errorMessages.Status">{{ errorMessages.Status }}</span>
         </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/rooms">Cancel</router-link>
-          <router-link class="registration-btn" @click="addRoom" to="/rooms">Confirm</router-link>
+          <button class="registration-btn" @click="addRoom">Confirm</button>
         </div>
       </form>
     </div>
@@ -76,6 +77,13 @@ export default {
         Price: '',
         Type: '',
         Status: ''
+      },
+      errorMessages: {
+        Number: '',
+        Capacity: '',
+        Price: '',
+        Type: '',
+        Status: ''
       }
     }
   },
@@ -94,11 +102,25 @@ export default {
     async addRoom() {
       try {
         const response = await axios.post('https://localhost:44384/api/Room', this.formData);
-        console.log('Success:', response.data);
+        console.log('Response:', response.data);
+        this.errorMessages = {
+          Number: '',
+          Capacity: '',
+          Price: '',
+          Type: '',
+          Status: ''
+        };
+
+        if(response.data && response.data.httpStatusCode === 200) {
+          this.$router.push({name: "Rooms"});
+        }
+        this.errorMessages = response.data.validationErrors;
       } catch (error) {
         console.log('Error:', error);
       }
     }
+
+
   },
   mounted(){
     this.fetchRoomTypes();
@@ -138,6 +160,7 @@ export default {
   font-weight: bold;
   color: white;
   margin: 10px;
+  cursor: pointer;
 }
 
 .registration-class{
@@ -179,6 +202,10 @@ h1 {
   margin-bottom: 10px;
   background-color: white;
   color: black;
+}
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 
 </style>
