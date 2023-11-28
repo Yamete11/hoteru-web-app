@@ -4,9 +4,14 @@
     <div class="content">
       <sidebar></sidebar>
       <div class="main">
+
         <div class="main-top">
-          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
-          <router-link to="/new-room" class="new-room-button">New Room</router-link>
+          <div class="left">
+            <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
+          </div>
+          <div class="right">
+            <router-link to="/new-room" class="new-room-button">New Room</router-link>
+          </div>
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -32,13 +37,14 @@ import axios from 'axios';
 export default {
   name: "Room",
   components: {},
-
   data() {
     return {
       rooms: [],
       searchQuery: '',
       page: 1,
       limit: 15,
+      roomTypes: [],
+      roomStatuses: [],
     };
   },
   mounted() {
@@ -46,7 +52,7 @@ export default {
   },
   computed: {
     sortedAndSearchedPosts() {
-      return this.rooms.filter(room => room.number.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      return this.rooms.filter(room => room.number.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
     }
   },
   methods: {
@@ -118,9 +124,13 @@ export default {
   padding: 1rem;
 }
 
+.left {
+  width: 100%;
+}
+
 .search-input {
   width: 10%;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
@@ -144,6 +154,18 @@ export default {
   text-decoration: none;
   border-radius: 4px;
   white-space: nowrap;
+}
+
+.filters-button{
+  text-decoration: none;
+  border: none;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 0.5rem 3rem;
+  background-color: #A4907C;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .table-headers {

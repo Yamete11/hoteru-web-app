@@ -100,6 +100,7 @@ export default {
       }
     },
     async addRoom() {
+      console.log(this.formData)
       try {
         const response = await axios.post('https://localhost:44384/api/Room', this.formData);
         console.log('Response:', response.data);

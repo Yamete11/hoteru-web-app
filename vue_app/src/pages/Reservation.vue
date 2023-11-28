@@ -19,7 +19,9 @@
             <span class="header action">Action</span>
           </div>
           <div>
-            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation"/>
+            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation">
+              The list of reservations is empty
+            </reservation-list>
           </div>
         </div>
       </div>
@@ -89,7 +91,7 @@ export default {
 
 .search-input {
   width: 10%;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;

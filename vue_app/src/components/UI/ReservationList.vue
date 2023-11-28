@@ -10,7 +10,7 @@
     </transition-group>
   </div>
   <h2 v-else>
-    List of reservations is empty
+    <slot></slot>
   </h2>
 </template>
 

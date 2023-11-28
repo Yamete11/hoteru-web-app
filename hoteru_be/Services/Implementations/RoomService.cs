@@ -4,6 +4,7 @@ using hoteru_be.Entities;
 using hoteru_be.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -82,47 +83,38 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO)
         {
-            Dictionary<string, string> validationErrors = new Dictionary<string, string>();
+            var existingRoom = await _context.Rooms
+                            .AnyAsync(r => r.Number == roomDTO.Number);
 
-            if (string.IsNullOrWhiteSpace(roomDTO.Number))
+            if (existingRoom)
             {
-                validationErrors.Add("Number", "Room number is required");
-            }
-            else if (roomDTO.Number.Length < 1)
-            {
-                validationErrors.Add("Number", "Room number is required");
-            } 
-            else if (roomDTO.Number.Length > 3)
-            {
-                validationErrors.Add("Number", "Room number must be at most 3 characters");
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "A room with this number already exists"
+                };
             }
 
 
-
-            if (!roomDTO.Capacity.HasValue || roomDTO.Capacity.Value < 1 || roomDTO.Capacity.Value > 10)
+            Room room = new Room
             {
-                validationErrors.Add("Capacity", "Room capacity should be between 1 and 10.");
-            }
+                Number = roomDTO.Number,
+                Capacity = roomDTO.Capacity,
+                Price = roomDTO.Price,
+                IdRoomType = int.Parse(roomDTO.Type),
+                IdRoomStatus = int.Parse(roomDTO.Status)
+            };
 
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(room, null, null);
 
-
-            if (!roomDTO.Price.HasValue)
+            if (!Validator.TryValidateObject(room, validationContext, validationResults, true))
             {
-                validationErrors.Add("Price", "Room price is required");
-            }
+                var validationErrors = validationResults.ToDictionary(
+                    vr => vr.MemberNames.First(),
+                    vr => vr.ErrorMessage
+                );
 
-
-            if (string.IsNullOrWhiteSpace(roomDTO.Status))
-            {
-                validationErrors.Add("Status", "Room status is required");
-            }
-            if (string.IsNullOrWhiteSpace(roomDTO.Type))
-            {
-                validationErrors.Add("Type", "Room type is required");
-            }
-
-            if (validationErrors.Count > 0)
-            {
                 return new MethodResultDTO
                 {
                     HttpStatusCode = HttpStatusCode.BadRequest,
@@ -130,23 +122,16 @@ namespace hoteru_be.Services.Implementations
                 };
             }
 
-            Room room = new Room
-            {
-                Number = roomDTO.Number,
-                Capacity = (int)roomDTO.Capacity,
-                Price = (int)roomDTO.Price,
-                IdRoomType = int.Parse(roomDTO.Type),
-                IdRoomStatus = int.Parse(roomDTO.Status)
-            };
             _context.Rooms.Add(room);
-
             await _context.SaveChangesAsync();
+
             return new MethodResultDTO
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Created"
             };
         }
+
 
         public async Task<MethodResultDTO> UpdateRoom(SpecificRoomDTO roomDTO)
         {
@@ -161,6 +146,18 @@ namespace hoteru_be.Services.Implementations
                 {
                     HttpStatusCode = HttpStatusCode.NotFound,
                     Message = "Room not found"
+                };
+            }
+
+            var existingRoom = await _context.Rooms
+                .AnyAsync(r => r.Number == roomDTO.Number && r.IdRoom != roomDTO.IdRoom);
+
+            if (existingRoom)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Another room with this number already exists"
                 };
             }
 
