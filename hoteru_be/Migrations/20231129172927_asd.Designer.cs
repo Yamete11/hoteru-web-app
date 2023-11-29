@@ -10,8 +10,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231125220647_sdf")]
-    partial class sdf
+    [Migration("20231129172927_asd")]
+    partial class asd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -112,10 +112,8 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
                 {
-                    b.Property<int>("IdGuest")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("IdPerson")
+                        .HasColumnType("int");
 
                     b.Property<int>("IdGuestStatus")
                         .HasColumnType("int");
@@ -126,7 +124,7 @@ namespace hoteru_be.Migrations
                     b.Property<string>("TelNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdGuest");
+                    b.HasKey("IdPerson");
 
                     b.HasIndex("IdGuestStatus");
 
@@ -306,7 +304,9 @@ namespace hoteru_be.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Number")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -803,7 +803,15 @@ namespace hoteru_be.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("hoteru_be.Entities.Person", "Person")
+                        .WithOne("Guest")
+                        .HasForeignKey("hoteru_be.Entities.Guest", "IdPerson")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("GuestStatus");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
@@ -969,6 +977,8 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Person", b =>
                 {
+                    b.Navigation("Guest");
+
                     b.Navigation("User");
                 });
 

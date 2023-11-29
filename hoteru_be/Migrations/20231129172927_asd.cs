@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace hoteru_be.Migrations
 {
-    public partial class sdf : Migration
+    public partial class asd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -158,33 +158,12 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Guests",
-                columns: table => new
-                {
-                    IdGuest = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Passport = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TelNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdGuestStatus = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Guests", x => x.IdGuest);
-                    table.ForeignKey(
-                        name: "FK_Guests_GuestStatuses_IdGuestStatus",
-                        column: x => x.IdGuestStatus,
-                        principalTable: "GuestStatuses",
-                        principalColumn: "IdGuestStatus",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Rooms",
                 columns: table => new
                 {
                     IdRoom = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Number = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     IdRoomStatus = table.Column<int>(type: "int", nullable: false),
@@ -226,6 +205,32 @@ namespace hoteru_be.Migrations
                         column: x => x.IdHotel,
                         principalTable: "Hotels",
                         principalColumn: "IdHotel",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Guests",
+                columns: table => new
+                {
+                    IdPerson = table.Column<int>(type: "int", nullable: false),
+                    Passport = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TelNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdGuestStatus = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Guests", x => x.IdPerson);
+                    table.ForeignKey(
+                        name: "FK_Guests_GuestStatuses_IdGuestStatus",
+                        column: x => x.IdGuestStatus,
+                        principalTable: "GuestStatuses",
+                        principalColumn: "IdGuestStatus",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Guests_Persons_IdPerson",
+                        column: x => x.IdPerson,
+                        principalTable: "Persons",
+                        principalColumn: "IdPerson",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -315,14 +320,14 @@ namespace hoteru_be.Migrations
                         name: "FK_GuestReservations_Guests_IdGuest",
                         column: x => x.IdGuest,
                         principalTable: "Guests",
-                        principalColumn: "IdGuest",
+                        principalColumn: "IdPerson",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GuestReservations_Reservations_IdReservation",
                         column: x => x.IdReservation,
                         principalTable: "Reservations",
                         principalColumn: "IdReservation",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(

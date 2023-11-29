@@ -7,13 +7,11 @@ namespace hoteru_be.Entities
     public class Guest
     {
         [Key]
-        public int IdGuest { get; set; }
-        /*[Key]
         public int IdPerson { get; set; }
 
         [Required]
         [ForeignKey(nameof(IdPerson))]
-        public Person Person { get; set; }*/
+        public Person Person { get; set; }
 
         public string Passport { get; set; }
         public string TelNumber { get; set; }

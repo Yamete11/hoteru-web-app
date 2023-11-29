@@ -99,8 +99,8 @@ namespace hoteru_be.Services.Implementations
             Room room = new Room
             {
                 Number = roomDTO.Number,
-                Capacity = roomDTO.Capacity,
-                Price = roomDTO.Price,
+                Capacity = roomDTO.Capacity.Value,
+                Price = roomDTO.Price.Value,
                 IdRoomType = int.Parse(roomDTO.Type),
                 IdRoomStatus = int.Parse(roomDTO.Status)
             };
