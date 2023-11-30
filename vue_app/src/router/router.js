@@ -57,7 +57,8 @@ const routes = [
     },
     {
         path: '/services',
-        component: Service
+        component: Service,
+        name: "Services"
     },
     {
         path: '/new-service',

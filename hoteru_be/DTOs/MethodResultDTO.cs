@@ -7,7 +7,7 @@ namespace hoteru_be.DTOs
     {
         public HttpStatusCode HttpStatusCode { get; set; }
         public string Message { get; set; }
-        public Dictionary<string, string> ValidationErrors { get; set; }
+        public Dictionary<string, List<string>> Errors { get; set; }
 
     }
 }

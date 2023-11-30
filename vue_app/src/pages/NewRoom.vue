@@ -13,7 +13,7 @@
               type="text"
               placeholder="Enter room number"
           >
-          <span class="error-message" v-if="errorMessages.Number">{{ errorMessages.Number }}</span>
+          <span class="error-message" v-if="errors.Number">{{ errors.Number[0] }}</span>
         </div>
         <div class="input-form">
           <label>Capacity: </label>
@@ -23,7 +23,7 @@
               type="text"
               placeholder="Enter room capacity"
           >
-          <span class="error-message" v-if="errorMessages.Capacity">{{ errorMessages.Capacity }}</span>
+          <span class="error-message" v-if="errors.Capacity">{{ errors.Capacity[0] }}</span>
         </div>
         <div class="input-form">
           <label>Price: </label>
@@ -33,7 +33,7 @@
               type="text"
               placeholder="Enter room price"
           >
-          <span class="error-message" v-if="errorMessages.Price">{{ errorMessages.Price }}</span>
+          <span class="error-message" v-if="errors.Price">{{ errors.Price[0] }}</span>
         </div>
         <div class="input-form">
           <label>Type: </label>
@@ -41,7 +41,7 @@
             <option disabled value="">Select type</option>
             <option v-for="roomType in roomTypes" :key="roomType.idRoomType" :value="String(roomType.idRoomType)">{{ roomType.title }}</option>
           </select>
-          <span class="error-message" v-if="errorMessages.Type">{{ errorMessages.Type }}</span>
+          <span class="error-message" v-if="errors.Type">{{ errors.Type[0] }}</span>
         </div>
         <div class="input-form">
           <label>Status: </label>
@@ -49,7 +49,7 @@
             <option disabled value="">Select status</option>
             <option v-for="roomStatus in roomStatuses" :key="roomStatus.idRoomStatus" :value="String(roomStatus.idRoomStatus)">{{ roomStatus.title }}</option>
           </select>
-          <span class="error-message" v-if="errorMessages.Status">{{ errorMessages.Status }}</span>
+          <span class="error-message" v-if="errors.Status">{{ errors.Status[0] }}</span>
         </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/rooms">Cancel</router-link>
@@ -63,6 +63,8 @@
 
 <script>
 import axios from 'axios';
+import { useVuelidate } from '@vuelidate/core'
+import { required, email } from '@vuelidate/validators'
 export default {
   name: "NewRoom",
   data() {
@@ -73,17 +75,29 @@ export default {
       selectedStatus: '',
       formData: {
         Number: '',
-        Capacity: '',
-        Price: '',
+        Capacity: 0,
+        Price: 0,
         Type: '',
         Status: ''
       },
-      errorMessages: {
+      errors: {
         Number: '',
         Capacity: '',
         Price: '',
         Type: '',
         Status: ''
+      }
+    }
+  },
+  setup: () => ({ v$: useVuelidate() }),
+  validations (){
+    return {
+      formData: {
+        Number: {required},
+        Capacity: {required},
+        Price: {required},
+        Type: {required},
+        Status: {required}
       }
     }
   },
@@ -104,24 +118,36 @@ export default {
       try {
         const response = await axios.post('https://localhost:44384/api/Room', this.formData);
         console.log('Response:', response.data);
-        this.errorMessages = {
-          Number: '',
-          Capacity: '',
-          Price: '',
-          Type: '',
-          Status: ''
-        };
-
-        if(response.data && response.data.httpStatusCode === 200) {
-          this.$router.push({name: "Rooms"});
+        this.errors= {
+              Number: '',
+              Capacity: '',
+              Price: '',
+              Type: '',
+              Status: ''
         }
-        this.errorMessages = response.data.validationErrors;
+
+        if (response.data && response.data.httpStatusCode === 200) {
+          this.$router.push({ name: "Rooms" });
+        }
       } catch (error) {
-        console.log('Error:', error);
+        if (error.response && error.response.data && error.response.data.errors) {
+          this.errors = error.response.data.errors;
+        } else {
+          console.log('Error', error);
+        }
       }
     }
-
-
+  },
+  computed(){
+    const v$ = useVuelidate(this.rules, this.formData)
+    const submitForm = async () => {
+      const result = await v$.value.$validate();
+      if(result){
+        alert("success")
+      } else {
+        alert("error")
+      }
+    }
   },
   mounted(){
     this.fetchRoomTypes();

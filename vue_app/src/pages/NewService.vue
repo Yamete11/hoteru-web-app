@@ -11,17 +11,19 @@
               v-model="formData.Title"
               class="input"
               type="text"
-              placeholder="Enter room number"
+              placeholder="Enter service title"
           >
+          <span class="error-message" v-if="errors.Title">{{ errors.Title[0] }}</span>
         </div>
         <div class="input-form">
           <label>Price: </label>
           <input
-              v-model="formData.Price"
+              v-model="formData.Sum"
               class="input"
               type="text"
-              placeholder="Enter room capacity"
+              placeholder="Enter service price"
           >
+          <span class="error-message" v-if="errors.Sum">{{ errors.Sum[0] }}</span>
         </div>
         <div class="input-form">
           <label>Description: </label>
@@ -29,12 +31,13 @@
               v-model="formData.Description"
               class="input"
               type="text"
-              placeholder="Enter room price"
+              placeholder="Enter service description"
           >
+          <span class="error-message" v-if="errors.Description">{{ errors.Description[0] }}</span>
         </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/services">Cancel</router-link>
-          <router-link class="registration-btn" @click="addService" to="/services">Confirm</router-link>
+          <button class="registration-btn" @click="addService">Confirm</button>
         </div>
       </form>
     </div>
@@ -50,7 +53,12 @@ export default {
     return {
       formData: {
         Title: '',
-        Price: '',
+        Sum: 0,
+        Description: '',
+      },
+      errors: {
+        Title: '',
+        Sum: '',
         Description: '',
       }
     }
@@ -59,9 +67,22 @@ export default {
     async addService() {
       try {
         const response = await axios.post('https://localhost:44384/api/Service', this.formData);
-        console.log('Success:', response.data);
+        console.log('Response:', response.data);
+        this.errors = {
+          Title: '',
+          Price: '',
+          Description: '',
+        }
+
+        if (response.data && response.data.httpStatusCode === 200) {
+          this.$router.push({ name: "Services" });
+        }
       } catch (error) {
-        console.log('Error:', error);
+        if (error.response && error.response.data && error.response.data.errors) {
+          this.errors = error.response.data.errors;
+        } else {
+          console.log('Error', error);
+        }
       }
     }
   }
@@ -100,6 +121,7 @@ export default {
   font-weight: bold;
   color: white;
   margin: 10px;
+  cursor: pointer;
 }
 
 .registration-class{
@@ -141,5 +163,9 @@ h1 {
   margin-bottom: 10px;
   background-color: white;
   color: black;
+}
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 </style>

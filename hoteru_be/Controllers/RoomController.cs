@@ -46,6 +46,7 @@ namespace hoteru_be.Controllers
         [HttpPost]
         public async Task<MethodResultDTO> PostRoom([FromBody] RoomDTO roomDTO)
         {
+
             return await _service.PostRoom(roomDTO);
         }
     }

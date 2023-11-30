@@ -63,7 +63,7 @@ namespace hoteru_be.Services.Implementations
             Service service = new Service
             {
                 Title = serviceDTO.Title,
-                Sum = serviceDTO.Sum,
+                Sum = serviceDTO.Sum.Value,
                 Description= serviceDTO.Description
             };
             _context.Services.Add(service);
@@ -91,7 +91,7 @@ namespace hoteru_be.Services.Implementations
             }
 
             service.Title = serviceDTO.Title;
-            service.Sum = serviceDTO.Sum;
+            service.Sum = serviceDTO.Sum.Value;
             service.Description = serviceDTO.Description;
 
             await _context.SaveChangesAsync();

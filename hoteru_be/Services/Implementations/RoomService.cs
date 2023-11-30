@@ -83,17 +83,9 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO)
         {
-            var existingRoom = await _context.Rooms
-                            .AnyAsync(r => r.Number == roomDTO.Number);
 
-            if (existingRoom)
-            {
-                return new MethodResultDTO
-                {
-                    HttpStatusCode = HttpStatusCode.BadRequest,
-                    Message = "A room with this number already exists"
-                };
-            }
+            var checkRoom = await _context.Rooms.FirstOrDefaultAsync(r => r.Number == roomDTO.Number);
+
 
 
             Room room = new Room
@@ -105,22 +97,6 @@ namespace hoteru_be.Services.Implementations
                 IdRoomStatus = int.Parse(roomDTO.Status)
             };
 
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(room, null, null);
-
-            if (!Validator.TryValidateObject(room, validationContext, validationResults, true))
-            {
-                var validationErrors = validationResults.ToDictionary(
-                    vr => vr.MemberNames.First(),
-                    vr => vr.ErrorMessage
-                );
-
-                return new MethodResultDTO
-                {
-                    HttpStatusCode = HttpStatusCode.BadRequest,
-                    ValidationErrors = validationErrors
-                };
-            }
 
             _context.Rooms.Add(room);
             await _context.SaveChangesAsync();
