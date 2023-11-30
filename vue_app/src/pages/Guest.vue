@@ -5,7 +5,7 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" placeholder="Search ..." />
+          <input type="text" class="search-input" placeholder="Search by name ..." />
           <router-link to="/new-guest" class="new-guest-button">New Guest</router-link>
         </div>
         <div class="main-bot">

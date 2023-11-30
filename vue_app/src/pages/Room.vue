@@ -8,6 +8,7 @@
         <div class="main-top">
           <div class="left">
             <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
+            <button @click="loadMoreRooms">Load</button>
           </div>
           <div class="right">
             <router-link to="/new-room" class="new-room-button">New Room</router-link>
@@ -23,7 +24,7 @@
           </div>
           <div>
             <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
-            <div v-intersection="loadMoreRooms"  class="observer"></div>
+            <div v-intersection=""  class="observer"></div>
           </div>
         </div>
       </div>
@@ -212,4 +213,9 @@ export default {
   justify-content: center;
   flex-basis: 10%;
 }
+
+.observer-anchor {
+  height: 20px;
+}
+
 </style>

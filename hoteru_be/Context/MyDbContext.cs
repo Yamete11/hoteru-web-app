@@ -85,6 +85,43 @@ namespace hoteru_be.Context
 
             });
 
+            modelBuilder.Entity<Address>(t =>
+            {
+                t.HasData(
+                    new Address { IdAddress = 1, City = "Warsaw", Country = "Poland", Street = "Koszykowa 86", Postcode = "02-913" });
+
+            });
+
+            modelBuilder.Entity<Hotel>(t =>
+            {
+                t.HasData(
+                    new Hotel { IdHotel = 1, Title = "Nobu", IdAddress = 1 });
+
+            });
+
+            modelBuilder.Entity<Person>(t =>
+            {
+                t.HasData(
+                    new Person { IdPerson = 1, Name = "Gleb", Surname = "Ivanov", Email = "helli@gmail.com", IdHotel = 1 },
+                    new Person { IdPerson = 2, Name = "Artur", Surname = "Morgan", Email = "test@gmail.com", IdHotel = 1 });
+
+            });
+
+            modelBuilder.Entity<GuestStatus>(t =>
+            {
+                t.HasData(
+                    new GuestStatus { IdGuestStatus = 1, Title = "VIP"});
+
+            });
+
+            modelBuilder.Entity<Guest>(t =>
+            {
+                t.HasData(
+                    new Guest { IdPerson = 1, Passport = "FV124124", TelNumber = "123123123", IdGuestStatus = 1},
+                    new Guest { IdPerson = 2, Passport = "BG121231", TelNumber = "567567567", IdGuestStatus = 1});
+
+            });
+
             modelBuilder.Entity<Room>(t =>
             {
                 t.HasData(

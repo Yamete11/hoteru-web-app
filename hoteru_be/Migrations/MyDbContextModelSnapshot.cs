@@ -41,6 +41,16 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdAddress");
 
                     b.ToTable("Addresses");
+
+                    b.HasData(
+                        new
+                        {
+                            IdAddress = 1,
+                            City = "Warsaw",
+                            Country = "Poland",
+                            Postcode = "02-913",
+                            Street = "Koszykowa 86"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Bill", b =>
@@ -127,6 +137,22 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdGuestStatus");
 
                     b.ToTable("Guests");
+
+                    b.HasData(
+                        new
+                        {
+                            IdPerson = 1,
+                            IdGuestStatus = 1,
+                            Passport = "FV124124",
+                            TelNumber = "123123123"
+                        },
+                        new
+                        {
+                            IdPerson = 2,
+                            IdGuestStatus = 1,
+                            Passport = "BG121231",
+                            TelNumber = "567567567"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
@@ -164,6 +190,13 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdGuestStatus");
 
                     b.ToTable("GuestStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            IdGuestStatus = 1,
+                            Title = "VIP"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
@@ -185,6 +218,14 @@ namespace hoteru_be.Migrations
                         .IsUnique();
 
                     b.ToTable("Hotels");
+
+                    b.HasData(
+                        new
+                        {
+                            IdHotel = 1,
+                            IdAddress = 1,
+                            Title = "Nobu"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Person", b =>
@@ -211,6 +252,24 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdHotel");
 
                     b.ToTable("Persons");
+
+                    b.HasData(
+                        new
+                        {
+                            IdPerson = 1,
+                            Email = "helli@gmail.com",
+                            IdHotel = 1,
+                            Name = "Gleb",
+                            Surname = "Ivanov"
+                        },
+                        new
+                        {
+                            IdPerson = 2,
+                            Email = "test@gmail.com",
+                            IdHotel = 1,
+                            Name = "Artur",
+                            Surname = "Morgan"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Reservation", b =>
@@ -303,8 +362,7 @@ namespace hoteru_be.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");

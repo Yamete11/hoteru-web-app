@@ -163,7 +163,7 @@ namespace hoteru_be.Migrations
                 {
                     IdRoom = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     IdRoomStatus = table.Column<int>(type: "int", nullable: false),
@@ -358,6 +358,11 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Addresses",
+                columns: new[] { "IdAddress", "City", "Country", "Postcode", "Street" },
+                values: new object[] { 1, "Warsaw", "Poland", "02-913", "Koszykowa 86" });
+
+            migrationBuilder.InsertData(
                 table: "DepositTypes",
                 columns: new[] { "IdDepositType", "Title" },
                 values: new object[,]
@@ -365,6 +370,11 @@ namespace hoteru_be.Migrations
                     { 1, "Card" },
                     { 2, "Cash" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "GuestStatuses",
+                columns: new[] { "IdGuestStatus", "Title" },
+                values: new object[] { 1, "VIP" });
 
             migrationBuilder.InsertData(
                 table: "RoomStatuses",
@@ -406,45 +416,70 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Hotels",
+                columns: new[] { "IdHotel", "IdAddress", "Title" },
+                values: new object[] { 1, 1, "Nobu" });
+
+            migrationBuilder.InsertData(
                 table: "Rooms",
                 columns: new[] { "IdRoom", "Capacity", "IdRoomStatus", "IdRoomType", "Number", "Price" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, 1, "101", 3.5f },
-                    { 32, 32, 2, 1, "201", 3.5f },
-                    { 31, 31, 1, 1, "101", 3.5f },
-                    { 30, 30, 1, 1, "305", 3.5f },
-                    { 29, 29, 3, 1, "203", 3.5f },
-                    { 28, 28, 2, 1, "201", 3.5f },
-                    { 27, 27, 1, 1, "101", 3.5f },
-                    { 26, 26, 1, 1, "305", 3.5f },
-                    { 25, 25, 3, 1, "203", 3.5f },
-                    { 24, 24, 1, 1, "305", 3.5f },
-                    { 23, 23, 3, 1, "203", 3.5f },
-                    { 22, 22, 2, 1, "201", 3.5f },
-                    { 21, 21, 1, 1, "101", 3.5f },
-                    { 20, 20, 1, 1, "305", 3.5f },
                     { 19, 19, 3, 1, "203", 3.5f },
+                    { 20, 20, 1, 1, "305", 3.5f },
+                    { 21, 21, 1, 1, "101", 3.5f },
+                    { 22, 22, 2, 1, "201", 3.5f },
+                    { 23, 23, 3, 1, "203", 3.5f },
+                    { 24, 24, 1, 1, "305", 3.5f },
                     { 18, 18, 2, 1, "201", 3.5f },
+                    { 25, 25, 3, 1, "203", 3.5f },
+                    { 27, 27, 1, 1, "101", 3.5f },
+                    { 28, 28, 2, 1, "201", 3.5f },
+                    { 29, 29, 3, 1, "203", 3.5f },
+                    { 30, 30, 1, 1, "305", 3.5f },
+                    { 31, 31, 1, 1, "101", 3.5f },
+                    { 32, 32, 2, 1, "201", 3.5f },
+                    { 26, 26, 1, 1, "305", 3.5f },
+                    { 33, 33, 3, 1, "203", 3.5f },
                     { 17, 17, 1, 1, "101", 3.5f },
-                    { 16, 16, 1, 1, "305", 3.5f },
+                    { 15, 15, 3, 1, "203", 3.5f },
+                    { 1, 1, 1, 1, "101", 3.5f },
                     { 2, 2, 2, 1, "201", 3.5f },
                     { 3, 3, 3, 1, "203", 3.5f },
                     { 4, 4, 1, 1, "305", 3.5f },
                     { 5, 5, 1, 1, "101", 3.5f },
                     { 6, 6, 2, 1, "201", 3.5f },
+                    { 16, 16, 1, 1, "305", 3.5f },
                     { 7, 7, 3, 1, "203", 3.5f },
-                    { 33, 33, 3, 1, "203", 3.5f },
-                    { 8, 8, 1, 1, "305", 3.5f },
+                    { 9, 9, 1, 1, "101", 3.5f },
                     { 10, 10, 2, 1, "201", 3.5f },
                     { 11, 11, 3, 1, "203", 3.5f },
                     { 12, 12, 1, 1, "305", 3.5f },
                     { 13, 13, 1, 1, "101", 3.5f },
                     { 14, 14, 2, 1, "201", 3.5f },
-                    { 15, 15, 3, 1, "203", 3.5f },
-                    { 9, 9, 1, 1, "101", 3.5f },
+                    { 8, 8, 1, 1, "305", 3.5f },
                     { 34, 34, 1, 1, "305", 3.5f }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Persons",
+                columns: new[] { "IdPerson", "Email", "IdHotel", "Name", "Surname" },
+                values: new object[] { 1, "helli@gmail.com", 1, "Gleb", "Ivanov" });
+
+            migrationBuilder.InsertData(
+                table: "Persons",
+                columns: new[] { "IdPerson", "Email", "IdHotel", "Name", "Surname" },
+                values: new object[] { 2, "test@gmail.com", 1, "Artur", "Morgan" });
+
+            migrationBuilder.InsertData(
+                table: "Guests",
+                columns: new[] { "IdPerson", "IdGuestStatus", "Passport", "TelNumber" },
+                values: new object[] { 1, 1, "FV124124", "123123123" });
+
+            migrationBuilder.InsertData(
+                table: "Guests",
+                columns: new[] { "IdPerson", "IdGuestStatus", "Passport", "TelNumber" },
+                values: new object[] { 2, 1, "BG121231", "567567567" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Deposits_IdDepositType",
