@@ -4,87 +4,101 @@
     <sidebar></sidebar>
     <div class="main">
       <h1>New Service</h1>
-      <form @submit.prevent class="creating-form">
+      <form @submit.prevent="addService" class="creating-form">
         <div class="input-form">
           <label>Title: </label>
           <input
-              v-model="formData.Title"
+              v-model="state.formData.Title"
               class="input"
               type="text"
               placeholder="Enter service title"
+              @input="v$.formData.Title.$touch()"
           >
-          <span class="error-message" v-if="errors.Title">{{ errors.Title[0] }}</span>
+          <span class="error-message" v-if="v$.formData.Title.$error">
+            <span v-if="!v$.formData.Title.required.$response">Title is required</span>
+            <span v-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters</span>
+          </span>
+
         </div>
         <div class="input-form">
           <label>Price: </label>
           <input
-              v-model="formData.Sum"
+              v-model.number="state.formData.Sum"
               class="input"
               type="text"
               placeholder="Enter service price"
+              @input="v$.formData.Sum.$touch()"
           >
-          <span class="error-message" v-if="errors.Sum">{{ errors.Sum[0] }}</span>
+          <span class="error-message" v-if="v$.formData.Sum.$error">
+            <span v-if="!v$.formData.Sum.required.$response">Price is required</span>
+            <span v-if="!v$.formData.Sum.numeric.$response">Price must be a number</span>
+            <span v-if="!v$.formData.Sum.maxValue.$response">Price must not exceed 1,000,000</span>
+          </span>
+
         </div>
         <div class="input-form">
           <label>Description: </label>
           <input
-              v-model="formData.Description"
+              v-model="state.formData.Description"
               class="input"
               type="text"
               placeholder="Enter service description"
+              @input="v$.formData.Description.$touch()"
           >
-          <span class="error-message" v-if="errors.Description">{{ errors.Description[0] }}</span>
+          <span class="error-message" v-if="v$.formData.Description.$error">Description can have only 50 symbols</span>
         </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/services">Cancel</router-link>
-          <button class="registration-btn" @click="addService">Confirm</button>
+          <button class="registration-btn" type="submit">Confirm</button>
         </div>
       </form>
     </div>
-
   </div>
 </template>
 
 <script>
+import { reactive } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import {required, numeric, maxLength, maxValue} from '@vuelidate/validators';
 import axios from 'axios';
+
 export default {
   name: "NewService",
-  data(){
-    return {
+  setup() {
+    const state = reactive({
       formData: {
-        Title: '',
-        Sum: 0,
-        Description: '',
-      },
-      errors: {
         Title: '',
         Sum: '',
         Description: '',
       }
-    }
-  },
-  methods:{
-    async addService() {
-      try {
-        const response = await axios.post('https://localhost:44384/api/Service', this.formData);
-        console.log('Response:', response.data);
-        this.errors = {
-          Title: '',
-          Price: '',
-          Description: '',
-        }
+    });
 
-        if (response.data && response.data.httpStatusCode === 200) {
-          this.$router.push({ name: "Services" });
-        }
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          this.errors = error.response.data.errors;
-        } else {
+    const rules = {
+      formData: {
+        Title: { required, maxLength: maxLength(20) },
+        Sum: { required, numeric, maxValue: maxValue(1000000) },
+        Description: { maxLength: maxLength(50) }
+      }
+    };
+
+    const v$ = useVuelidate(rules, state);
+
+    async function addService() {
+      v$.value.$validate();
+      if (!v$.value.$error) {
+        try {
+          const response = await axios.post('https://localhost:44384/api/Service', state.formData);
+          console.log('Response:', response.data);
+
+          if (response.data && response.data.httpStatusCode === 200) {
+            this.$router.push({ name: "Services" });
+          }
+        } catch (error) {
           console.log('Error', error);
         }
       }
     }
+    return { state, v$, addService };
   }
 }
 </script>

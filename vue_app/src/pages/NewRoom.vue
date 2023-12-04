@@ -63,8 +63,6 @@
 
 <script>
 import axios from 'axios';
-import { useVuelidate } from '@vuelidate/core'
-import { required, email } from '@vuelidate/validators'
 export default {
   name: "NewRoom",
   data() {
@@ -86,18 +84,6 @@ export default {
         Price: '',
         Type: '',
         Status: ''
-      }
-    }
-  },
-  setup: () => ({ v$: useVuelidate() }),
-  validations (){
-    return {
-      formData: {
-        Number: {required},
-        Capacity: {required},
-        Price: {required},
-        Type: {required},
-        Status: {required}
       }
     }
   },
@@ -135,17 +121,6 @@ export default {
         } else {
           console.log('Error', error);
         }
-      }
-    }
-  },
-  computed(){
-    const v$ = useVuelidate(this.rules, this.formData)
-    const submitForm = async () => {
-      const result = await v$.value.$validate();
-      if(result){
-        alert("success")
-      } else {
-        alert("error")
       }
     }
   },
