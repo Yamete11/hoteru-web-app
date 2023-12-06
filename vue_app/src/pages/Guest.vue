@@ -48,8 +48,8 @@ export default {
         console.error(error);
       }
     },
-    deleteRoom(idGuest) {
-      this.guests = this.guests.filter(guest => guest.idGuest !== idGuest);
+    deleteRoom(idPerson) {
+      this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
     }
   },
 }

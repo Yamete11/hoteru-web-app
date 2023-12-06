@@ -4,7 +4,7 @@
       <guest-item
           v-for="guest in guests"
           :guest="guest"
-          :key="guest.idGuest"
+          :key="guest.idPerson"
           @deleteRoom="deleteGuest"
       />
     </transition-group>
@@ -24,8 +24,8 @@ export default {
     }
   },
   methods: {
-    deleteGuest(idGuest) {
-      this.$emit('deleteGuest', idGuest);
+    deleteGuest(idPerson) {
+      this.$emit('deleteGuest', idPerson);
     }
   }
 }

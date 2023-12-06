@@ -22,6 +22,7 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> DeleteGuest(int IdPerson)
         {
+            Person person = _context.Persons.SingleOrDefault(x => x.IdPerson == IdPerson);
             Guest guest = _context.Guests.SingleOrDefault(x => x.IdPerson == IdPerson);
 
             if (guest == null)
@@ -34,6 +35,7 @@ namespace hoteru_be.Services.Implementations
             };
 
             _context.Guests.Remove(guest);
+            _context.Persons.Remove(person);
 
             await _context.SaveChangesAsync();
 
@@ -61,6 +63,99 @@ namespace hoteru_be.Services.Implementations
                 }).ToListAsync();
         }
 
+        public async Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson)
+        {
+            var guest = await _context.Guests
+            .Include(r => r.GuestStatus)
+            .Include(r => r.Person)
+            .FirstOrDefaultAsync(x => x.IdPerson == IdPerson);
 
+            return new SpecificGuestDTO
+            {
+                IdPerson = guest.IdPerson,
+                Name = guest.Person.Name,
+                Surname= guest.Person.Surname,
+                Email= guest.Person.Email,
+                Passport = guest.Passport,
+                TelNumber = guest.TelNumber,
+                IdGuestStatus = guest.IdGuestStatus
+            };
+        }
+
+        public async Task<MethodResultDTO> PostGuest(GuestDTO guestDTO)
+        {
+            var hotel = await _context.Hotels.FirstOrDefaultAsync(r => r.IdHotel == 1);
+
+            Person person = new Person
+            {
+                Name = guestDTO.Name,
+                Surname = guestDTO.Surname,
+                Email = guestDTO.Email,
+                Hotel = hotel
+            };
+
+            Guest guest = new Guest
+            {
+                Passport = guestDTO.Passport,
+                TelNumber = guestDTO.TelNumber,
+                IdGuestStatus = int.Parse(guestDTO.IdGuestStatus),
+                Person = person
+            };
+
+
+            _context.Persons.Add(person);
+            _context.Guests.Add(guest);
+            await _context.SaveChangesAsync();
+
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Created"
+            };
+        }
+
+        public async Task<MethodResultDTO> UpdateGuest(SpecificGuestDTO guestDTO)
+        {
+            var guest = await _context.Guests
+                             .Include(r => r.GuestStatus)
+                             .FirstOrDefaultAsync(r => r.IdPerson == guestDTO.IdPerson);
+
+            var person = await _context.Persons.FirstOrDefaultAsync(r => r.IdPerson == guestDTO.IdPerson);
+
+            if (guest == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Guest not found"
+                };
+            }
+
+            var existingGuest = await _context.Guests
+                .AnyAsync(r => r.Passport == guestDTO.Passport);
+
+            if (existingGuest)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Another guest with this email already exists"
+                };
+            }
+
+            guest.TelNumber = guestDTO.TelNumber;
+            guest.Passport = guestDTO.Passport;
+            guest.IdGuestStatus = guestDTO.IdGuestStatus;
+            person.Name = guestDTO.Name;
+            person.Surname = guestDTO.Surname;
+            person.Email = guestDTO.Email;
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Updated"
+            };
+        }
     }
 }

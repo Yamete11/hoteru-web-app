@@ -23,5 +23,30 @@ namespace hoteru_be.Controllers
         {
             return await _service.GetGuests();
         }
+
+        [HttpGet("{IdPerson}")]
+        public async Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson)
+        {
+            return await _service.GetSpecificGuest(IdPerson);
+        }
+
+        [HttpDelete("{IdPerson}")]
+        public async Task<MethodResultDTO> DeleteGuest(int IdPerson)
+        {
+            return await _service.DeleteGuest(IdPerson);
+        }
+
+        [HttpPut]
+        public async Task<MethodResultDTO> UpdateGuest([FromBody] SpecificGuestDTO guestDTO)
+        {
+            return await _service.UpdateGuest(guestDTO);
+        }
+
+        [HttpPost]
+        public async Task<MethodResultDTO> PostGuest([FromBody] GuestDTO guestDTO)
+        {
+
+            return await _service.PostGuest(guestDTO);
+        }
     }
 }

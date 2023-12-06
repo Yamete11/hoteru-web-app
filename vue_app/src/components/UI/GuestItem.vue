@@ -5,10 +5,10 @@
     <span class="item telNumber">{{ guest.telNumber }}</span>
     <span class="item email">{{ guest.email }}</span>
     <div class="item-btns">
-      <button class="btn" type="button">
+      <button class="btn" type="button" @click="viewGuestDetails(guest.idPerson)">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteGuest(guest.idGuest)">
+      <button class="btn" type="button" @click="deleteGuest(guest.idPerson)">
         Delete
       </button>
     </div>
@@ -27,10 +27,13 @@ export default {
     }
   },
   methods: {
-    deleteGuest(idGuest) {
-      axios.delete(`https://localhost:44384/api/Room/${idGuest}`)
+    viewGuestDetails(idPerson) {
+      this.$router.push({ name: 'GuestDetails', params: { idPerson: idPerson } });
+    },
+    deleteGuest(idPerson) {
+      axios.delete(`https://localhost:44384/api/Room/${idPerson}`)
           .then(() => {
-            this.$emit('deleteGuest', idGuest);
+            this.$emit('deleteGuest', idPerson);
           })
           .catch(error => {
             console.error(error);

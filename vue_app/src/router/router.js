@@ -7,10 +7,11 @@ import Room from "../pages/Room.vue";
 import Service from "../pages/Service.vue";
 import History from "../pages/History.vue";
 import Registration from "../pages/Registration.vue";
-import NewRoom from "../pages/NewRoom.vue";
-import NewService from "../pages/NewService.vue";
-import RoomDetails from "../pages/RoomDetails.vue";
-import ServiceDetails from "../pages/ServiceDetails.vue";
+import NewRoom from "../pages/new/NewRoom.vue";
+import NewService from "../pages/new/NewService.vue";
+import RoomDetails from "../pages/details/RoomDetails.vue";
+import ServiceDetails from "../pages/details/ServiceDetails.vue";
+import GuestDetails from "../pages/details/GuestDetails.vue";
 
 
 const routes = [
@@ -29,6 +30,12 @@ const routes = [
     {
         path: '/arrivals',
         component: Arrival
+    },
+    {
+        path: '/guests/:idPerson',
+        component: GuestDetails,
+        name: 'GuestDetails',
+        props: true
     },
     {
         path: '/guests',
