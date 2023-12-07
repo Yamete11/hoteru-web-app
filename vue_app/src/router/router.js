@@ -12,6 +12,11 @@ import NewService from "../pages/new/NewService.vue";
 import RoomDetails from "../pages/details/RoomDetails.vue";
 import ServiceDetails from "../pages/details/ServiceDetails.vue";
 import GuestDetails from "../pages/details/GuestDetails.vue";
+import NewGuest from "../pages/new/NewGuest.vue";
+import HistoryDetails from "../pages/details/HistoryDetails.vue";
+import ReservationDetails from "../pages/details/ReservationDetails.vue";
+import ArrivalDetails from "../pages/details/ArrivalDetails.vue";
+import NewReservation from "../pages/new/NewReservation.vue";
 
 
 const routes = [
@@ -20,12 +25,28 @@ const routes = [
         component: Login
     },
     {
+        path: '/new-reservation',
+        component: NewReservation
+    },
+    {
+        path: '/reservations/:idReservation',
+        component: ReservationDetails,
+        name: 'ReservationDetails',
+        props: true
+    },
+    {
         path: '/reservations',
         component: Reservation
     },
     {
         path: '/registration',
         component: Registration
+    },
+    {
+        path: '/arrivals/:idReservation',
+        component: ArrivalDetails,
+        name: 'ArrivalDetails',
+        props: true
     },
     {
         path: '/arrivals',
@@ -40,6 +61,10 @@ const routes = [
     {
         path: '/guests',
         component: Guest
+    },
+    {
+        path: '/new-guest',
+        component: NewGuest
     },
     {
         path: '/rooms/:idRoom',
@@ -70,6 +95,12 @@ const routes = [
     {
         path: '/new-service',
         component: NewService
+    },
+    {
+        path: '/history/:idReservation',
+        component: HistoryDetails,
+        name: 'HistoryDetails',
+        props: true
     },
     {
         path: '/history',

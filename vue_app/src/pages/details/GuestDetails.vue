@@ -29,8 +29,8 @@
         <div class="input-form">
           <label>Status: </label>
           <input v-if="!isEditing" class="input" type="text" :value="statusTitle" readonly>
-          <select v-else v-model="guest.status" class="input">
-            <option v-for="status in guestStatus" :value="status.idGuestStatus" :key="status.idGuestStatus">{{ status.title }}</option>
+          <select v-else v-model="guest.idGuestStatus" class="input">
+            <option v-for="status in guestStatuses" :value="status.idGuestStatus" :key="status.idGuestStatus">{{ status.title }}</option>
           </select>
         </div>
         <div class="registration-class">
@@ -57,7 +57,7 @@ export default {
         email: '',
         telNumber: '',
         passport: '',
-        status: ''
+        idGuestStatus: ''
       },
       statusTitle: '',
       guestStatuses: []
@@ -74,7 +74,7 @@ export default {
       this.isEditing = !this.isEditing;
       if (!this.isEditing) {
 
-        const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.status);
+        const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.idGuestStatus);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
         try {
           const response = await axios.put('https://localhost:44384/api/Guest', this.guest);
@@ -92,7 +92,7 @@ export default {
         const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus');
         this.guestStatuses = responseStatus.data;
 
-        const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.status);
+        const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.idGuestStatus);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
       } catch (error) {
         console.error(error);

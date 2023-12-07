@@ -1,5 +1,6 @@
 ﻿using hoteru_be.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace hoteru_be.Context
@@ -99,18 +100,22 @@ namespace hoteru_be.Context
 
             });
 
-            modelBuilder.Entity<Person>(t =>
-            {
-                t.HasData(
-                    new Person { IdPerson = 1, Name = "Gleb", Surname = "Ivanov", Email = "helli@gmail.com", IdHotel = 1 },
-                    new Person { IdPerson = 2, Name = "Artur", Surname = "Morgan", Email = "test@gmail.com", IdHotel = 1 });
-
-            });
-
             modelBuilder.Entity<GuestStatus>(t =>
             {
                 t.HasData(
                     new GuestStatus { IdGuestStatus = 1, Title = "VIP"});
+
+            });
+
+
+
+            modelBuilder.Entity<Person>(t =>
+            {
+                t.HasData(
+                    new Person { IdPerson = 1, Name = "Gleb", Surname = "Ivanov", Email = "helli@gmail.com", IdHotel = 1 },
+                    new Person { IdPerson = 2, Name = "Artur", Surname = "Morgan", Email = "test@gmail.com", IdHotel = 1 },
+                    new Person { IdPerson = 3, Name = "Mikolaj", Surname = "Sluzalek", Email = "password@gmail.com", IdHotel = 1 },
+                    new Person { IdPerson = 4, Name = "Jack", Surname = "Marston", Email = "marston@gmail.com", IdHotel = 1 });
 
             });
 
@@ -121,6 +126,17 @@ namespace hoteru_be.Context
                     new Guest { IdPerson = 2, Passport = "BG121231", TelNumber = "567567567", IdGuestStatus = 1});
 
             });
+
+            modelBuilder.Entity<User>(t =>
+            {
+                t.HasData(
+                    new User { IdPerson = 3, LoginName = "Login1", Password = "123123123", IdUserType = 3 },
+                    new User { IdPerson = 4, LoginName = "Login2", Password = "567567567", IdUserType = 3 });
+
+            });
+
+
+
 
             modelBuilder.Entity<Room>(t =>
             {
@@ -161,6 +177,47 @@ namespace hoteru_be.Context
                     new Room { IdRoom = 34, Number = "305", Capacity = 34, Price = 3.5f, IdRoomType = 1, IdRoomStatus = 1 });
 
             });
+            modelBuilder.Entity<Deposit>(t =>
+            {
+                t.HasData(
+                    new Deposit { IdDeposit = 1, Sum = 200, IdDepositType = 1 },
+                    new Deposit { IdDeposit = 2, Sum = 300, IdDepositType = 1 });
+
+            });
+
+
+            modelBuilder.Entity<Reservation>(t =>
+            {
+                t.HasData(
+                    new Reservation { IdReservation = 1, Capacity = 2, Price = 1.0f, In = new DateTime(2023, 12, 6), Out = new DateTime(2023, 12, 12), Confirmed = true, IdRoom = 1, IdUser = 3, IdDeposit = 1 },
+                    new Reservation { IdReservation = 2, Capacity = 3, Price = 2.0f, In = new DateTime(2023, 12, 6), Out = new DateTime(2023, 12, 18), Confirmed = true, IdRoom = 2, IdUser = 4, IdDeposit = 2, IdBill = 1 },
+                    new Reservation { IdReservation = 3, Capacity = 2, Price = 1.0f, In = new DateTime(2023, 12, 6), Out = new DateTime(2023, 12, 12), Confirmed = false, IdRoom = 1, IdUser = 3});
+
+            });
+
+            modelBuilder.Entity<GuestReservation>(t =>
+            {
+                t.HasData(
+                    new GuestReservation { IdGuestReservation = 1, IdReservation = 1, IdGuest = 1 },
+                    new GuestReservation { IdGuestReservation = 2, IdReservation = 1, IdGuest = 2 });
+
+            });
+
+            modelBuilder.Entity<Bill>(t =>
+            {
+                t.HasData(
+                    new Bill { IdBill = 1, Created = new DateTime(2023, 12, 06), Sum = 300 });
+            });
+
+            modelBuilder.Entity<ReservationService>(t =>
+            {
+                t.HasData(
+                    new ReservationService { IdReservationService = 1, IdReservation = 2, IdService = 1, Date = new DateTime(2023, 11, 10) },
+                    new ReservationService { IdReservationService = 2, IdReservation = 2, IdService = 2, Date = new DateTime(2023, 11, 12) },
+                    new ReservationService { IdReservationService = 3, IdReservation = 2, IdService = 3, Date = new DateTime(2023, 11, 13) });
+
+            });
+
         }
     }
 }

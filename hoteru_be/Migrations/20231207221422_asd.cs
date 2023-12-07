@@ -29,7 +29,7 @@ namespace hoteru_be.Migrations
                 {
                     IdBill = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Creating = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Sum = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
@@ -270,8 +270,9 @@ namespace hoteru_be.Migrations
                     Price = table.Column<float>(type: "real", nullable: false),
                     In = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Out = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Confirmed = table.Column<bool>(type: "bit", nullable: false),
                     IdRoom = table.Column<int>(type: "int", nullable: false),
-                    IdDeposit = table.Column<int>(type: "int", nullable: false),
+                    IdDeposit = table.Column<int>(type: "int", nullable: true),
                     IdUser = table.Column<int>(type: "int", nullable: false),
                     IdBill = table.Column<int>(type: "int", nullable: true)
                 },
@@ -289,7 +290,7 @@ namespace hoteru_be.Migrations
                         column: x => x.IdDeposit,
                         principalTable: "Deposits",
                         principalColumn: "IdDeposit",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Reservations_Rooms_IdRoom",
                         column: x => x.IdRoom,
@@ -363,6 +364,11 @@ namespace hoteru_be.Migrations
                 values: new object[] { 1, "Warsaw", "Poland", "02-913", "Koszykowa 86" });
 
             migrationBuilder.InsertData(
+                table: "Bills",
+                columns: new[] { "IdBill", "Created", "Sum" },
+                values: new object[] { 1, new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), 300f });
+
+            migrationBuilder.InsertData(
                 table: "DepositTypes",
                 columns: new[] { "IdDepositType", "Title" },
                 values: new object[,]
@@ -416,6 +422,15 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Deposits",
+                columns: new[] { "IdDeposit", "IdDepositType", "Sum" },
+                values: new object[,]
+                {
+                    { 1, 1, 200f },
+                    { 2, 1, 300f }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Hotels",
                 columns: new[] { "IdHotel", "IdAddress", "Title" },
                 values: new object[] { 1, 1, "Nobu" });
@@ -431,17 +446,17 @@ namespace hoteru_be.Migrations
                     { 22, 22, 2, 1, "201", 3.5f },
                     { 23, 23, 3, 1, "203", 3.5f },
                     { 24, 24, 1, 1, "305", 3.5f },
-                    { 18, 18, 2, 1, "201", 3.5f },
                     { 25, 25, 3, 1, "203", 3.5f },
+                    { 26, 26, 1, 1, "305", 3.5f },
                     { 27, 27, 1, 1, "101", 3.5f },
                     { 28, 28, 2, 1, "201", 3.5f },
                     { 29, 29, 3, 1, "203", 3.5f },
                     { 30, 30, 1, 1, "305", 3.5f },
                     { 31, 31, 1, 1, "101", 3.5f },
                     { 32, 32, 2, 1, "201", 3.5f },
-                    { 26, 26, 1, 1, "305", 3.5f },
-                    { 33, 33, 3, 1, "203", 3.5f },
+                    { 18, 18, 2, 1, "201", 3.5f },
                     { 17, 17, 1, 1, "101", 3.5f },
+                    { 16, 16, 1, 1, "305", 3.5f },
                     { 15, 15, 3, 1, "203", 3.5f },
                     { 1, 1, 1, 1, "101", 3.5f },
                     { 2, 2, 2, 1, "201", 3.5f },
@@ -449,7 +464,7 @@ namespace hoteru_be.Migrations
                     { 4, 4, 1, 1, "305", 3.5f },
                     { 5, 5, 1, 1, "101", 3.5f },
                     { 6, 6, 2, 1, "201", 3.5f },
-                    { 16, 16, 1, 1, "305", 3.5f },
+                    { 33, 33, 3, 1, "203", 3.5f },
                     { 7, 7, 3, 1, "203", 3.5f },
                     { 9, 9, 1, 1, "101", 3.5f },
                     { 10, 10, 2, 1, "201", 3.5f },
@@ -464,22 +479,65 @@ namespace hoteru_be.Migrations
             migrationBuilder.InsertData(
                 table: "Persons",
                 columns: new[] { "IdPerson", "Email", "IdHotel", "Name", "Surname" },
-                values: new object[] { 1, "helli@gmail.com", 1, "Gleb", "Ivanov" });
-
-            migrationBuilder.InsertData(
-                table: "Persons",
-                columns: new[] { "IdPerson", "Email", "IdHotel", "Name", "Surname" },
-                values: new object[] { 2, "test@gmail.com", 1, "Artur", "Morgan" });
-
-            migrationBuilder.InsertData(
-                table: "Guests",
-                columns: new[] { "IdPerson", "IdGuestStatus", "Passport", "TelNumber" },
-                values: new object[] { 1, 1, "FV124124", "123123123" });
+                values: new object[,]
+                {
+                    { 1, "helli@gmail.com", 1, "Gleb", "Ivanov" },
+                    { 2, "test@gmail.com", 1, "Artur", "Morgan" },
+                    { 3, "password@gmail.com", 1, "Mikolaj", "Sluzalek" },
+                    { 4, "marston@gmail.com", 1, "Jack", "Marston" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Guests",
                 columns: new[] { "IdPerson", "IdGuestStatus", "Passport", "TelNumber" },
-                values: new object[] { 2, 1, "BG121231", "567567567" });
+                values: new object[,]
+                {
+                    { 1, 1, "FV124124", "123123123" },
+                    { 2, 1, "BG121231", "567567567" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "IdPerson", "IdUserType", "LoginName", "Password" },
+                values: new object[,]
+                {
+                    { 3, 3, "Login1", "123123123" },
+                    { 4, 3, "Login2", "567567567" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reservations",
+                columns: new[] { "IdReservation", "Capacity", "Confirmed", "IdBill", "IdDeposit", "IdRoom", "IdUser", "In", "Out", "Price" },
+                values: new object[] { 1, 2, true, null, 1, 1, 3, new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 1f });
+
+            migrationBuilder.InsertData(
+                table: "Reservations",
+                columns: new[] { "IdReservation", "Capacity", "Confirmed", "IdBill", "IdDeposit", "IdRoom", "IdUser", "In", "Out", "Price" },
+                values: new object[] { 3, 2, false, null, null, 1, 3, new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 1f });
+
+            migrationBuilder.InsertData(
+                table: "Reservations",
+                columns: new[] { "IdReservation", "Capacity", "Confirmed", "IdBill", "IdDeposit", "IdRoom", "IdUser", "In", "Out", "Price" },
+                values: new object[] { 2, 3, true, 1, 2, 2, 4, new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), 2f });
+
+            migrationBuilder.InsertData(
+                table: "GuestReservations",
+                columns: new[] { "IdGuestReservation", "IdGuest", "IdReservation" },
+                values: new object[,]
+                {
+                    { 1, 1, 1 },
+                    { 2, 2, 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ReservationService",
+                columns: new[] { "IdReservationService", "Date", "IdReservation", "IdService" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 1 },
+                    { 2, new DateTime(2023, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 2 },
+                    { 3, new DateTime(2023, 11, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 3 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Deposits_IdDepositType",
@@ -523,7 +581,8 @@ namespace hoteru_be.Migrations
                 name: "IX_Reservations_IdDeposit",
                 table: "Reservations",
                 column: "IdDeposit",
-                unique: true);
+                unique: true,
+                filter: "[IdDeposit] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_IdRoom",

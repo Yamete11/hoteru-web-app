@@ -23,5 +23,30 @@ namespace hoteru_be.Controllers
         {
             return await _service.GetReservations();
         }
+
+        [HttpGet("history")]
+        public async Task<IEnumerable<ReservationDTO>> GetHistory()
+        {
+            return await _service.GetHistory();
+        }
+
+        [HttpGet("arrivals")]
+        public async Task<IEnumerable<ReservationDTO>> GetArrivals()
+        {
+            return await _service.GetArrivals();
+        }
+
+        [HttpGet("history/{IdReservation}")]
+        public async Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation)
+        {
+            return await _service.GetSpecificHistory(IdReservation);
+        }
+
+        [HttpDelete("{IdReservation}")]
+        public async Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation)
+        {
+            return await _service.DeleteSpecificReservation(IdReservation);
+        }
+
     }
 }

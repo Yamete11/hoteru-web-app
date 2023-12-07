@@ -5,8 +5,9 @@
     <div class="main">
       <h1>New Service</h1>
       <form @submit.prevent="addService" class="creating-form">
+
         <div class="input-form">
-          <label>Title: </label>
+          <label>Title*: </label>
           <input
               v-model="state.formData.Title"
               class="input"
@@ -15,13 +16,15 @@
               @input="v$.formData.Title.$touch()"
           >
           <span class="error-message" v-if="v$.formData.Title.$error">
-            <span v-if="!v$.formData.Title.required.$response">Title is required</span>
-            <span v-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters</span>
+            <span v-if="!v$.formData.Title.required.$response">Title is required*</span>
+            <span v-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters*</span>
           </span>
-
+          <span class="error-message" v-if="state.errors.Title">{{ state.errors.Title[0] }}</span>
         </div>
+
+
         <div class="input-form">
-          <label>Price: </label>
+          <label>Price*: </label>
           <input
               v-model.number="state.formData.Sum"
               class="input"
@@ -30,12 +33,14 @@
               @input="v$.formData.Sum.$touch()"
           >
           <span class="error-message" v-if="v$.formData.Sum.$error">
-            <span v-if="!v$.formData.Sum.required.$response">Price is required</span>
-            <span v-if="!v$.formData.Sum.numeric.$response">Price must be a number</span>
-            <span v-if="!v$.formData.Sum.maxValue.$response">Price must not exceed 1,000,000</span>
+            <span v-if="!v$.formData.Sum.required.$response">Price is required*</span>
+            <span v-if="!v$.formData.Sum.numeric.$response">Price must be a number*</span>
+            <span v-if="!v$.formData.Sum.maxValue.$response">Price must not exceed 1,000,000*</span>
           </span>
-
+          <span class="error-message" v-if="state.errors.Sum">{{ state.errors.Sum[0] }}</span>
         </div>
+
+
         <div class="input-form">
           <label>Description: </label>
           <input
@@ -46,7 +51,10 @@
               @input="v$.formData.Description.$touch()"
           >
           <span class="error-message" v-if="v$.formData.Description.$error">Description can have only 50 symbols</span>
+          <span class="error-message" v-if="state.errors.Description">{{ state.errors.Description[0] }}</span>
         </div>
+
+
         <div class="registration-class">
           <router-link class="registration-btn" to="/services">Cancel</router-link>
           <button class="registration-btn" type="submit">Confirm</button>
@@ -59,7 +67,7 @@
 <script>
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import {required, numeric, maxLength, maxValue} from '@vuelidate/validators';
+import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
 import axios from 'axios';
 
 export default {
@@ -68,9 +76,10 @@ export default {
     const state = reactive({
       formData: {
         Title: '',
-        Sum: '',
+        Sum: 0,
         Description: '',
-      }
+      },
+      errors: {}
     });
 
     const rules = {
@@ -89,15 +98,18 @@ export default {
         try {
           const response = await axios.post('https://localhost:44384/api/Service', state.formData);
           console.log('Response:', response.data);
-
           if (response.data && response.data.httpStatusCode === 200) {
             this.$router.push({ name: "Services" });
           }
         } catch (error) {
+          if (error.response && error.response.data && error.response.data.errors) {
+            state.errors = error.response.data.errors;
+          }
           console.log('Error', error);
         }
       }
     }
+
     return { state, v$, addService };
   }
 }

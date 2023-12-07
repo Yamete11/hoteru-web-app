@@ -10,7 +10,7 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231130173445_asd")]
+    [Migration("20231207221422_asd")]
     partial class asd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,7 +62,7 @@ namespace hoteru_be.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Creating")
+                    b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
                     b.Property<float>("Sum")
@@ -71,6 +71,14 @@ namespace hoteru_be.Migrations
                     b.HasKey("IdBill");
 
                     b.ToTable("Bills");
+
+                    b.HasData(
+                        new
+                        {
+                            IdBill = 1,
+                            Created = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Sum = 300f
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Deposit", b =>
@@ -91,6 +99,20 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdDepositType");
 
                     b.ToTable("Deposits");
+
+                    b.HasData(
+                        new
+                        {
+                            IdDeposit = 1,
+                            IdDepositType = 1,
+                            Sum = 200f
+                        },
+                        new
+                        {
+                            IdDeposit = 2,
+                            IdDepositType = 1,
+                            Sum = 300f
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.DepositType", b =>
@@ -177,6 +199,20 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdReservation");
 
                     b.ToTable("GuestReservations");
+
+                    b.HasData(
+                        new
+                        {
+                            IdGuestReservation = 1,
+                            IdGuest = 1,
+                            IdReservation = 1
+                        },
+                        new
+                        {
+                            IdGuestReservation = 2,
+                            IdGuest = 2,
+                            IdReservation = 1
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestStatus", b =>
@@ -271,6 +307,22 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             Name = "Artur",
                             Surname = "Morgan"
+                        },
+                        new
+                        {
+                            IdPerson = 3,
+                            Email = "password@gmail.com",
+                            IdHotel = 1,
+                            Name = "Mikolaj",
+                            Surname = "Sluzalek"
+                        },
+                        new
+                        {
+                            IdPerson = 4,
+                            Email = "marston@gmail.com",
+                            IdHotel = 1,
+                            Name = "Jack",
+                            Surname = "Marston"
                         });
                 });
 
@@ -284,10 +336,13 @@ namespace hoteru_be.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("IdBill")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdDeposit")
+                    b.Property<int?>("IdDeposit")
                         .HasColumnType("int");
 
                     b.Property<int>("IdRoom")
@@ -312,13 +367,52 @@ namespace hoteru_be.Migrations
                         .HasFilter("[IdBill] IS NOT NULL");
 
                     b.HasIndex("IdDeposit")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IdDeposit] IS NOT NULL");
 
                     b.HasIndex("IdRoom");
 
                     b.HasIndex("IdUser");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            IdReservation = 1,
+                            Capacity = 2,
+                            Confirmed = true,
+                            IdDeposit = 1,
+                            IdRoom = 1,
+                            IdUser = 3,
+                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 1f
+                        },
+                        new
+                        {
+                            IdReservation = 2,
+                            Capacity = 3,
+                            Confirmed = true,
+                            IdBill = 1,
+                            IdDeposit = 2,
+                            IdRoom = 2,
+                            IdUser = 4,
+                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 2f
+                        },
+                        new
+                        {
+                            IdReservation = 3,
+                            Capacity = 2,
+                            Confirmed = false,
+                            IdRoom = 1,
+                            IdUser = 3,
+                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 1f
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.ReservationService", b =>
@@ -344,6 +438,29 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdService");
 
                     b.ToTable("ReservationService");
+
+                    b.HasData(
+                        new
+                        {
+                            IdReservationService = 1,
+                            Date = new DateTime(2023, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IdReservation = 2,
+                            IdService = 1
+                        },
+                        new
+                        {
+                            IdReservationService = 2,
+                            Date = new DateTime(2023, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IdReservation = 2,
+                            IdService = 2
+                        },
+                        new
+                        {
+                            IdReservationService = 3,
+                            Date = new DateTime(2023, 11, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IdReservation = 2,
+                            IdService = 3
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.Room", b =>
@@ -808,6 +925,22 @@ namespace hoteru_be.Migrations
                     b.HasIndex("IdUserType");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            IdPerson = 3,
+                            IdUserType = 3,
+                            LoginName = "Login1",
+                            Password = "123123123"
+                        },
+                        new
+                        {
+                            IdPerson = 4,
+                            IdUserType = 3,
+                            LoginName = "Login2",
+                            Password = "567567567"
+                        });
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.UserType", b =>
@@ -921,9 +1054,7 @@ namespace hoteru_be.Migrations
 
                     b.HasOne("hoteru_be.Entities.Deposit", "Deposit")
                         .WithOne("Reservation")
-                        .HasForeignKey("hoteru_be.Entities.Reservation", "IdDeposit")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("hoteru_be.Entities.Reservation", "IdDeposit");
 
                     b.HasOne("hoteru_be.Entities.Room", "Room")
                         .WithMany("Reservations")

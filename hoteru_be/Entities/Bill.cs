@@ -7,7 +7,7 @@ namespace hoteru_be.Entities
     {
         [Key]
         public int IdBill { get; set; }
-        public DateTime Creating { get; set; }
+        public DateTime Created { get; set; }
         public float Sum { get; set; }
 
         public Reservation Reservation { get; set; }

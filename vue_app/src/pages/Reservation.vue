@@ -6,21 +6,19 @@
       <div class="main">
         <div class="main-top">
           <input type="text" class="search-input" placeholder="Search ..." />
-          <router-link to="/new-reservation" class="new-reservation-button">New Reservation</router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">
-            <span class="header date">Date</span>
-            <span class="header time">Time</span>
+            <span class="header in">Date In</span>
+            <span class="header out">Date Out</span>
             <span class="header name">Name</span>
             <span class="header room">Room</span>
             <span class="header bookedBy">Booked By</span>
-            <span class="header note">Note</span>
             <span class="header action">Action</span>
           </div>
           <div>
             <reservation-list :reservations="reservations" @deleteReservation="deleteReservation">
-              The list of reservations is empty
+              The reservation list is empty
             </reservation-list>
           </div>
         </div>
@@ -105,18 +103,6 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-.new-reservation-button {
-  font-weight: bold;
-  font-size: 20px;
-  padding: 0.5rem 3rem;
-  background-color: #A4907C;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-
 .table-headers {
   display: flex;
   justify-content: space-between;
@@ -130,13 +116,13 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.date {
+.header.in {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
-.header.time {
+.header.out {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }
@@ -149,10 +135,6 @@ export default {
   justify-content: center;
   flex-basis: 10%; }
 .header.bookedBy {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.note {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }

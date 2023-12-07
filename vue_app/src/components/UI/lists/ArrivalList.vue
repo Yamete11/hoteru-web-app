@@ -1,7 +1,7 @@
 <template>
   <div v-if="reservations.length > 0" class="room-list">
     <transition-group name="room-list">
-      <reservation-item
+      <arrival-item
           v-for="reservation in reservations"
           :reservation="reservation"
           :key="reservation.idReservation"
@@ -10,13 +10,13 @@
     </transition-group>
   </div>
   <h2 v-else>
-    <slot></slot>
+    The reservation list is empty
   </h2>
 </template>
 
 <script>
 export default {
-  name: "ReservationList",
+  name: "ArrivalList",
   props:{
     reservations:{
       type: Array,

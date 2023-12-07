@@ -9,21 +9,20 @@
         </div>
         <div class="main-bot">
           <div class="table-headers">
-            <span class="header date">Date</span>
-            <span class="header time">Time</span>
+            <span class="header in">Date In</span>
+            <span class="header out">Date Out</span>
             <span class="header name">Name</span>
             <span class="header room">Room</span>
             <span class="header bookedBy">Booked By</span>
-            <span class="header note">Note</span>
             <span class="header action">Action</span>
           </div>
           <div>
-            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation">
-              The list of arrivals is empty
-            </reservation-list>
+            <arrival-list :reservations="reservations" @deleteReservation="deleteReservation">
+              The arrivals list is empty
+            </arrival-list>
           </div>
         </div>
-      </div>
+      </div>`
     </div>
   </div>
 </template>
@@ -47,7 +46,7 @@ export default {
   methods: {
     async fetchReservations() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Reservation');
+        const response = await axios.get('https://localhost:44384/api/Reservation/arrivals');
         this.reservations = response.data;
       } catch (error) {
         console.error(error);
@@ -116,13 +115,13 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.date {
+.header.in {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
-.header.time {
+.header.out {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }
@@ -135,10 +134,6 @@ export default {
   justify-content: center;
   flex-basis: 10%; }
 .header.bookedBy {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.note {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }

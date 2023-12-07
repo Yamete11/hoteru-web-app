@@ -1,13 +1,12 @@
 <template>
   <div class="item-div">
-    <span class="item date">{{ reservation.date }}</span>
-    <span class="item time">{{ reservation.time }}</span>
-    <span class="item fullName">{{ reservation.name }}{{ reservation.surname }}</span>
-    <span class="item room">{{ reservation.room }}</span>
+    <span class="item in">{{ reservation.in }}</span>
+    <span class="item out">{{ reservation.out }}</span>
+    <span class="item name">{{ reservation.name }} {{ reservation.surname }}</span>
+    <span class="item roomNumber">{{ reservation.roomNumber }}</span>
     <span class="item bookedBy">{{ reservation.bookedBy }}</span>
-    <span class="item note">{{ reservation.note }}</span>
     <div class="item-btns">
-      <button class="btn" type="button">
+      <button class="btn" type="button" @click="viewReservationDetails(reservation.idReservation)">
         Details
       </button>
       <button class="btn" type="button" @click="deleteReservation(reservation.idReservation)">
@@ -29,7 +28,10 @@ export default {
     }
   },
   methods: {
-    deleteRoom(idReservation) {
+    viewReservationDetails(idReservation) {
+      this.$router.push({ name: 'ReservationDetails', params: { idReservation: idReservation } });
+    },
+    deleteReservation(idReservation) {
       axios.delete(`https://localhost:44384/api/Reservation/${idReservation}`)
           .then(() => {
             this.$emit('deleteReservation', idReservation);
@@ -45,7 +47,7 @@ export default {
 
 <style scoped>
 .item-div{
-  padding: 0.5rem 0.5rem 0.5rem 3rem;
+  padding: 0.7rem 0.5rem 0.7rem 3rem;
   margin: 1rem;
   display: flex;
   align-items: center;
@@ -73,33 +75,28 @@ export default {
   color: #FFFFFF;
 }
 
-.item.date {
+.item.in {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 
 }
-.item.time {
+.item.out {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
-.item.fullName {
+.item.name {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
-.item.room {
+.item.roomNumber {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
 .item.bookedBy {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-.item.note {
   display: flex;
   justify-content: center;
   flex-basis: 10%;

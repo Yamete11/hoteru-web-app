@@ -12,6 +12,9 @@ namespace hoteru_be.Entities
         [Required]
         [ForeignKey(nameof(IdPerson))]
         public Person Person { get; set; }
+
+
+
         public string LoginName { get; set; }
         public string Password { get; set; }
 

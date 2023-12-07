@@ -7,7 +7,7 @@ namespace hoteru_be.DTOs
         public int IdService { get; set; }
 
 
-        [Required(ErrorMessage = "Room title is required")]
+        [Required(ErrorMessage = "Title is required")]
         [MaxLength(20, ErrorMessage = "Title can have max 20 symbols")]
         public string Title { get; set; }
 

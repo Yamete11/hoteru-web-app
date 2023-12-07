@@ -14,6 +14,8 @@ namespace hoteru_be.Entities
         public DateTime In { get; set; }
         public DateTime Out { get; set; }
 
+        public bool Confirmed { get; set; }
+
 
         public int IdRoom { get; set; }
         [Required]
@@ -22,8 +24,7 @@ namespace hoteru_be.Entities
 
 
 
-        public int IdDeposit { get; set; }
-        [Required]
+        public int? IdDeposit { get; set; }
         [ForeignKey(nameof(IdDeposit))]
         public Deposit Deposit { get; set; }
 
@@ -33,6 +34,8 @@ namespace hoteru_be.Entities
         [Required]
         [ForeignKey(nameof(IdUser))]
         public User User { get; set; }
+
+
 
         public int? IdBill { get; set; }
         [ForeignKey(nameof(IdBill))]
