@@ -42,7 +42,7 @@ export default {
   },
   computed:{
     sortedAndSearchedPosts(){
-      return this.services.filter(service => service.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      return this.services.filter(service => service.title.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
     }
   },
   methods: {

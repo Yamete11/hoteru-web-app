@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import components from './components/UI';
 import router from './router/router.js'
-import VIntersection from "./components/directives/VIntersection";
+import VIntersection from "./components/directives/VIntersection.js";
 
 const app = createApp(App);
 

@@ -8,7 +8,6 @@
         <div class="main-top">
           <div class="left">
             <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
-            <button @click="loadMoreRooms">Load</button>
           </div>
           <div class="right">
             <router-link to="/new-room" class="new-room-button">New Room</router-link>
@@ -22,9 +21,12 @@
             <span class="header status">Status</span>
             <span class="header action">Action</span>
           </div>
-          <div>
+          <div v-if="!isRoomLoading">
             <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
-            <div v-intersection=""  class="observer"></div>
+            <div v-intersection="loadMoreRooms" class="observer"></div>
+          </div>
+          <div v-else>
+            <div>The list is loading...</div>
           </div>
         </div>
       </div>
@@ -40,12 +42,14 @@ export default {
   components: {},
   data() {
     return {
+      isRoomLoading: false,
       rooms: [],
       searchQuery: '',
       page: 1,
       limit: 15,
       roomTypes: [],
       roomStatuses: [],
+      totalRooms: 0
     };
   },
   mounted() {
@@ -62,21 +66,25 @@ export default {
     },
     async fetchRooms() {
       try {
+        this.isRoomLoading = true;
         const response = await axios.get('https://localhost:44384/api/Room', {
           params: {
             page: this.page,
             limit: this.limit
           }
         });
-        this.rooms = response.data;
+        this.rooms = response.data.rooms;
+        this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
         console.log(this.rooms)
       } catch (error) {
         console.error(error);
+      } finally {
+        this.isRoomLoading = false;
       }
     },
     async loadMoreRooms() {
       try {
-        this.page += 1;
+        this.page++;
         console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Room', {
           params: {
@@ -84,7 +92,9 @@ export default {
             limit: this.limit
           }
         });
-        this.rooms = [...this.rooms, ...response.data];
+        console.log(response)
+        this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
+        this.rooms = [...this.rooms, ...response.data.rooms];
       } catch (error) {
         console.error(error);
       }
@@ -214,8 +224,8 @@ export default {
   flex-basis: 10%;
 }
 
-.observer-anchor {
-  height: 20px;
+.observer{
+  height: 10px;
+  margin-bottom: 20px;
 }
-
 </style>

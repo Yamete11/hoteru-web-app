@@ -5,7 +5,7 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" placeholder="Search by name ..." />
+          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search by name ..." />
           <router-link to="/new-guest" class="new-guest-button">New Guest</router-link>
         </div>
         <div class="main-bot">
@@ -17,7 +17,7 @@
             <span class="header action">Action</span>
           </div>
           <div>
-            <guest-list :guests="guests" @deleteGuest="deleteGuest"/>
+            <guest-list :guests="sortedAndSearchedPosts" @deleteGuest="deleteGuest"/>
           </div>
         </div>
       </div>
@@ -32,11 +32,16 @@ export default {
   name: "Guest",
   data() {
     return {
-      guests: []
+      guests: [],
+      searchQuery: ''
     };
   },
+  computed: {
+    sortedAndSearchedPosts() {
+      return this.guests.filter(guest => guest.name.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
+    }
+  },
   mounted() {
-    console.log(this.$refs.observer);
     this.fetchGuests();
   },
   methods: {
@@ -48,7 +53,7 @@ export default {
         console.error(error);
       }
     },
-    deleteRoom(idPerson) {
+    deleteGuest(idPerson) {
       this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
     }
   },

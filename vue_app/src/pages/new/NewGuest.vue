@@ -4,118 +4,178 @@
     <sidebar></sidebar>
     <div class="main">
       <h1>New Guest</h1>
-      <form @submit.prevent class="creating-form">
+      <form @submit.prevent="addGuest" class="creating-form">
+
         <div class="input-form">
           <label>Name: </label>
           <input
-              v-model="formData.name"
+              v-model="state.formData.Name"
               class="input"
               type="text"
               placeholder="Enter name"
+              @input="v$.formData.Name.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.Name.$error">
+            <span v-if="!v$.formData.Name.required.$response">Name is required*</span>
+            <span v-if="!v$.formData.Name.maxLength.$response">Name must be less than 20 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
         </div>
+
+
         <div class="input-form">
           <label>Surname: </label>
           <input
-              v-model="formData.surname"
+              v-model="state.formData.Surname"
               class="input"
               type="text"
               placeholder="Enter surname"
+              @input="v$.formData.Surname.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.Surname.$error">
+            <span v-if="!v$.formData.Surname.required.$response">Surname is required*</span>
+            <span v-if="!v$.formData.Surname.maxLength.$response">Surname must be less than 20 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
         </div>
+
+
         <div class="input-form">
           <label>Email: </label>
           <input
-              v-model="formData.email"
+              v-model="state.formData.Email"
               class="input"
               type="text"
               placeholder="Enter email"
+              @input="v$.formData.Email.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.Email.$error">
+            <span v-if="!v$.formData.Email.required.$response">Email is required*</span>
+            <span v-if="!v$.formData.Email.email.$response">Invalid email format*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email[0] }}</span>
         </div>
+
 
         <div class="input-form">
           <label>Tel. number: </label>
           <input
-              v-model="formData.telNumber"
+              v-model="state.formData.TelNumber"
               class="input"
               type="text"
               placeholder="Enter tel. number"
+              @input="v$.formData.TelNumber.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.TelNumber.$error">
+            <span v-if="!v$.formData.TelNumber.required.$response">Telephone number is required*</span>
+            <span v-if="!v$.formData.TelNumber.maxLength.$response">Telephone number must be less than 15 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.TelNumber">{{ state.errors.TelNumber[0] }}</span>
         </div>
+
 
         <div class="input-form">
           <label>Passport: </label>
           <input
-              v-model="formData.passport"
+              v-model="state.formData.Passport"
               class="input"
               type="text"
-              placeholder="Enter room price"
+              placeholder="Enter passport number"
+              @input="v$.formData.Passport.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.Passport.$error">
+            <span v-if="!v$.formData.Passport.required.$response">Passport number is required*</span>
+            <span v-if="!v$.formData.Passport.maxLength.$response">Passport number must be less than 10 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Passport">{{ state.errors.Passport[0] }}</span>
         </div>
+
 
         <div class="input-form">
           <label>Status: </label>
-          <select v-model="formData.status">
+          <select v-model="state.formData.IdGuestStatus" @change="v$.formData.IdGuestStatus.$touch()">
             <option disabled value="">Select status</option>
-            <option v-for="guestStatus in guestStatuses" :key="guestStatus.idGuestStatus" :value="String(guestStatus.idGuestStatus)">{{ guestStatus.title }}</option>
+            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.IdGuestStatus" :value="String(guestStatus.IdGuestStatus)">{{ guestStatus.title }}</option>
           </select>
+          <span class="error-message" v-if="v$.formData.IdGuestStatus.$error">
+            <span v-if="!v$.formData.IdGuestStatus.required.$response">Status is required*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.IdGuestStatus">{{ state.errors.IdGuestStatus[0] }}</span>
         </div>
+
+
         <div class="registration-class">
           <router-link class="registration-btn" to="/guests">Cancel</router-link>
-          <button class="registration-btn" @click="addGuest">Confirm</button>
+          <button class="registration-btn" type="submit">Confirm</button>
         </div>
       </form>
     </div>
-
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import {reactive} from "vue";
+import {useVuelidate} from "@vuelidate/core";
+import {email, maxLength, required} from "@vuelidate/validators";
 
 export default {
   name: "NewGuest",
-  data(){
-    return {
+  setup() {
+    const state = reactive({
       formData: {
-        idPerson: '',
-        name: '',
-        surname: '',
-        email: '',
-        telNumber: '',
-        passport: '',
-        status: ''
+        Name: '',
+        Surname: '',
+        Email: '',
+        TelNumber: '',
+        Passport: '',
+        IdGuestStatus: ''
       },
       guestStatuses: [],
+      errors: {}
+    });
+
+    const rules = {
+      formData: {
+        Name: { required, maxLength: maxLength(20) },
+        Surname: { required, maxLength: maxLength(20) },
+        Email: { required, email },
+        TelNumber: { required, maxLength: maxLength(15) },
+        Passport: { required, maxLength: maxLength(10) },
+        IdGuestStatus: { required }
+      }
     }
-  },
-  methods:{
-    async fetchGuestStatuses(){
-      console.log(this.formData)
-      try{
+
+    const v$ = useVuelidate(rules, state);
+
+    async function fetchGuestStatuses() {
+      try {
         const response = await axios.get('https://localhost:44384/api/GuestStatus');
-        this.guestStatuses = response.data;
+        state.guestStatuses = response.data;
       } catch (error) {
         console.error(error);
       }
-    },
-    async addGuest() {
-      console.log(this.formData)
-      try {
-        const response = await axios.post('https://localhost:44384/api/Guest', this.formData);
-        console.log('Response:', response.data);
+    }
 
-        if (response.data && response.data.httpStatusCode === 200) {
-          this.$router.push({ name: "Rooms" });
-        }
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          this.errors = error.response.data.errors;
-        } else {
+    async function addGuest() {
+      v$.value.$validate();
+      if (!v$.value.$error) {
+        try {
+          const response = await axios.post('https://localhost:44384/api/Guest', state.formData);
+          console.log('Response:', response.data);
+          if (response.data && response.data.httpStatusCode === 200) {
+            this.$router.push({name: "Guests"});
+          }
+        } catch (error) {
+          if (error.response && error.response.data && error.response.data.errors) {
+            state.errors = error.response.data.errors;
+          }
           console.log('Error', error);
         }
       }
     }
+
+    return { state, v$, addGuest, fetchGuestStatuses };
   },
   mounted(){
     this.fetchGuestStatuses();

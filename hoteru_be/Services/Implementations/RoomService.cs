@@ -45,9 +45,12 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<RoomDTO>> GetRooms(int page, int limit)
+        public async Task<PaginatedRoomResultDTO> GetRooms(int page, int limit)
         {
-            return await _context.Rooms
+           
+            var totalRooms = await _context.Rooms.CountAsync();
+
+            var rooms = await _context.Rooms
                 .OrderBy(r => r.IdRoom)
                 .Skip((page - 1) * limit)
                 .Take(limit)
@@ -61,6 +64,15 @@ namespace hoteru_be.Services.Implementations
                     Type = x.RoomType.Title
                 })
                 .ToListAsync();
+
+            return new PaginatedRoomResultDTO
+            {
+                Rooms = rooms,
+                TotalCount = totalRooms,
+                Page = page,
+                Limit = limit
+            };
+
         }
 
         public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)

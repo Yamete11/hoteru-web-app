@@ -8,15 +8,15 @@ namespace hoteru_be.DTOs
         public int IdRoom { get; set; }
 
         [Required(ErrorMessage = "Room number is required")]
-        [MaxLength(10, ErrorMessage = "Number can have max 10 symbols")]
+        [MaxLength(20, ErrorMessage = "Number can have max 20 symbols")]
         public string? Number { get; set; }
 
-        [Required(ErrorMessage = "Capacity is required.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be a positive number")]
+        [Required(ErrorMessage = "Capacity is required")]
+        [Range(1, 10, ErrorMessage = "Capacity must be a number between 1 and 10")]
         public int? Capacity { get; set; }
 
-        [Required(ErrorMessage = "Price is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
+        [Required(ErrorMessage = "Price is required")]
+        [Range(0.01, 1000000, ErrorMessage = "Price must be a number between 0.01 and 1,000,000")]
         public float? Price { get; set; }
 
         [Required(ErrorMessage = "Status is required")]

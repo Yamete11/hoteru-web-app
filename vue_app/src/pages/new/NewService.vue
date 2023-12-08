@@ -93,7 +93,7 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     async function addService() {
-      v$.value.$validate();
+      /*v$.value.$validate();*/
       if (!v$.value.$error) {
         try {
           const response = await axios.post('https://localhost:44384/api/Service', state.formData);
@@ -101,7 +101,7 @@ export default {
           if (response.data && response.data.httpStatusCode === 200) {
             this.$router.push({ name: "Services" });
           }
-        } catch (error) {
+          } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
             state.errors = error.response.data.errors;
           }
