@@ -19,9 +19,17 @@ namespace hoteru_be.Services.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<ReservationDTO>> GetReservations()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations(int page, int limit)
         {
-            return await _context.Reservations
+
+            var totalReservations = await _context.Reservations
+                .Where(r => r.Bill == null && r.Confirmed == true)
+                .CountAsync();
+
+            var reservations = await _context.Reservations
+            .OrderBy(r => r.IdRoom)
+            .Skip((page - 1) * limit)
+            .Take(limit)
             .Where(r => r.Bill == null && r.Confirmed == true)
             .Include(r => r.Room)
             .Include(r => r.User)
@@ -41,11 +49,26 @@ namespace hoteru_be.Services.Implementations
             }
             ).ToListAsync();
 
+            return new PaginatedResultDTO<ReservationDTO>
+            {
+                List = reservations,
+                TotalCount = totalReservations,
+                Page = page,
+                Limit = limit
+            };
+
         }
 
-        public async Task<IEnumerable<ReservationDTO>> GetHistory()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory(int page, int limit)
         {
-            return await _context.Reservations
+            var totalReservations = await _context.Reservations
+                .Where(r => r.Bill != null)
+                .CountAsync();
+
+            var reservations = await _context.Reservations
+            .OrderBy(r => r.IdRoom)
+            .Skip((page - 1) * limit)
+            .Take(limit)
             .Where(r => r.Bill != null)
             .Include(r => r.Room)
             .Include(r => r.User)
@@ -64,28 +87,52 @@ namespace hoteru_be.Services.Implementations
                 Surname = r.User.Person.Surname
             }
             ).ToListAsync();
+
+            return new PaginatedResultDTO<ReservationDTO>
+            {
+                List = reservations,
+                TotalCount = totalReservations,
+                Page = page,
+                Limit = limit
+            };
         }
 
-        public async Task<IEnumerable<ReservationDTO>> GetArrivals()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals(int page, int limit)
         {
-            return await _context.Reservations
-             .Where(r => r.Confirmed == false)
-             .Include(r => r.Room)
-             .Include(r => r.User)
-             .ThenInclude(u => u.Person)
-             .Include(r => r.GuestReservations)
-             .ThenInclude(gr => gr.Guest)
-             .ThenInclude(g => g.Person)
-             .Select(r => new ReservationDTO
-              {
-                 IdReservation = r.IdReservation,
-                 In = r.In.ToString("yyyy-MM-dd"),
-                 Out = r.Out.ToString("yyyy-MM-dd"),
-                 RoomNumber = r.Room.Number,
-                 BookedBy = r.User.LoginName,
-                 Name = r.User.Person.Name,
-                 Surname = r.User.Person.Surname
-              }).ToListAsync();
+            var totalReservations = await _context.Reservations
+                .Where(r => r.Confirmed == false)
+                .CountAsync();
+
+            var reservations = await _context.Reservations
+            .OrderBy(r => r.IdRoom)
+            .Skip((page - 1) * limit)
+            .Take(limit)
+            .Where(r => r.Confirmed == false)
+            .Include(r => r.Room)
+            .Include(r => r.User)
+            .ThenInclude(u => u.Person)
+            .Include(r => r.GuestReservations)
+            .ThenInclude(gr => gr.Guest)
+            .ThenInclude(g => g.Person)
+            .Select(r => new ReservationDTO
+            {
+                IdReservation = r.IdReservation,
+                In = r.In.ToString("yyyy-MM-dd"),
+                Out = r.Out.ToString("yyyy-MM-dd"),
+                RoomNumber = r.Room.Number,
+                BookedBy = r.User.LoginName,
+                Name = r.User.Person.Name,
+                Surname = r.User.Person.Surname
+            }
+            ).ToListAsync();
+
+            return new PaginatedResultDTO<ReservationDTO>
+            {
+                List = reservations,
+                TotalCount = totalReservations,
+                Page = page,
+                Limit = limit
+            };
         }
 
         public async Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation)

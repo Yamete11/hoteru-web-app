@@ -46,21 +46,34 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<GuestDTO>> GetGuests()
+        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests(int page, int limit)
         {
-            return await _context.Guests
-                .Include(g => g.Person)
-                .Include(g => g.GuestStatus)
+
+            var totalGuests = await _context.Guests.CountAsync();
+
+            var guests = await _context.Guests
+                .OrderBy(r => r.IdPerson)
+                .Skip((page - 1) * limit)
+                .Take(limit)
                 .Select(x => new GuestDTO
                 {
                     IdPerson = x.IdPerson,
-                    Name = x.Person.Name, 
+                    Name = x.Person.Name,
                     Surname = x.Person.Surname,
                     Email = x.Person.Email,
                     Passport = x.Passport,
                     TelNumber = x.TelNumber,
-                    IdGuestStatus = x.GuestStatus.Title 
-                }).ToListAsync();
+                    IdGuestStatus = x.GuestStatus.Title
+                })
+                .ToListAsync();
+
+            return new PaginatedResultDTO<GuestDTO>
+            {
+                List = guests,
+                TotalCount = totalGuests,
+                Page = page,
+                Limit = limit
+            };
         }
 
         public async Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson)

@@ -34,16 +34,34 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<ServiceDTO>> GetServices()
+        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit)
         {
-            return await _context.Services.Select(x => new ServiceDTO
+            
+            var totalServices = await _context.Services.CountAsync();
+
+            var services = await _context.Services
+                .OrderBy(r => r.IdService)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .Select(x => new ServiceDTO
+                {
+                    IdService = x.IdService,
+                    Title = x.Title,
+                    Sum = x.Sum,
+                    Description = x.Description
+                })
+                .ToListAsync();
+
+            return new PaginatedResultDTO<ServiceDTO>
             {
-                IdService = x.IdService,
-                Title = x.Title,
-                Sum = x.Sum,
-                Description = x.Description
-            }).ToListAsync();
+                List = services,
+                TotalCount = totalServices,
+                Page = page,
+                Limit = limit
+            };
         }
+
+     
 
         public async Task<ServiceDTO> GetSpecificService(int idService)
         {

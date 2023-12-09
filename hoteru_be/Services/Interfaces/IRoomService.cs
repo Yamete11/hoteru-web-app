@@ -6,7 +6,7 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IRoomService
     {
-        public Task<PaginatedRoomResultDTO> GetRooms(int page, int limit);
+        public Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit);
         public Task<MethodResultDTO> DeleteRoom(int IdRoom);
 
         public Task<MethodResultDTO> PostRoom(RoomDTO roomDTO);

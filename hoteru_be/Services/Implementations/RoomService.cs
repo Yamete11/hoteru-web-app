@@ -45,7 +45,7 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<PaginatedRoomResultDTO> GetRooms(int page, int limit)
+        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit)
         {
            
             var totalRooms = await _context.Rooms.CountAsync();
@@ -65,9 +65,9 @@ namespace hoteru_be.Services.Implementations
                 })
                 .ToListAsync();
 
-            return new PaginatedRoomResultDTO
+            return new PaginatedResultDTO<RoomDTO>
             {
-                Rooms = rooms,
+                List = rooms,
                 TotalCount = totalRooms,
                 Page = page,
                 Limit = limit

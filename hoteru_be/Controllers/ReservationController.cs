@@ -19,21 +19,21 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ReservationDTO>> GetReservations()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations([FromQuery] int page = 1, [FromQuery] int limit = 15)
         {
-            return await _service.GetReservations();
+            return await _service.GetReservations(page, limit);
         }
 
         [HttpGet("history")]
-        public async Task<IEnumerable<ReservationDTO>> GetHistory()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory([FromQuery] int page = 1, [FromQuery] int limit = 15)
         {
-            return await _service.GetHistory();
+            return await _service.GetHistory(page, limit);
         }
 
         [HttpGet("arrivals")]
-        public async Task<IEnumerable<ReservationDTO>> GetArrivals()
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals([FromQuery] int page = 1, [FromQuery] int limit = 15)
         {
-            return await _service.GetArrivals();
+            return await _service.GetArrivals(page, limit);
         }
 
         [HttpGet("history/{IdReservation}")]

@@ -6,7 +6,7 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IGuestService
     {
-        public Task<IEnumerable<GuestDTO>> GetGuests();
+        public Task<PaginatedResultDTO<GuestDTO>> GetGuests(int page, int limit);
 
         public Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson);
         public Task<MethodResultDTO> DeleteGuest(int IdPerson);

@@ -6,9 +6,9 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IReservationService
     {
-        public Task<IEnumerable<ReservationDTO>> GetReservations();
-        public Task<IEnumerable<ReservationDTO>> GetHistory();
-        public Task<IEnumerable<ReservationDTO>> GetArrivals();
+        public Task<PaginatedResultDTO<ReservationDTO>> GetReservations(int page, int limit);
+        public Task<PaginatedResultDTO<ReservationDTO>> GetHistory(int page, int limit);
+        public Task<PaginatedResultDTO<ReservationDTO>> GetArrivals(int page, int limit);
 
         public Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation);
 

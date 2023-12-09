@@ -19,9 +19,9 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<GuestDTO>> GetGuests()
+        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests([FromQuery] int page = 1, [FromQuery] int limit = 15)
         {
-            return await _service.GetGuests();
+            return await _service.GetGuests(page, limit);
         }
 
         [HttpGet("{IdPerson}")]

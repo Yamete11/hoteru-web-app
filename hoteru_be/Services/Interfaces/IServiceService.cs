@@ -6,7 +6,7 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IServiceService
     {
-        public Task<IEnumerable<ServiceDTO>> GetServices();
+        public Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit);
         public Task<ServiceDTO> GetSpecificService(int idService);
         public Task<MethodResultDTO> DeleteService(int idService);
 
