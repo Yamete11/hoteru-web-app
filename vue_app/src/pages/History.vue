@@ -16,10 +16,12 @@
             <span class="header bookedBy">Booked By</span>
             <span class="header action">Action</span>
           </div>
-          <div>
-            <history-list :reservations="reservations" @deleteReservation="deleteReservation">
-              The history list is empty
-            </history-list>
+          <div v-if="!isLoading">
+            <history-list :reservations="reservations" @deleteReservation="deleteReservation"/>
+            <div v-intersection="loadMore" class="observer"></div>
+          </div>
+          <div v-else>
+            <div>The list is loading...</div>
           </div>
         </div>
       </div>
@@ -34,7 +36,11 @@ export default {
   name: "History",
   data() {
     return {
-      reservations: []
+      isLoading: false,
+      reservations: [],
+      page: 1,
+      limit: 15,
+      totalReservations: 0
     };
   },
   mounted() {
@@ -47,12 +53,39 @@ export default {
     },
     async fetchReservations() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Reservation/history');
-        this.reservations = response.data;
+        this.isLoading = true;
+        const response = await axios.get('https://localhost:44384/api/Reservation/history', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.reservations = response.data.list;
+        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
+        console.log(this.reservations)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadMore() {
+      try {
+        this.page++;
+        console.log(this.page)
+        const response = await axios.get('https://localhost:44384/api/Reservation/history', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        console.log(response)
+        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
+        this.reservations = [...this.reservations, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
-    },
+    }
   }
 }
 </script>

@@ -16,8 +16,12 @@
             <span class="header email">Email</span>
             <span class="header action">Action</span>
           </div>
-          <div>
+          <div v-if="!isLoading">
             <guest-list :guests="sortedAndSearchedPosts" @deleteGuest="deleteGuest"/>
+            <div v-intersection="loadMore" class="observer"></div>
+          </div>
+          <div v-else>
+            <div>The list is loading...</div>
           </div>
         </div>
       </div>
@@ -32,8 +36,12 @@ export default {
   name: "Guest",
   data() {
     return {
+      totalGuests: 0,
+      isLoading: false,
       guests: [],
-      searchQuery: ''
+      searchQuery: '',
+      page: 1,
+      limit: 15,
     };
   },
   computed: {
@@ -45,17 +53,44 @@ export default {
     this.fetchGuests();
   },
   methods: {
+    deleteGuest(idPerson) {
+      this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
+    },
     async fetchGuests() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Guest');
-        this.guests = response.data;
+        this.isLoading = true;
+        const response = await axios.get('https://localhost:44384/api/Guest', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.guests = response.data.list;
+        this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
+        console.log(this.guests)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadMore() {
+      try {
+        this.page++;
+        console.log(this.page)
+        const response = await axios.get('https://localhost:44384/api/Guest', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        console.log(response)
+        this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
+        this.guests = [...this.guests, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
     },
-    deleteGuest(idPerson) {
-      this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
-    }
   },
 }
 </script>
@@ -150,4 +185,9 @@ export default {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }
+
+.observer{
+  height: 10px;
+  margin-bottom: 20px;
+}
 </style>

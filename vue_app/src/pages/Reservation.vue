@@ -16,10 +16,12 @@
             <span class="header bookedBy">Booked By</span>
             <span class="header action">Action</span>
           </div>
-          <div>
-            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation">
-              The reservation list is empty
-            </reservation-list>
+          <div v-if="!isLoading">
+            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation"/>
+            <div v-intersection="loadMore" class="observer"></div>
+          </div>
+          <div v-else>
+            <div>The list is loading...</div>
           </div>
         </div>
       </div>
@@ -35,7 +37,11 @@ export default {
   components: {},
   data() {
     return {
-      reservations: []
+      isLoading: false,
+      reservations: [],
+      page: 1,
+      limit: 15,
+      totalReservations: 0
     };
   },
   mounted() {
@@ -44,16 +50,43 @@ export default {
   }
   ,
   methods: {
+    deleteReservation(idReservation) {
+      this.reservations = this.reservations.filter(reservation => reservation.idReservation !== idReservation);
+    },
     async fetchReservations() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Reservation');
-        this.reservations = response.data;
+        this.isLoading = true;
+        const response = await axios.get('https://localhost:44384/api/Reservation', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.reservations = response.data.list;
+        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
+        console.log(this.reservations)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadMore() {
+      try {
+        this.page++;
+        console.log(this.page)
+        const response = await axios.get('https://localhost:44384/api/Reservation', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        console.log(response)
+        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
+        this.reservations = [...this.reservations, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
-    },
-    deleteReservation(idReservation) {
-      this.reservations = this.reservations.filter(reservation => reservation.idReservation !== idReservation);
     }
   }
 
@@ -142,4 +175,9 @@ export default {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }
+
+.observer{
+  height: 10px;
+  margin-bottom: 20px;
+}
 </style>

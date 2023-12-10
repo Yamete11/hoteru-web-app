@@ -15,8 +15,12 @@
             <span class="header description">Description</span>
             <span class="header action">Action</span>
           </div>
-          <div>
+          <div v-if="!isLoading">
             <service-list :services="sortedAndSearchedPosts" @deleteService="deleteService"/>
+            <div v-intersection="loadMore" class="observer"></div>
+          </div>
+          <div v-else>
+            <div>The list is loading...</div>
           </div>
         </div>
       </div>
@@ -32,8 +36,12 @@ export default {
 
   data() {
     return {
+      isLoading: false,
       services: [],
-      searchQuery: ''
+      searchQuery: '',
+      totalServices: 0,
+      page: 1,
+      limit: 15,
     };
   },
   mounted() {
@@ -46,18 +54,45 @@ export default {
     }
   },
   methods: {
+    deleteService(idService) {
+      this.services = this.services.filter(service => service.idService !== idService);
+    },
     async fetchServices() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Service');
-        this.services = response.data;
+        this.isLoading = true;
+        const response = await axios.get('https://localhost:44384/api/Service', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        this.services = response.data.list;
+        this.totalServices = Math.ceil(response.data.totalCount / this.limit);
         console.log(this.services)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadMore() {
+      try {
+        this.page++;
+        console.log(this.page)
+        const response = await axios.get('https://localhost:44384/api/Service', {
+          params: {
+            page: this.page,
+            limit: this.limit
+          }
+        });
+        console.log(response)
+        this.totalServices = Math.ceil(response.data.totalCount / this.limit);
+        this.services = [...this.services, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
     },
-    deleteService(idService) {
-      this.services = this.services.filter(service => service.idService !== idService);
-    }
+
   },
 }
 </script>
@@ -150,4 +185,9 @@ export default {
   display: flex;
   justify-content: center;
   flex-basis: 10%; }
+
+.observer{
+  height: 10px;
+  margin-bottom: 20px;
+}
 </style>

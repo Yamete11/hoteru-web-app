@@ -7,15 +7,27 @@
       <form @submit.prevent class="creating-form">
         <div class="input-form">
           <label>Number: </label>
-          <input v-model="room.number" class="input" type="text" placeholder="Enter room number" :readonly="!isEditing">
+          <input v-model="room.number"
+                 class="input"
+                 type="text"
+                 placeholder="Enter room number"
+                 :readonly="!isEditing">
         </div>
         <div class="input-form">
           <label>Capacity: </label>
-          <input v-model="room.capacity" class="input" type="text" placeholder="Enter room capacity" :readonly="!isEditing">
+          <input v-model="room.capacity"
+                 class="input"
+                 type="text"
+                 placeholder="Enter room capacity"
+                 :readonly="!isEditing">
         </div>
         <div class="input-form">
           <label>Price: </label>
-          <input v-model="room.price" class="input" type="text" placeholder="Enter room price" :readonly="!isEditing">
+          <input v-model="room.price"
+                 class="input"
+                 type="text"
+                 placeholder="Enter room price"
+                 :readonly="!isEditing">
         </div>
         <div class="input-form">
           <label>Type: </label>

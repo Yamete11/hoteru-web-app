@@ -76,6 +76,7 @@ export default {
 
         const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.idGuestStatus);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
+
         try {
           const response = await axios.put('https://localhost:44384/api/Guest', this.guest);
           console.log('Success:', response.data);

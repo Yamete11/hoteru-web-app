@@ -69,6 +69,14 @@ export default {
   methods:{
     async toggleEdit() {
       this.isEditing = !this.isEditing;
+      if (!this.isEditing) {
+        try {
+          const response = await axios.put('https://localhost:44384/api/Service', this.service);
+          console.log('Success:', response.data);
+        } catch (error) {
+          console.log('Error:', error);
+        }
+      }
     },
     async fetchSpecificService(idService) {
       try {

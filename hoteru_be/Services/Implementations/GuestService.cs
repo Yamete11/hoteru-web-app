@@ -144,7 +144,7 @@ namespace hoteru_be.Services.Implementations
                 };
             }
 
-            var existingGuest = await _context.Guests
+            /*var existingGuest = await _context.Guests
                 .AnyAsync(r => r.Passport == guestDTO.Passport);
 
             if (existingGuest)
@@ -154,7 +154,7 @@ namespace hoteru_be.Services.Implementations
                     HttpStatusCode = HttpStatusCode.BadRequest,
                     Message = "Another guest with this email already exists"
                 };
-            }
+            }*/
 
             guest.TelNumber = guestDTO.TelNumber;
             guest.Passport = guestDTO.Passport;

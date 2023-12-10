@@ -21,9 +21,9 @@
             <span class="header status">Status</span>
             <span class="header action">Action</span>
           </div>
-          <div v-if="!isRoomLoading">
+          <div v-if="!isLoading">
             <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
-            <div v-intersection="loadMoreRooms" class="observer"></div>
+            <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
             <div>The list is loading...</div>
@@ -42,7 +42,7 @@ export default {
   components: {},
   data() {
     return {
-      isRoomLoading: false,
+      isLoading: false,
       rooms: [],
       searchQuery: '',
       page: 1,
@@ -66,23 +66,23 @@ export default {
     },
     async fetchRooms() {
       try {
-        this.isRoomLoading = true;
+        this.isLoading = true;
         const response = await axios.get('https://localhost:44384/api/Room', {
           params: {
             page: this.page,
             limit: this.limit
           }
         });
-        this.rooms = response.data.rooms;
+        this.rooms = response.data.list;
         this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
         console.log(this.rooms)
       } catch (error) {
         console.error(error);
       } finally {
-        this.isRoomLoading = false;
+        this.isLoading = false;
       }
     },
-    async loadMoreRooms() {
+    async loadMore() {
       try {
         this.page++;
         console.log(this.page)
@@ -94,7 +94,7 @@ export default {
         });
         console.log(response)
         this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
-        this.rooms = [...this.rooms, ...response.data.rooms];
+        this.rooms = [...this.rooms, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
