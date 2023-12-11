@@ -45,6 +45,21 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
+        public async Task<List<RoomDTO>> GetFreeRooms()
+        {
+            return await _context.Rooms.
+                Where(x => x.IdRoomStatus == 3)
+                .Select(x => new RoomDTO
+                {
+                    IdRoom = x.IdRoom,
+                    Number = x.Number,
+                    Capacity = x.Capacity,
+                    Price = x.Price,
+                    Status = x.RoomStatus.Title,
+                    Type = x.RoomType.Title
+                }).ToListAsync();
+        }
+
         public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit)
         {
            
@@ -62,8 +77,7 @@ namespace hoteru_be.Services.Implementations
                     Price = x.Price,
                     Status = x.RoomStatus.Title,
                     Type = x.RoomType.Title
-                })
-                .ToListAsync();
+                }).ToListAsync();
 
             return new PaginatedResultDTO<RoomDTO>
             {

@@ -25,10 +25,6 @@ const routes = [
         component: Login
     },
     {
-        path: '/new-reservation',
-        component: NewReservation
-    },
-    {
         path: '/reservations/:idReservation',
         component: ReservationDetails,
         name: 'ReservationDetails',
@@ -37,6 +33,10 @@ const routes = [
     {
         path: '/reservations',
         component: Reservation
+    },
+    {
+        path: '/new-reservation',
+        component: NewReservation
     },
     {
         path: '/registration',

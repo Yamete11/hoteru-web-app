@@ -25,6 +25,13 @@ namespace hoteru_be.Controllers
             return await _service.GetRooms(page, limit);
         }
 
+        [HttpGet("freeRooms")]
+        public async Task<List<RoomDTO>> GetFreeRooms()
+        {
+            return await _service.GetFreeRooms();
+        }
+
+
         [HttpGet("{IdRoom}")]
         public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)
         {
