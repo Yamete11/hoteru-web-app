@@ -3,6 +3,7 @@ using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -202,6 +203,43 @@ namespace hoteru_be.Services.Implementations
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Deleted"
+            };
+        }
+
+        public async Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO)
+        {
+            var room = await _context.Rooms.SingleOrDefaultAsync(x => x.IdRoom == reservationDTO.IdRoom);
+            Reservation reservation = new Reservation
+            {
+                Capacity = reservationDTO.Capacity,
+                Price = reservationDTO.Price,
+                In = reservationDTO.In,
+                Out = reservationDTO.Out,
+                Confirmed = reservationDTO.Confirmed,
+                IdRoom = room.IdRoom,
+                IdUser = 3
+            };
+
+            _context.Reservations.Add(reservation);
+
+            if (reservationDTO.guest.IdPerson != 0)
+            {
+                var guest = await _context.Guests.SingleOrDefaultAsync(x => x.IdPerson == reservationDTO.guest.IdPerson);
+                GuestReservation guestReservation = new GuestReservation
+                {
+                    Reservation = reservation,
+                    Guest = guest
+                };
+
+                _context.GuestReservations.Add(guestReservation);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Created"
             };
         }
     }

@@ -10,6 +10,18 @@ components.forEach(component => {
     app.component(component.name, component)
 })
 
+router.beforeEach((to, from, next) => {
+    const requiresAuth = !['/', '/registration'].includes(to.path);
+    const token = localStorage.getItem('token');
+
+    if (requiresAuth && !token) {
+        next('/');
+    } else {
+        next();
+    }
+});
+
+
 app.directive('intersection', VIntersection)
 
 app

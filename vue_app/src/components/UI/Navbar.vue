@@ -8,7 +8,7 @@
       <router-link class="navbar-btn" to="/new-reservation">New Reservation</router-link>
       <div class="right-links">
         <router-link class="navbar-btn" to="/settings">Settings</router-link>
-        <router-link class="navbar-btn" to="/">Log out</router-link>
+        <button class="navbar-btn" @click="logout">Log out</button>
       </div>
     </div>
   </div>
@@ -17,7 +17,13 @@
 
 <script>
 export default {
-  name: "Navbar"
+  name: "Navbar",
+  methods: {
+    logout() {
+      localStorage.removeItem('token');
+      this.$router.push('/');
+    }
+  }
 }
 </script>
 

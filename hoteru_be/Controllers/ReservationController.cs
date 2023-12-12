@@ -1,5 +1,6 @@
 ﻿using hoteru_be.DTOs;
 using hoteru_be.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationController : ControllerBase
@@ -46,6 +48,13 @@ namespace hoteru_be.Controllers
         public async Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation)
         {
             return await _service.DeleteSpecificReservation(IdReservation);
+        }
+
+        [HttpPost]
+        public async Task<MethodResultDTO> PostReservation([FromBody] PostReservationDTO reservationDTO)
+        {
+
+            return await _service.PostReservation(reservationDTO);
         }
 
     }

@@ -4,12 +4,12 @@
     <sidebar></sidebar>
     <div class="main">
       <h1>New Reservation</h1>
-      <form @submit.prevent="addRoom" class="creating-form">
+      <form @submit.prevent="addReservation" class="creating-form">
 
         <div class="tab-switcher">
-          <span :class="{ active: state.activeTab === 'arrival' }" @click="state.activeTab = 'arrival'">Arrival</span>
+          <span :class="{ active: state.formData.Confirmed === false }" @click="state.formData.Confirmed = false">Arrival</span>
           <span> - </span>
-          <span :class="{ active: state.activeTab === 'reservation' }" @click="state.activeTab = 'reservation'">Reservation</span>
+          <span :class="{ active: state.formData.Confirmed === true }" @click="state.formData.Confirmed = true">Reservation</span>
         </div>
 
 
@@ -17,7 +17,7 @@
           <div class="input-form">
             <label>In: </label>
             <input
-                v-model="state.in"
+                v-model="state.formData.In"
                 class="input"
                 type="date"
                 :min="today"
@@ -27,11 +27,11 @@
           <div class="input-form">
             <label>Out: </label>
             <input
-                v-model="state.out"
+                v-model="state.formData.Out"
                 class="input"
                 type="date"
                 :min="minOutDate"
-                :disabled="!state.in"
+                :disabled="!state.formData.In"
                 placeholder="Enter out"
             >
           </div>
@@ -42,7 +42,7 @@
             <div class="input-form">
               <label>Capacity: </label>
               <input
-                  v-model="state.capacity"
+                  v-model="state.formData.Capacity"
                   class="input"
                   type="text"
                   placeholder="Enter room number"
@@ -59,7 +59,7 @@
 
           <div class="input-form">
             <label>Room Selection: </label>
-            <select v-model="state.room">
+            <select v-model="state.formData.IdRoom">
               <option disabled value="">Select a room</option>
               <option v-for="room in filteredRooms" :key="room.idRoom" :value="String(room.idRoom)">{{ room.number }} - Capacity: {{ room.capacity }}</option>
             </select>
@@ -78,7 +78,7 @@
                 placeholder="Start typing name..."
             >
             <ul v-if="state.filteredGuests.length" class="suggestions">
-              <li v-for="guest in state.filteredGuests" :key="state.guest.idPerson" @click="selectGuest(guest)">
+              <li v-for="guest in state.filteredGuests" :key="state.formData.guest.idPerson" @click="selectGuest(guest)">
                 {{ guest.name }} {{ guest.surname}}, {{ guest.passport}}
               </li>
             </ul>
@@ -89,7 +89,7 @@
             <div class="input-form">
               <label>Name: </label>
               <input
-                  v-model="state.guest.name"
+                  v-model="state.formData.guest.name"
                   class="input"
                   type="text"
                   placeholder="Enter name"
@@ -100,7 +100,7 @@
             <div class="input-form">
               <label>Surname: </label>
               <input
-                  v-model="state.guest.surname"
+                  v-model="state.formData.guest.surname"
                   class="input"
                   type="text"
                   placeholder="Enter name"
@@ -113,7 +113,7 @@
             <div class="input-form">
               <label>Email: </label>
               <input
-                  v-model="state.guest.email"
+                  v-model="state.formData.guest.email"
                   class="input"
                   type="text"
                   placeholder="Enter name"
@@ -124,7 +124,7 @@
             <div class="input-form">
               <label>Passport: </label>
               <input
-                  v-model="state.guest.telNumber"
+                  v-model="state.formData.guest.telNumber"
                   class="input"
                   type="text"
                   placeholder="Enter name"
@@ -137,7 +137,7 @@
             <div class="input-form">
               <label>Tel. number: </label>
               <input
-                  v-model="state.guest.passport"
+                  v-model="state.formData.guest.passport"
                   class="input"
                   type="text"
                   placeholder="Enter name"
@@ -147,7 +147,7 @@
 
             <div class="input-form">
               <label>Status: </label>
-              <select v-model="state.guest.idGuestStatus" class="input" :disabled="state.isGuestSelected">
+              <select v-model="state.formData.guest.idGuestStatus" class="input" :disabled="state.isGuestSelected">
                 <option disabled value="">Select status</option>
                 <option v-for="status in state.guestStatuses" :value="status.idGuestStatus" :key="status.idGuestStatus">{{ status.title }}</option>
               </select>
@@ -177,26 +177,24 @@ export default {
   setup(){
     const state = reactive({
       formData: {
-        In: '',
-        Out: '',
+        In: Date,
+        Out: Date,
         Capacity: '',
-        Price: '',
-        RoomNumber: '',
-      },
-      guest: {
-        idPerson: '',
-        name: '',
-        surname: '',
-        email: '',
-        telNumber: '',
-        passport: '',
-        idGuestStatus: ''
+        Price: 3.3,
+        IdRoom: 0,
+        Confirmed: false,
+        guest: {
+          idPerson: 0,
+          name: '',
+          surname: '',
+          email: '',
+          telNumber: '',
+          passport: '',
+          idGuestStatus: 0
+        }
       },
       statusTitle: '',
       guestStatuses: [],
-      in: '',
-      out: '',
-      capacity: 0,
       roomType: '',
       room: '',
       rooms: [],
@@ -205,8 +203,7 @@ export default {
       errors: {},
       guestSearchQuery: '',
       filteredGuests: [],
-      isGuestSelected: false,
-      activeTab: 'reservation'
+      isGuestSelected: false
     });
 
     function searchGuests() {
@@ -219,9 +216,9 @@ export default {
       }
     }
 
-
     function selectGuest(guest) {
       state.guestSearchQuery = guest.name + " " + guest.surname + ", " + guest.passport;
+      state.formData.guest.idPerson = guest.idPerson
       state.isGuestSelected = true;
       state.filteredGuests = [];
     }
@@ -256,10 +253,20 @@ export default {
       }
     }
 
+    async function addReservation(){
+      console.log(this.state.formData)
+      try {
+        const response = await axios.post('https://localhost:44384/api/Reservation', state.formData);
+        console.log('Response:', response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     const filteredRooms = computed(() => {
       const selectedRoomType = state.roomTypes.find(rt => rt.idRoomType.toString() === state.roomType)?.title;
       return state.rooms.filter(room => {
-        const capacityMatch = room.capacity >= state.capacity;
+        const capacityMatch = room.capacity >= state.formData.Capacity;
         const roomTypeMatch = room.type === selectedRoomType;
         return capacityMatch && roomTypeMatch;
       });
@@ -268,8 +275,9 @@ export default {
 
     const v$ = useVuelidate(rules, state);
     const today = new Date().toISOString().split('T')[0];
+
     const minOutDate = ref('');
-    watch(() => state.in, (newValue) => {
+    watch(() => state.formData.In, (newValue) => {
       if (newValue) {
         const inDate = new Date(newValue);
         inDate.setDate(inDate.getDate() + 1);
@@ -285,7 +293,7 @@ export default {
       }
     });
 
-    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, searchGuests, selectGuest}
+    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, searchGuests, selectGuest, addReservation}
   },
   mounted() {
     this.fetchRooms();

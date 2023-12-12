@@ -68,3 +68,4 @@ C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Form
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Text.Encoding.CodePages.dll
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

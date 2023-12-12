@@ -1,11 +1,11 @@
 <template>
   <div class="main-login">
     <div class="registration">
-      <router-link class="registration-btn" @click="login" to="/registration">New Company</router-link>
+      <router-link class="registration-btn" to="/registration">New Company</router-link>
     </div>
     <div class="login">
       <h1>HOTERU ホテル</h1>
-      <form @submit.prevent class="login-form">
+      <form @submit.prevent="login" class="login-form">
         <my-input
             class="login-input"
             v-model="login"
@@ -18,7 +18,7 @@
             type="password"
             placeholder="password"
         />
-        <router-link class="login-btn" @click="login" to="/arrivals">LOGIN</router-link>
+        <button class="login-btn" type="submit">LOG IN</button>
 
       </form>
     </div>
@@ -35,8 +35,24 @@ export default {
     }
   },
   methods: {
-    login() {
-      // handle login
+    async login() {
+      console.log("hello")
+      try {
+        const response = await fetch('https://localhost:44384/api/Login/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login: this.login, password: this.password })
+        });
+
+        if (!response.ok) throw new Error('Login failed');
+
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+
+        this.$router.push('/arrivals');
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 }
@@ -84,6 +100,7 @@ export default {
   border-radius: 5px;
   font-weight: bold;
   color: white;
+  cursor: pointer;
 }
 
 .registration{
