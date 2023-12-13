@@ -95,7 +95,7 @@
           <label>Status: </label>
           <select v-model="state.formData.IdGuestStatus" @change="v$.formData.IdGuestStatus.$touch()">
             <option disabled value="">Select status</option>
-            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.IdGuestStatus" :value="String(guestStatus.IdGuestStatus)">{{ guestStatus.title }}</option>
+            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.idGuestStatus" :value="String(guestStatus.idGuestStatus)">{{ guestStatus.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.IdGuestStatus.$error">
             <span v-if="!v$.formData.IdGuestStatus.required.$response">Status is required*</span>
@@ -118,10 +118,14 @@ import axios from "axios";
 import {reactive} from "vue";
 import {useVuelidate} from "@vuelidate/core";
 import {email, maxLength, required} from "@vuelidate/validators";
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "NewGuest",
   setup() {
+    const store = useStore();
+    const router = useRouter();
     const state = reactive({
       formData: {
         Name: '',
@@ -149,8 +153,13 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     async function fetchGuestStatuses() {
+      console.log(this.$store.getters.getToken)
       try {
-        const response = await axios.get('https://localhost:44384/api/GuestStatus');
+        const response = await axios.get('https://localhost:44384/api/GuestStatus',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          }
+        });
         state.guestStatuses = response.data;
       } catch (error) {
         console.error(error);
@@ -160,11 +169,16 @@ export default {
     async function addGuest() {
       v$.value.$validate();
       if (!v$.value.$error) {
+        console.log(state.formData)
         try {
-          const response = await axios.post('https://localhost:44384/api/Guest', state.formData);
+          const response = await axios.post('https://localhost:44384/api/Guest', state.formData,{
+            headers: {
+              'Authorization': `Bearer ${store.getters.getToken}`
+            }
+          });
           console.log('Response:', response.data);
           if (response.data && response.data.httpStatusCode === 200) {
-            this.$router.push({name: "Guests"});
+            await router.push('/guests');
           }
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
@@ -175,7 +189,7 @@ export default {
       }
     }
 
-    return { state, v$, addGuest, fetchGuestStatuses };
+    return { state, v$, addGuest, fetchGuestStatuses};
   },
   mounted(){
     this.fetchGuestStatuses();

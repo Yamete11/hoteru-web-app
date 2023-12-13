@@ -87,10 +87,18 @@ export default {
     },
     async fetchSpecificGuest(idPerson) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Guest/' + idPerson);
+        const response = await axios.get('https://localhost:44384/api/Guest/' + idPerson, {
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.guest = response.data;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus');
+        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.guestStatuses = responseStatus.data;
 
         const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.idGuestStatus);

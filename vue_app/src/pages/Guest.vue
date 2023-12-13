@@ -58,8 +58,13 @@ export default {
     },
     async fetchGuests() {
       try {
+        const token = this.$store.getters.getToken;
+        console.log("Token " + token)
         this.isLoading = true;
         const response = await axios.get('https://localhost:44384/api/Guest', {
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
           params: {
             page: this.page,
             limit: this.limit
@@ -79,6 +84,9 @@ export default {
         this.page++;
         console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Guest', {
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
           params: {
             page: this.page,
             limit: this.limit

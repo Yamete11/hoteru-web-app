@@ -80,7 +80,11 @@ export default {
     },
     async fetchSpecificService(idService) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Service/' + idService);
+        const response = await axios.get('https://localhost:44384/api/Service/' + idService,{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.service = response.data;
       } catch (error) {
         console.error(error);

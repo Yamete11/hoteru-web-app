@@ -80,7 +80,11 @@ export default {
   methods:{
     async fetchSpecificHistory(idReservation){
       try{
-        const response = await axios.get('https://localhost:44384/api/Reservation/history/' + idReservation);
+        const response = await axios.get('https://localhost:44384/api/Reservation/history/' + idReservation,{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
 
         this.reservation = response.data[0];
         console.log(this.reservation)

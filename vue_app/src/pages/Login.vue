@@ -5,7 +5,7 @@
     </div>
     <div class="login">
       <h1>HOTERU ホテル</h1>
-      <form @submit.prevent="login" class="login-form">
+      <form @submit.prevent="loginIn" class="login-form">
         <my-input
             class="login-input"
             v-model="login"
@@ -35,19 +35,22 @@ export default {
     }
   },
   methods: {
-    async login() {
-      console.log("hello")
+    async loginIn() {
+      console.log("Logging in");
       try {
-        const response = await fetch('https://localhost:44384/api/Login/login', {
+        const response = await fetch('https://localhost:44384/api/Login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ login: this.login, password: this.password })
+          body: JSON.stringify({ Login: this.login, Password: this.password })
         });
 
         if (!response.ok) throw new Error('Login failed');
 
         const data = await response.json();
+        console.log(data);
+
         localStorage.setItem('token', data.token);
+        this.$store.commit('setToken', data.token);
 
         this.$router.push('/arrivals');
       } catch (error) {

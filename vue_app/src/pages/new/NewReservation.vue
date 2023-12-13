@@ -172,9 +172,14 @@ import {computed, reactive, ref, watch} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
 import axios from 'axios';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+
 export default {
   name: "NewReservation",
   setup(){
+    const store = useStore();
+    const router = useRouter();
     const state = reactive({
       formData: {
         In: Date,
@@ -237,14 +242,30 @@ export default {
 
     async function fetchRooms() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Room/freeRooms');
+        const response = await axios.get('https://localhost:44384/api/Room/freeRooms',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.rooms = response.data;
-        const response2 = await axios.get('https://localhost:44384/api/RoomType');
+        const response2 = await axios.get('https://localhost:44384/api/RoomType',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.roomTypes = response2.data;
-        const response3 = await axios.get('https://localhost:44384/api/Guest');
+        const response3 = await axios.get('https://localhost:44384/api/Guest',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.guests = response3.data.list;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus');
+        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.guestStatuses = responseStatus.data;
 
         console.log(state.guests)
@@ -256,8 +277,15 @@ export default {
     async function addReservation(){
       console.log(this.state.formData)
       try {
-        const response = await axios.post('https://localhost:44384/api/Reservation', state.formData);
+        const response = await axios.post('https://localhost:44384/api/Reservation', state.formData, {
+          headers: {
+            'Authorization': `Bearer ${store.getters.getToken}`
+          }
+        });
         console.log('Response:', response.data);
+        if (response.data && response.data.httpStatusCode === 200) {
+          await router.push('/reservations');
+        }
       } catch (error) {
         console.error(error);
       }

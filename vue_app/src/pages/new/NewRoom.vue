@@ -99,10 +99,14 @@ import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
 import axios from 'axios';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "NewRoom",
   setup() {
+    const store = useStore();
+    const router = useRouter();
     const state = reactive({
       roomTypes: [],
       roomStatuses: [],
@@ -130,9 +134,17 @@ export default {
 
     async function fetchRoomTypes() {
       try {
-        const response = await axios.get('https://localhost:44384/api/RoomType');
+        const response = await axios.get('https://localhost:44384/api/RoomType',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.roomTypes = response.data;
-        const response2 = await axios.get('https://localhost:44384/api/RoomStatus');
+        const response2 = await axios.get('https://localhost:44384/api/RoomStatus',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         state.roomStatuses = response2.data;
       } catch (error) {
         console.error(error);
@@ -143,10 +155,14 @@ export default {
       v$.value.$touch();
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Room', state.formData);
+          const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
+            headers: {
+              'Authorization': `Bearer ${store.getters.getToken}`
+            }
+          });
           console.log('Response:', response.data);
           if (response.data && response.data.httpStatusCode === 200) {
-            this.$router.push({ name: "Rooms" });
+            await router.push('/rooms');
           }
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {

@@ -68,6 +68,9 @@ export default {
       try {
         this.isLoading = true;
         const response = await axios.get('https://localhost:44384/api/Room', {
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
           params: {
             page: this.page,
             limit: this.limit
@@ -87,6 +90,9 @@ export default {
         this.page++;
         console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Room', {
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
           params: {
             page: this.page,
             limit: this.limit

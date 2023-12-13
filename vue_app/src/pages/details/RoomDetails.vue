@@ -99,13 +99,25 @@ export default {
     },
     async fetchSpecificRoom(idRoom) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Room/' + idRoom);
+        const response = await axios.get('https://localhost:44384/api/Room/' + idRoom,{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.room = response.data;
 
-        const responseType = await axios.get('https://localhost:44384/api/RoomType');
+        const responseType = await axios.get('https://localhost:44384/api/RoomType',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.roomTypes = responseType.data;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/RoomStatus');
+        const responseStatus = await axios.get('https://localhost:44384/api/RoomStatus',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
         this.roomStatuses = responseStatus.data;
 
         const foundType = this.roomTypes.find(type => type.idRoomType === this.room.type);
