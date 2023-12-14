@@ -153,7 +153,7 @@ export default {
         In: today,
         Out: Date,
         Capacity: 0,
-        Price: 3.3,
+        Price: 0,
         IdRoom: 0,
         Confirmed: false,
         Sum: 0,

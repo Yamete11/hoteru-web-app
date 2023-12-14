@@ -2,7 +2,7 @@
   <div class="navbar">
     <div class="navbar-title">
       <h1>HOTERU ホテル</h1>
-      <h2>"Company name"</h2>
+      <h2>{{ companyName }}</h2>
     </div>
     <div class="navbar-links">
       <router-link class="navbar-btn" to="/new-reservation">New Reservation</router-link>
@@ -22,6 +22,11 @@ export default {
     logout() {
       localStorage.removeItem('token');
       this.$router.push('/');
+    }
+  },
+  computed:{
+    companyName(){
+      return this.$store.getters.getUserData.companyTitle || 'No Company';
     }
   }
 }

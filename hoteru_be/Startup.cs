@@ -47,6 +47,8 @@ namespace hoteru_be
             services.AddScoped<IReservationService, ReservationService>();
             services.AddScoped<IGuestStatusService, GuestStatusService>();
             services.AddScoped<IDepositTypeService, DepositTypeService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserTypeService, UserTypeService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Login",
   data() {
@@ -51,6 +53,8 @@ export default {
 
         localStorage.setItem('token', data.token);
         this.$store.commit('setToken', data.token);
+
+        await this.$store.dispatch('fetchUserData', this.login);
 
         this.$router.push('/arrivals');
       } catch (error) {
