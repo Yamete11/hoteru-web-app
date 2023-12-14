@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace hoteru_be.DTOs
 {
@@ -10,6 +11,9 @@ namespace hoteru_be.DTOs
         public int Capacity { get; set; }
         public int IdRoom { get; set; }
         public bool Confirmed { get; set; }
-        public GuestD guest { get; set; }
+        public float Sum { get; set; }
+        public int IdDepositType { get; set; }
+        public List<ServiceD> Services { get; set; }
+        public int IdPerson { get; set; }
     }
 }

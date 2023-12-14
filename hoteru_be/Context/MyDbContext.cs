@@ -130,8 +130,8 @@ namespace hoteru_be.Context
             modelBuilder.Entity<User>(t =>
             {
                 t.HasData(
-                    new User { IdPerson = 3, LoginName = "Login1", Password = "123123123", IdUserType = 3 },
-                    new User { IdPerson = 4, LoginName = "Login2", Password = "567567567", IdUserType = 3 });
+                    new User { IdPerson = 3, LoginName = "asd", Password = "asd", IdUserType = 3 },
+                    new User { IdPerson = 4, LoginName = "qwe", Password = "qwe", IdUserType = 3 });
 
             });
 

@@ -21,6 +21,7 @@
                 class="input"
                 type="date"
                 :min="today"
+                :max="maxInDate"
                 placeholder="Enter in"
             >
           </div>
@@ -30,8 +31,7 @@
                 v-model="state.formData.Out"
                 class="input"
                 type="date"
-                :min="minOutDate"
-                :disabled="!state.formData.In"
+                :min="today"
                 placeholder="Enter out"
             >
           </div>
@@ -44,8 +44,8 @@
               <input
                   v-model="state.formData.Capacity"
                   class="input"
-                  type="text"
-                  placeholder="Enter room number"
+                  type="number"
+                  placeholder="Enter room capacity"
               >
             </div>
             <div class="input-form">
@@ -61,96 +61,62 @@
             <label>Room Selection: </label>
             <select v-model="state.formData.IdRoom">
               <option disabled value="">Select a room</option>
-              <option v-for="room in filteredRooms" :key="room.idRoom" :value="String(room.idRoom)">{{ room.number }} - Capacity: {{ room.capacity }}</option>
+              <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
             </select>
+            <label>Price: {{state.formData.Price}}</label>
           </div>
         </div>
 
         <div class="guest">
           <label>Guest personal information</label>
           <div class="input-form">
-            <label>Guest Name: </label>
+            <label>Guest Selection: </label>
+            <select v-model="state.formData.idPerson">
+              <option disabled value="">Select a guest</option>
+              <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
+                {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
+              </option>
+            </select>
+            <router-link class="form-btn" to="/new-guest">Add new guest</router-link>
+          </div>
+        </div>
+
+        <div class="guest">
+          <label>Deposit option</label>
+          <div class="input-form">
+            <label>Deposit sum: </label>
             <input
-                v-model="state.guestSearchQuery"
-                @input="searchGuests"
+                v-model="state.formData.Sum"
                 class="input"
-                type="text"
-                placeholder="Start typing name..."
+                type="number"
+                placeholder="Enter room capacity"
             >
-            <ul v-if="state.filteredGuests.length" class="suggestions">
-              <li v-for="guest in state.filteredGuests" :key="state.formData.guest.idPerson" @click="selectGuest(guest)">
-                {{ guest.name }} {{ guest.surname}}, {{ guest.passport}}
-              </li>
-            </ul>
+            <select v-model="state.formData.IdDepositType">
+              <option disabled value="">Select type</option>
+              <option v-for="type in state.depositTypes" :key="type.idDepositType" :value="type.idDepositType">
+                {{ type.title }}
+              </option>
+            </select>
           </div>
+        </div>
 
-
-          <div class="date-inputs">
-            <div class="input-form">
-              <label>Name: </label>
-              <input
-                  v-model="state.formData.guest.name"
-                  class="input"
-                  type="text"
-                  placeholder="Enter name"
-                  :disabled="state.isGuestSelected"
-              >
-            </div>
-
-            <div class="input-form">
-              <label>Surname: </label>
-              <input
-                  v-model="state.formData.guest.surname"
-                  class="input"
-                  type="text"
-                  placeholder="Enter name"
-                  :disabled="state.isGuestSelected"
-              >
-            </div>
-          </div>
-
-          <div class="date-inputs">
-            <div class="input-form">
-              <label>Email: </label>
-              <input
-                  v-model="state.formData.guest.email"
-                  class="input"
-                  type="text"
-                  placeholder="Enter name"
-                  :disabled="state.isGuestSelected"
-              >
-            </div>
-
-            <div class="input-form">
-              <label>Passport: </label>
-              <input
-                  v-model="state.formData.guest.telNumber"
-                  class="input"
-                  type="text"
-                  placeholder="Enter name"
-                  :disabled="state.isGuestSelected"
-              >
-            </div>
-          </div>
-
-          <div class="date-inputs">
-            <div class="input-form">
-              <label>Tel. number: </label>
-              <input
-                  v-model="state.formData.guest.passport"
-                  class="input"
-                  type="text"
-                  placeholder="Enter name"
-                  :disabled="state.isGuestSelected"
-              >
-            </div>
-
-            <div class="input-form">
-              <label>Status: </label>
-              <select v-model="state.formData.guest.idGuestStatus" class="input" :disabled="state.isGuestSelected">
-                <option disabled value="">Select status</option>
-                <option v-for="status in state.guestStatuses" :value="status.idGuestStatus" :key="status.idGuestStatus">{{ status.title }}</option>
-              </select>
+        <div class="guest">
+          <label>Service option</label>
+          <div class="input-form">
+            <label>Choose a service</label>
+            <select v-model="state.selectedService" class="input">
+              <option disabled value="">Select service</option>
+              <option v-for="service in state.services" :key="service.idService" :value="service">
+                {{ service.title }}: {{ service.sum }}
+              </option>
+            </select>
+            <button @click.prevent="addService" class="form-btn">Add</button>
+            <div class="service-list" v-if="state.formData.services.length > 0">
+              <ul class="added-services-list">
+                <li class="element" v-for="(service, index) in state.formData.services" :key="index">
+                  {{ service.title }}: {{ service.sum }} <button @click.prevent="removeService(index)">Remove</button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -174,59 +140,43 @@ import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { differenceInCalendarDays } from 'date-fns';
 
 export default {
   name: "NewReservation",
   setup(){
     const store = useStore();
     const router = useRouter();
+    const today = new Date().toISOString().split('T')[0];
     const state = reactive({
       formData: {
-        In: Date,
+        In: today,
         Out: Date,
-        Capacity: '',
+        Capacity: 0,
         Price: 3.3,
         IdRoom: 0,
         Confirmed: false,
-        guest: {
-          idPerson: 0,
-          name: '',
-          surname: '',
-          email: '',
-          telNumber: '',
-          passport: '',
-          idGuestStatus: 0
-        }
+        Sum: 0,
+        IdDepositType: 0,
+        idPerson: 0,
+        services: []
       },
+      selectedService: null,
       statusTitle: '',
       guestStatuses: [],
       roomType: '',
       room: '',
       rooms: [],
       roomTypes: [],
+      depositTypes: [],
       guests: [],
+      services: [],
       errors: {},
       guestSearchQuery: '',
       filteredGuests: [],
       isGuestSelected: false
     });
 
-    function searchGuests() {
-      if (state.guestSearchQuery.length && Array.isArray(state.guests)) {
-        state.filteredGuests = state.guests.filter(guest =>
-            guest.name.toLowerCase().includes(state.guestSearchQuery.toLowerCase())
-        );
-      } else {
-        state.filteredGuests = [];
-      }
-    }
-
-    function selectGuest(guest) {
-      state.guestSearchQuery = guest.name + " " + guest.surname + ", " + guest.passport;
-      state.formData.guest.idPerson = guest.idPerson
-      state.isGuestSelected = true;
-      state.filteredGuests = [];
-    }
 
     const rules = {
       formData: {
@@ -268,6 +218,20 @@ export default {
         });
         state.guestStatuses = responseStatus.data;
 
+        const responseDepositType = await axios.get('https://localhost:44384/api/DepositType',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
+        state.depositTypes = responseDepositType.data;
+
+        const responseServices = await axios.get('https://localhost:44384/api/Service',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
+        state.services = responseServices.data.list;
+
         console.log(state.guests)
       } catch (error) {
         console.error(error);
@@ -291,6 +255,25 @@ export default {
       }
     }
 
+    async function addGuest(){
+      try {
+        const response = await axios.post('https://localhost:44384/api/Guest', state.formData.guest,{
+          headers: {
+            'Authorization': `Bearer ${store.getters.getToken}`
+          }
+        });
+        console.log('Response:', response.data);
+        if (response.data && response.data.httpStatusCode === 200) {
+          await router.push('/guests');
+        }
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          state.errors = error.response.data.errors;
+        }
+        console.log('Error', error);
+      }
+    }
+
     const filteredRooms = computed(() => {
       const selectedRoomType = state.roomTypes.find(rt => rt.idRoomType.toString() === state.roomType)?.title;
       return state.rooms.filter(room => {
@@ -302,7 +285,6 @@ export default {
 
 
     const v$ = useVuelidate(rules, state);
-    const today = new Date().toISOString().split('T')[0];
 
     const minOutDate = ref('');
     watch(() => state.formData.In, (newValue) => {
@@ -311,9 +293,10 @@ export default {
         inDate.setDate(inDate.getDate() + 1);
         minOutDate.value = inDate.toISOString().split('T')[0];
       } else {
-        minOutDate.value = '';
+        minOutDate.value = null;
       }
     });
+
 
     watch(() => state.guestSearchQuery, (newValue) => {
       if (!newValue) {
@@ -321,7 +304,47 @@ export default {
       }
     });
 
-    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, searchGuests, selectGuest, addReservation}
+    const calculatedPrice = computed(() => {
+      const inDate = new Date(state.formData.In);
+      const outDate = new Date(state.formData.Out);
+      const daysDifference = differenceInCalendarDays(outDate, inDate);
+      const selectedRoom = state.rooms.find(x => String(x.idRoom) === String(state.formData.IdRoom))
+      if(selectedRoom !== undefined){
+        return daysDifference * selectedRoom.price;
+      } else {
+        return 0
+      }
+    });
+
+    watch(() => [state.formData.In, state.formData.Out, state.formData.IdRoom], () => {
+      if(isNaN(calculatedPrice.value)){
+        state.formData.Price = 0
+      } else {
+        state.formData.Price = parseFloat(calculatedPrice.value);
+      }
+    });
+
+    const maxInDate = computed(() => {
+      if (state.formData.Out && state.formData.Out !== Date) {
+        const outDate = new Date(state.formData.Out);
+        outDate.setDate(outDate.getDate() - 1);
+        return outDate.toISOString().split('T')[0];
+      }
+      return null;
+    });
+
+    const addService = () => {
+      if (state.selectedService && !state.formData.services.includes(state.selectedService)) {
+        state.formData.services.push(state.selectedService);
+      }
+    };
+
+    const removeService = (index) => {
+      state.formData.services.splice(index, 1);
+    };
+
+
+    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, addReservation, calculatedPrice, maxInDate, addGuest, addService, removeService }
   },
   mounted() {
     this.fetchRooms();
@@ -353,18 +376,6 @@ export default {
   flex-direction: column;
   width: 100%;
   max-width: 30%;
-}
-
-.registration-btn {
-  text-decoration: none;
-  background-color: #8D7B68;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-weight: bold;
-  color: white;
-  margin: 10px;
-  cursor: pointer;
 }
 
 .registration-class {
@@ -400,6 +411,7 @@ export default {
 
 .input-form input[type="text"],
 .input-form input[type="date"],
+.input-form input[type="number"],
 .input-form select{
   padding: 10px;
   border: 1px solid #ccc;
@@ -407,39 +419,23 @@ export default {
   margin-bottom: 10px;
 }
 
+.registration-btn {
+  text-decoration: none;
+  background-color: #8D7B68;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+  margin: 10px;
+  cursor: pointer;
+  max-width: 110px;
+}
+
 .error-message {
   color: red;
   margin: 10px 0;
 }
-
-.suggestions {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  z-index: 1000;
-  width: 100%;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  top: 100%;
-}
-
-.suggestions li {
-  padding: 5px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  width: 100%;
-}
-
-.suggestions li:last-child {
-  border-bottom: none;
-}
-
-.suggestions li:hover {
-  background-color: #f1f1f1;
-}
-
 h1 {
   display: flex;
   justify-content: center;
@@ -448,17 +444,13 @@ h1 {
 
 
 .guest {
+  display: flex;
+  flex-direction: column;
   border: 2px solid #989595;
   border-radius: 5px;
   padding: 10px;
   margin-top: 20px;
 }
-
-
-
-
-
-
 
 
 
@@ -480,5 +472,49 @@ h1 {
   border-color: #8D7B68;
   font-weight: bold;
   font-size: 20px;
+}
+
+
+.form-btn {
+  text-decoration: none;
+  background-color: #8D7B68;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  max-width: 110px;
+}
+
+.element{
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  background-color:#C8B6A6;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 10px 0;
+}
+
+.service-list ul {
+  padding-left: 0;
+  list-style-type: none;
+  width: 100%;
+}
+
+.service-list {
+  max-height: 200px;
+  overflow-y: auto;
+  width: 96%;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+
 }
 </style>

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationController : ControllerBase

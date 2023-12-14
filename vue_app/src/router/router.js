@@ -17,6 +17,7 @@ import HistoryDetails from "../pages/details/HistoryDetails.vue";
 import ReservationDetails from "../pages/details/ReservationDetails.vue";
 import ArrivalDetails from "../pages/details/ArrivalDetails.vue";
 import NewReservation from "../pages/new/NewReservation.vue";
+import Settings from "../pages/Settings.vue";
 
 
 const routes = [
@@ -105,6 +106,10 @@ const routes = [
     {
         path: '/history',
         component: History
+    },
+    {
+        path: '/settings',
+        component: Settings
     }
 ]
 

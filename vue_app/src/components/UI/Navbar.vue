@@ -70,6 +70,8 @@ export default {
   border: solid 2px white;
   border-radius: 5px;
   padding: 10px;
+  background-color: #715d47;
+  cursor: pointer;
 }
 
 .navbar h1, .navbar h2 {

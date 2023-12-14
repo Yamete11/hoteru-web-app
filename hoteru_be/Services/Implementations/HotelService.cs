@@ -37,6 +37,20 @@ namespace hoteru_be.Services.Implementations
                 Address = address
             };
 
+            Person person = new Person
+            {
+                Name = hotelDTO.Name,
+                Surname = hotelDTO.Surname,
+                Email = hotelDTO.Email,
+                Hotel = hotel
+            };
+            User user = new User
+            {
+                LoginName = hotelDTO.LoginName,
+                Password = hotelDTO.Password,
+                Person = person
+            };
+
             _context.Hotels.Add(hotel);
 
 

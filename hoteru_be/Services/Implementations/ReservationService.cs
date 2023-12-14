@@ -208,6 +208,14 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO)
         {
+            Deposit deposit = new Deposit
+            {
+                Sum = reservationDTO.Sum,
+                IdDepositType = reservationDTO.IdDepositType
+            };
+            _context.Deposits.Add(deposit);
+
+
             var room = await _context.Rooms.SingleOrDefaultAsync(x => x.IdRoom == reservationDTO.IdRoom);
             Reservation reservation = new Reservation
             {
@@ -217,22 +225,36 @@ namespace hoteru_be.Services.Implementations
                 Out = reservationDTO.Out,
                 Confirmed = reservationDTO.Confirmed,
                 IdRoom = room.IdRoom,
-                IdUser = 3
+                IdUser = 3,
+                Deposit = deposit
+                
             };
 
             _context.Reservations.Add(reservation);
 
-            if (reservationDTO.guest.IdPerson != 0)
+    
+
+            var guest = await _context.Guests.SingleOrDefaultAsync(x => x.IdPerson == reservationDTO.IdPerson);
+            GuestReservation guestReservation = new GuestReservation
             {
-                var guest = await _context.Guests.SingleOrDefaultAsync(x => x.IdPerson == reservationDTO.guest.IdPerson);
-                GuestReservation guestReservation = new GuestReservation
+                 Reservation = reservation,
+                 Guest = guest
+            };
+
+            _context.GuestReservations.Add(guestReservation);
+
+            for (int i = 0; i < reservationDTO.Services.Count; i++)
+            {
+                var service = await _context.Services.SingleOrDefaultAsync(x => x.IdService == reservationDTO.Services[i].IdService);
+                Entities.ReservationService reservationService = new Entities.ReservationService
                 {
                     Reservation = reservation,
-                    Guest = guest
+                    Service = service
                 };
-
-                _context.GuestReservations.Add(guestReservation);
+                _context.ReservationService.Add(reservationService);
             }
+
+
 
             await _context.SaveChangesAsync();
 
