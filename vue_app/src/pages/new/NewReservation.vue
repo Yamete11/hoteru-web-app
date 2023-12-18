@@ -91,6 +91,7 @@
                 type="number"
                 placeholder="Enter room capacity"
             >
+            <label>Choose type: </label>
             <select v-model="state.formData.IdDepositType">
               <option disabled value="">Select type</option>
               <option v-for="type in state.depositTypes" :key="type.idDepositType" :value="type.idDepositType">
