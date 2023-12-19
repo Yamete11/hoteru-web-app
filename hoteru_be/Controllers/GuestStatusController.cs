@@ -22,7 +22,7 @@ namespace hoteru_be.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<GuestStatusDTO>> GetRoomStatuses()
+        public async Task<IEnumerable<StatusDTO>> GetRoomStatuses()
         {
             return await _service.GetGuestStatuses();
         }

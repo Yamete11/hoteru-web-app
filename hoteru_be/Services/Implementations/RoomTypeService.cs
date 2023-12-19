@@ -17,11 +17,11 @@ namespace hoteru_be.Services.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<RoomTypeDTO>> GetRoomTypes()
+        public async Task<IEnumerable<TypeDTO>> GetRoomTypes()
         {
-            return await _context.RoomTypes.Select(x => new RoomTypeDTO
+            return await _context.RoomTypes.Select(x => new TypeDTO
             {
-                IdRoomType = x.IdRoomType,
+                IdType = x.IdRoomType,
                 Title = x.Title,
             }).ToListAsync();
         }

@@ -19,7 +19,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<DepositTypeDTO>> GetDepositTypes()
+        public async Task<IEnumerable<TypeDTO>> GetDepositTypes()
         {
             return await _service.GetDepositTypes();
         }

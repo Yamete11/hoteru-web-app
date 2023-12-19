@@ -30,7 +30,7 @@
           <label>Status: </label>
           <input v-if="!isEditing" class="input" type="text" :value="statusTitle" readonly>
           <select v-else v-model="guest.idGuestStatus" class="input">
-            <option v-for="status in guestStatuses" :value="status.idGuestStatus" :key="status.idGuestStatus">{{ status.title }}</option>
+            <option v-for="status in guestStatuses" :value="status.idStatus" :key="status.idStatus">{{ status.title }}</option>
           </select>
         </div>
         <div class="registration-class">
@@ -101,7 +101,7 @@ export default {
         });
         this.guestStatuses = responseStatus.data;
 
-        const foundStatus = this.guestStatuses.find(status => status.idGuestStatus === this.guest.idGuestStatus);
+        const foundStatus = this.guestStatuses.find(status => status.idStatus === this.guest.idGuestStatus);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
       } catch (error) {
         console.error(error);

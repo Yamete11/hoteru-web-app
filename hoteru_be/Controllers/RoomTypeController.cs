@@ -21,7 +21,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<RoomTypeDTO>> GetRoomTypes()
+        public async Task<IEnumerable<TypeDTO>> GetRoomTypes()
         {
             return await _service.GetRoomTypes();
         }

@@ -6,6 +6,6 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IDepositTypeService
     {
-        public Task<IEnumerable<DepositTypeDTO>> GetDepositTypes();
+        public Task<IEnumerable<TypeDTO>> GetDepositTypes();
     }
 }

@@ -276,7 +276,7 @@ export default {
     }
 
     const filteredRooms = computed(() => {
-      const selectedRoomType = state.roomTypes.find(rt => rt.idRoomType.toString() === state.roomType)?.title;
+      const selectedRoomType = state.roomTypes.find(rt => rt.idType.toString() === state.roomType)?.title;
       return state.rooms.filter(room => {
         const capacityMatch = room.capacity >= state.formData.Capacity;
         const roomTypeMatch = room.type === selectedRoomType;

@@ -16,11 +16,11 @@ namespace hoteru_be.Services.Implementations
         {
             _context = context;
         }
-        public async Task<IEnumerable<GuestStatusDTO>> GetGuestStatuses()
+        public async Task<IEnumerable<StatusDTO>> GetGuestStatuses()
         {
-            return await _context.GuestStatuses.Select(x => new GuestStatusDTO
+            return await _context.GuestStatuses.Select(x => new StatusDTO
             {
-                IdGuestStatus = x.IdGuestStatus,
+                IdStatus = x.IdGuestStatus,
                 Title = x.Title,
             }).ToListAsync();
         }

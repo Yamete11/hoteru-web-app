@@ -6,6 +6,6 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IUserTypeService
     {
-        public Task<IEnumerable<UserTypeDTO>> GetUserTypes();
+        public Task<IEnumerable<TypeDTO>> GetUserTypes();
     }
 }

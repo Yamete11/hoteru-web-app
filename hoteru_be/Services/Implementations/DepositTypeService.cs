@@ -17,11 +17,11 @@ namespace hoteru_be.Services.Implementations
         {
             _context = context;
         }
-        public async Task<IEnumerable<DepositTypeDTO>> GetDepositTypes()
+        public async Task<IEnumerable<TypeDTO>> GetDepositTypes()
         {
-            return await _context.DepositTypes.Select(x => new DepositTypeDTO
+            return await _context.DepositTypes.Select(x => new TypeDTO
             {
-                IdDepositType = x.IdDepositType,
+                IdType = x.IdDepositType,
                 Title = x.Title,
             }).ToListAsync();
         }

@@ -21,7 +21,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<UserTypeDTO>> GetUserTypes()
+        public async Task<IEnumerable<TypeDTO>> GetUserTypes()
         {
             return await _service.GetUserTypes();
         }

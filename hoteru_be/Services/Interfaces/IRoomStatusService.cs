@@ -6,6 +6,6 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IRoomStatusService
     {
-        public Task<IEnumerable<RoomStatusDTO>> GetRoomStatuses();
+        public Task<IEnumerable<StatusDTO>> GetRoomStatuses();
     }
 }

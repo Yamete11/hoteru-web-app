@@ -6,6 +6,6 @@ namespace hoteru_be.Services.Interfaces
 {
     public interface IGuestStatusService
     {
-        public Task<IEnumerable<GuestStatusDTO>> GetGuestStatuses();
+        public Task<IEnumerable<StatusDTO>> GetGuestStatuses();
     }
 }

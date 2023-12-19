@@ -1,8 +1,8 @@
 ﻿namespace hoteru_be.DTOs
 {
-    public class RoomTypeDTO
+    public class StatusDTO
     {
-        public int IdRoomType { get; set; }
+        public int IdStatus { get; set; }
         public string Title { get; set; }
     }
 }

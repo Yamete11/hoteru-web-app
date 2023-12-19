@@ -33,14 +33,14 @@
           <label>Type: </label>
           <input v-if="!isEditing" class="input" type="text" :value="typeTitle" readonly>
           <select v-else v-model="room.type" class="input">
-            <option v-for="type in roomTypes" :value="type.idRoomType" :key="type.idRoomType">{{ type.title }}</option>
+            <option v-for="type in roomTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
           </select>
         </div>
         <div class="input-form">
           <label>Status: </label>
           <input v-if="!isEditing" class="input" type="text" :value="statusTitle" readonly>
           <select v-else v-model="room.status" class="input">
-            <option v-for="status in roomStatuses" :value="status.idRoomStatus" :key="status.idRoomStatus">{{ status.title }}</option>
+            <option v-for="status in roomStatuses" :value="status.idStatus" :key="status.idStatus">{{ status.title }}</option>
           </select>
         </div>
         <div class="registration-class">
@@ -84,10 +84,10 @@ export default {
     async toggleEdit() {
       this.isEditing = !this.isEditing;
       if (!this.isEditing) {
-        const foundType = this.roomTypes.find(type => type.idRoomType === this.room.type);
+        const foundType = this.roomTypes.find(type => type.idType === this.room.type);
         this.typeTitle = foundType ? foundType.title : 'Type not found';
 
-        const foundStatus = this.roomStatuses.find(status => status.idRoomStatus === this.room.status);
+        const foundStatus = this.roomStatuses.find(status => status.idStatus === this.room.status);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
         try {
           const response = await axios.put('https://localhost:44384/api/Room', this.room);
@@ -120,10 +120,10 @@ export default {
         });
         this.roomStatuses = responseStatus.data;
 
-        const foundType = this.roomTypes.find(type => type.idRoomType === this.room.type);
+        const foundType = this.roomTypes.find(type => type.idType === this.room.type);
         this.typeTitle = foundType ? foundType.title : 'Type not found';
 
-        const foundStatus = this.roomStatuses.find(status => status.idRoomStatus === this.room.status);
+        const foundStatus = this.roomStatuses.find(status => status.idStatus === this.room.status);
         this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
       } catch (error) {
         console.error(error);
