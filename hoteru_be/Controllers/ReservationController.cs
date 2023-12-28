@@ -43,6 +43,12 @@ namespace hoteru_be.Controllers
             return await _service.GetSpecificHistory(IdReservation);
         }
 
+        [HttpGet("arrival/{IdReservation}")]
+        public async Task<ArrivalDTO> GetSpecificArrival(int IdReservation)
+        {
+            return await _service.GetSpecificArrival(IdReservation);
+        }
+
         [HttpDelete("{IdReservation}")]
         public async Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation)
         {

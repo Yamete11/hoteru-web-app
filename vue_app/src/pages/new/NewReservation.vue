@@ -52,7 +52,7 @@
               <label>Type: </label>
               <select v-model="state.roomType">
                 <option disabled value="">Select type</option>
-                <option v-for="roomType in state.roomTypes" :key="roomType.idRoomType" :value="String(roomType.idRoomType)">{{ roomType.title }}</option>
+                <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
               </select>
             </div>
           </div>
@@ -160,7 +160,8 @@ export default {
         Sum: 0,
         IdDepositType: 0,
         idPerson: 0,
-        services: []
+        services: [],
+        idUser: this.$store.getters.getUserData.IdUser
       },
       selectedService: null,
       statusTitle: '',
@@ -277,6 +278,7 @@ export default {
 
     const filteredRooms = computed(() => {
       const selectedRoomType = state.roomTypes.find(rt => rt.idType.toString() === state.roomType)?.title;
+      console.log(state.roomType)
       return state.rooms.filter(room => {
         const capacityMatch = room.capacity >= state.formData.Capacity;
         const roomTypeMatch = room.type === selectedRoomType;

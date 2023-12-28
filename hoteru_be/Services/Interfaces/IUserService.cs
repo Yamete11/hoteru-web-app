@@ -7,5 +7,7 @@ namespace hoteru_be.Services.Interfaces
     {
         public Task<UserDTO> GetUser(string userName);
         public Task<FullUserDTO> GetFullUser(int idUser);
+
+        public Task<MethodResultDTO> PostUser(NewUserDTO newUserDTO);
     }
 }

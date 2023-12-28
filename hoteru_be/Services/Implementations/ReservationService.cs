@@ -225,7 +225,7 @@ namespace hoteru_be.Services.Implementations
                 Out = reservationDTO.Out,
                 Confirmed = reservationDTO.Confirmed,
                 IdRoom = room.IdRoom,
-                IdUser = 3,
+                IdUser = reservationDTO.,
                 Deposit = deposit
                 
             };
@@ -263,6 +263,36 @@ namespace hoteru_be.Services.Implementations
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Created"
             };
+        }
+
+        public async Task<ArrivalDTO> GetSpecificArrival(int IdArrival)
+        {
+
+            var services = await _context.ReservationService
+                .Where(r => r.IdReservation == IdArrival)
+                .Include(r => r.Service)
+                .Select(r => new ServiceHistoryDTO
+                {
+                    IdService = r.IdService,
+                    Title = r.Service.Title,
+                    Sum = r.Service.Sum,
+                    Date = r.Date.ToString("yyyy-MM-dd")
+                }).ToListAsync();
+
+            return await _context.Reservations
+                .Where(r => r.IdReservation == IdArrival && r.Confirmed == false)
+                .Select(r => new ArrivalDTO
+                {
+                   IdReservation = r.IdReservation,
+                   In = r.In.ToString("yyyy-MM-dd"),
+                   Out = r.Out.ToString("yyyy-MM-dd"),
+                   Capacity = r.Capacity,
+                   IdRoom = r.IdRoom,
+                   IdDeposit = r.IdDeposit.HasValue ? r.IdDeposit.Value : 0,
+                   IdGuest = r.IdUser,
+                   Services = services
+
+                }).FirstOrDefaultAsync();
         }
     }
 }

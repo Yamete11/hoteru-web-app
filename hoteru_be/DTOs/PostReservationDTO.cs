@@ -15,5 +15,6 @@ namespace hoteru_be.DTOs
         public int IdDepositType { get; set; }
         public List<ServiceD> Services { get; set; }
         public int IdPerson { get; set; }
+        public int IdUser { get; set; }
     }
 }

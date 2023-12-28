@@ -12,6 +12,8 @@ namespace hoteru_be.Services.Interfaces
 
         public Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation);
 
+        public Task<ArrivalDTO> GetSpecificArrival(int IdArrival);
+
         public Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation);
 
         public Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO);

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -29,6 +28,12 @@ namespace hoteru_be.Controllers
         public Task<FullUserDTO> GetFullUser(int idUser)
         {
             return _service.GetFullUser(idUser);
+        }
+
+        [HttpPost]
+        public async Task<MethodResultDTO> PostRoom([FromBody] NewUserDTO newUserDTO)
+        {
+            return await _service.PostUser(newUserDTO);
         }
     }
 }
