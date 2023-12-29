@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RoomController : ControllerBase
@@ -28,9 +27,9 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet("freeRooms")]
-        public async Task<List<RoomDTO>> GetFreeRooms()
+        public async Task<List<RoomDTO>> GetFreeRooms([FromQuery] int idRoom = 0)
         {
-            return await _service.GetFreeRooms();
+            return await _service.GetFreeRooms(idRoom);
         }
 
 

@@ -8,22 +8,19 @@
         <div class="input-form">
           <label>In: </label>
           <input
-              v-model="state.reservation.In"
+              v-model="state.reservation.in"
               class="input"
               type="date"
-              :min="today"
-              :max="maxInDate"
-              placeholder="Enter in"
+              readonly
           >
         </div>
         <div class="input-form">
           <label>Out: </label>
           <input
-              v-model="state.reservation.Out"
+              v-model="state.reservation.out"
               class="input"
               type="date"
-              :min="today"
-              placeholder="Enter out"
+              readonly
           >
         </div>
       </div>
@@ -33,7 +30,7 @@
           <div class="input-form">
             <label>Capacity: </label>
             <input
-                v-model="state.reservation.Capacity"
+                v-model="state.reservation.capacity"
                 class="input"
                 type="number"
                 placeholder="Enter room capacity"
@@ -41,20 +38,21 @@
           </div>
           <div class="input-form">
             <label>Type: </label>
-            <select v-model="state.roomType">
+            <input v-if="!isEditing" class="input" type="text" :value="state.roomType" readonly>
+            <select v-else v-model="state.roomType" class="input">
               <option disabled value="">Select type</option>
-              <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
+              <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="roomType.idType">{{ roomType.title }}</option>
             </select>
           </div>
         </div>
 
         <div class="input-form">
           <label>Room Selection: </label>
-          <select v-model="state.reservation.IdRoom">
+          <select v-model="state.reservation.idRoom">
             <option disabled value="">Select a room</option>
-            <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
+            <option v-for="room in state.rooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
           </select>
-          <label>Price: {{state.reservation.Price}}</label>
+          <label>Price: {{state.reservation.price}}</label>
         </div>
       </div>
 
@@ -62,7 +60,7 @@
         <label>Guest personal information</label>
         <div class="input-form">
           <label>Guest Selection: </label>
-          <select v-model="state.reservation.idUser">
+          <select v-model="state.reservation.idGuest">
             <option disabled value="">Select a guest</option>
             <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
               {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
@@ -72,7 +70,7 @@
         </div>
       </div>
 
-      <div class="guest">
+<!--      <div class="guest">
         <label>Deposit option</label>
         <div class="input-form">
           <label>Deposit sum: </label>
@@ -90,9 +88,9 @@
             </option>
           </select>
         </div>
-      </div>
+      </div>-->
 
-      <div class="guest">
+<!--      <div class="guest">
         <label>Service option</label>
         <div class="input-form">
           <label>Choose a service</label>
@@ -111,7 +109,7 @@
             </ul>
           </div>
         </div>
-      </div>
+      </div>-->
 
 
 
@@ -147,6 +145,7 @@ export default {
     const state = reactive({
       reservation: '',
       rooms: '',
+      roomType: '',
       roomTypes: '',
       guests: '',
       depositTypes: '',
@@ -168,7 +167,7 @@ export default {
       }
 
       try{
-        const response = await axios.get('https://localhost:44384/api/Room/freeRooms',{
+        const response = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.reservation.idRoom,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -181,6 +180,10 @@ export default {
           },
         });
         state.roomTypes = response2.data;
+
+        const foundRoom = this.guestStatuses.find(status => status.idRoom === state.reservation.idRoom);
+        const foundStatus = this.guestStatuses.find(status => status.idType === foundRoom.idType);
+        state.roomType = foundStatus ? foundStatus.title : 'Status not found';
 
         const response3 = await axios.get('https://localhost:44384/api/Guest',{
           headers: {

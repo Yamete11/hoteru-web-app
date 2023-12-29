@@ -94,7 +94,7 @@
             <label>Choose type: </label>
             <select v-model="state.formData.IdDepositType">
               <option disabled value="">Select type</option>
-              <option v-for="type in state.depositTypes" :key="type.idDepositType" :value="type.idDepositType">
+              <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
                 {{ type.title }}
               </option>
             </select>
@@ -149,6 +149,8 @@ export default {
     const store = useStore();
     const router = useRouter();
     const today = new Date().toISOString().split('T')[0];
+    const idUser = store.getters.getUserData.idUser;
+
     const state = reactive({
       formData: {
         In: today,
@@ -161,7 +163,7 @@ export default {
         IdDepositType: 0,
         idPerson: 0,
         services: [],
-        idUser: this.$store.getters.getUserData.IdUser
+        idUser: idUser
       },
       selectedService: null,
       statusTitle: '',

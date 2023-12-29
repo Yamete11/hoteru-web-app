@@ -199,7 +199,8 @@ namespace hoteru_be.Context
             {
                 t.HasData(
                     new GuestReservation { IdGuestReservation = 1, IdReservation = 1, IdGuest = 1 },
-                    new GuestReservation { IdGuestReservation = 2, IdReservation = 1, IdGuest = 2 });
+                    new GuestReservation { IdGuestReservation = 2, IdReservation = 2, IdGuest = 2 },
+                    new GuestReservation { IdGuestReservation = 3, IdReservation = 3, IdGuest = 1 });
 
             });
 

@@ -45,8 +45,8 @@ namespace hoteru_be.Services.Implementations
                 Out = r.Out.ToString("yyyy-MM-dd"),
                 RoomNumber = r.Room.Number,
                 BookedBy = r.User.LoginName,
-                Name = r.User.Person.Name,
-                Surname = r.User.Person.Surname
+                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
+                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
             }
             ).ToListAsync();
 
@@ -84,8 +84,8 @@ namespace hoteru_be.Services.Implementations
                 Out = r.Out.ToString("yyyy-MM-dd"),
                 RoomNumber = r.Room.Number,
                 BookedBy = r.User.LoginName,
-                Name = r.User.Person.Name,
-                Surname = r.User.Person.Surname
+                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
+                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
             }
             ).ToListAsync();
 
@@ -122,8 +122,8 @@ namespace hoteru_be.Services.Implementations
                 Out = r.Out.ToString("yyyy-MM-dd"),
                 RoomNumber = r.Room.Number,
                 BookedBy = r.User.LoginName,
-                Name = r.User.Person.Name,
-                Surname = r.User.Person.Surname
+                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
+                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
             }
             ).ToListAsync();
 
@@ -172,8 +172,8 @@ namespace hoteru_be.Services.Implementations
                 RoomNumber = r.Room.Number,
                 RoomType = r.Room.RoomType.Title,
                 BookedBy = r.User.LoginName,
-                Name = r.User.Person.Name,
-                Surname = r.User.Person.Surname,
+                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
+                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname,
                 DepositSum = r.Deposit.Sum,
                 DepositType = r.Deposit.DepositType.Title,
                 BillSum = r.Bill.Sum,
@@ -225,7 +225,7 @@ namespace hoteru_be.Services.Implementations
                 Out = reservationDTO.Out,
                 Confirmed = reservationDTO.Confirmed,
                 IdRoom = room.IdRoom,
-                IdUser = reservationDTO.,
+                IdUser = reservationDTO.IdUser,
                 Deposit = deposit
                 
             };
@@ -243,15 +243,19 @@ namespace hoteru_be.Services.Implementations
 
             _context.GuestReservations.Add(guestReservation);
 
-            for (int i = 0; i < reservationDTO.Services.Count; i++)
+
+            if (reservationDTO.Services.Count > 0)
             {
-                var service = await _context.Services.SingleOrDefaultAsync(x => x.IdService == reservationDTO.Services[i].IdService);
-                Entities.ReservationService reservationService = new Entities.ReservationService
+                for (int i = 0; i < reservationDTO.Services.Count; i++)
                 {
-                    Reservation = reservation,
-                    Service = service
-                };
-                _context.ReservationService.Add(reservationService);
+                    var service = await _context.Services.SingleOrDefaultAsync(x => x.IdService == reservationDTO.Services[i].IdService);
+                    Entities.ReservationService reservationService = new Entities.ReservationService
+                    {
+                        Reservation = reservation,
+                        Service = service
+                    };
+                    _context.ReservationService.Add(reservationService);
+                }
             }
 
 

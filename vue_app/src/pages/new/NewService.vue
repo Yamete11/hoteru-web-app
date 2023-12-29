@@ -33,12 +33,14 @@
               @input="v$.formData.Sum.$touch()"
           >
           <span class="error-message" v-if="v$.formData.Sum.$error">
-            <span v-if="!v$.formData.Sum.required.$response">Price is required*</span>
-            <span v-if="!v$.formData.Sum.numeric.$response">Price must be a number*</span>
-            <span v-if="!v$.formData.Sum.maxValue.$response">Price must not exceed 1,000,000*</span>
+          <span v-if="!v$.formData.Sum.numeric.$response">Price must be a number*</span>
+          <span v-else-if="!v$.formData.Sum.required.$response">Price is required*</span>
+          <span v-else-if="!v$.formData.Sum.minValue.$response">Price must be at least 1*</span>
+          <span v-else-if="!v$.formData.Sum.maxValue.$response">Price must not exceed 1,000,000*</span>
           </span>
           <span class="error-message" v-if="state.errors.Sum">{{ state.errors.Sum[0] }}</span>
         </div>
+
 
 
         <div class="input-form">
@@ -67,7 +69,7 @@
 <script>
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
+import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -89,7 +91,7 @@ export default {
     const rules = {
       formData: {
         Title: { required, maxLength: maxLength(20) },
-        Sum: { required, numeric, maxValue: maxValue(1000000) },
+        Sum: { required, numeric, minValue: minValue(1), maxValue: maxValue(1000000) },
         Description: { maxLength: maxLength(50) }
       }
     };

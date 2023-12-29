@@ -17,10 +17,12 @@
           >
           <span class="error-message" v-if="v$.formData.Name.$error">
             <span v-if="!v$.formData.Name.required.$response">Name is required*</span>
-            <span v-if="!v$.formData.Name.maxLength.$response">Name must be less than 20 characters*</span>
+            <span v-else-if="!v$.formData.Name.maxLength.$response">Name must be less than 20 characters*</span>
+            <span v-else-if="!v$.formData.Name.onlyLetters.$response">Name must contain only letters*</span>
           </span>
           <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
         </div>
+
 
 
         <div class="input-form">
@@ -34,7 +36,8 @@
           >
           <span class="error-message" v-if="v$.formData.Surname.$error">
             <span v-if="!v$.formData.Surname.required.$response">Surname is required*</span>
-            <span v-if="!v$.formData.Surname.maxLength.$response">Surname must be less than 20 characters*</span>
+            <span v-else-if="!v$.formData.Surname.maxLength.$response">Surname must be less than 20 characters*</span>
+            <span v-else-if="!v$.formData.Surname.onlyLetters.$response">Name must contain only letters*</span>
           </span>
           <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
         </div>
@@ -68,6 +71,7 @@
           >
           <span class="error-message" v-if="v$.formData.TelNumber.$error">
             <span v-if="!v$.formData.TelNumber.required.$response">Telephone number is required*</span>
+            <span v-if="!v$.formData.TelNumber.numeric.$response">Telephone number must be a number*</span>
             <span v-if="!v$.formData.TelNumber.maxLength.$response">Telephone number must be less than 15 characters*</span>
           </span>
           <span class="error-message" v-if="state.errors.TelNumber">{{ state.errors.TelNumber[0] }}</span>
@@ -117,9 +121,10 @@
 import axios from "axios";
 import {reactive} from "vue";
 import {useVuelidate} from "@vuelidate/core";
-import {email, maxLength, required} from "@vuelidate/validators";
+import {email, numeric, maxLength, required} from "@vuelidate/validators";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+
 
 export default {
   name: "NewGuest",
@@ -139,12 +144,16 @@ export default {
       errors: {}
     });
 
+    function onlyLetters(value) {
+      return /^[A-Za-z]+$/.test(value);
+    }
+
     const rules = {
       formData: {
-        Name: { required, maxLength: maxLength(20) },
-        Surname: { required, maxLength: maxLength(20) },
+        Name: { required, maxLength: maxLength(20), onlyLetters },
+        Surname: { required, maxLength: maxLength(20), onlyLetters},
         Email: { required, email },
-        TelNumber: { required, maxLength: maxLength(15) },
+        TelNumber: { required, maxLength: maxLength(15), numeric },
         Passport: { required, maxLength: maxLength(10) },
         IdGuestStatus: { required }
       }

@@ -45,8 +45,23 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<List<RoomDTO>> GetFreeRooms()
+        public async Task<List<RoomDTO>> GetFreeRooms(int idRoom)
         {
+            if(idRoom != 0)
+            {
+                return await _context.Rooms.
+                Where(x => x.IdRoomStatus == 3 || x.IdRoom == idRoom)
+                .Select(x => new RoomDTO
+                {
+                    IdRoom = x.IdRoom,
+                    Number = x.Number,
+                    Capacity = x.Capacity,
+                    Price = x.Price,
+                    Status = x.RoomStatus.Title,
+                    Type = x.RoomType.Title
+                }).ToListAsync();
+            }
+
             return await _context.Rooms.
                 Where(x => x.IdRoomStatus == 3)
                 .Select(x => new RoomDTO

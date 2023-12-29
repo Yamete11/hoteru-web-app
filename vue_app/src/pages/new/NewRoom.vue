@@ -34,8 +34,8 @@
           >
           <span class="error-message" v-if="v$.formData.Capacity.$error">
             <span v-if="!v$.formData.Capacity.required.$response">Capacity is required*</span>
-            <span v-if="!v$.formData.Capacity.numeric.$response">Capacity must be a number*</span>
-            <span v-if="!v$.formData.Capacity.maxValue.$response">Capacity must be less than or equal to 10*</span>
+            <span v-else-if="!v$.formData.Capacity.numeric.$response">Capacity must be a number*</span>
+            <span v-else-if="!v$.formData.Capacity.maxValue.$response">Capacity must be less than or equal to 10*</span>
           </span>
           <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
         </div>
@@ -52,8 +52,8 @@
           >
           <span class="error-message" v-if="v$.formData.Price.$error">
             <span v-if="!v$.formData.Price.required.$response">Price is required*</span>
-            <span v-if="!v$.formData.Price.numeric.$response">Price must be a number*</span>
-            <span v-if="!v$.formData.Price.maxValue.$response">Price must be less than or equal to 1,000,000*</span>
+            <span v-else-if="!v$.formData.Price.numeric.$response">Price must be a number*</span>
+            <span v-else-if="!v$.formData.Price.maxValue.$response">Price must be less than or equal to 1,000,000*</span>
           </span>
           <span class="error-message" v-if="state.errors.Price">{{ state.errors.Price[0] }}</span>
         </div>
