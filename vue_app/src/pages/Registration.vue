@@ -1,7 +1,7 @@
 <template>
   <div class="registration">
     <h1>HOTERU ホテル</h1>
-    <form @submit.prevent="create" class="registration-form">
+    <form @submit.prevent="addCompany" class="registration-form">
       <div class="input-form">
         <label>First name: </label>
         <input
@@ -16,6 +16,7 @@
           <span v-else-if="!v$.formData.Name.maxLength.$response">Name must be less than 50 characters</span>
           <span v-else-if="!v$.formData.Name.onlyLetters.$response">Name must contain only letters</span>
         </span>
+        <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
       </div>
       <div class="input-form">
         <label>Last name: </label>
@@ -24,7 +25,15 @@
             class="input"
             type="text"
             placeholder="Enter your last name"
+            @input="v$.formData.Surname.$touch()"
         >
+        <span v-if="v$.formData.Surname.$error" class="error-message">
+          <span v-if="!v$.formData.Surname.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Surname.maxLength.$response">Name must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Surname.onlyLetters.$response">Name must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
+
       </div>
       <div class="input-form">
         <label>Email: </label>
@@ -34,7 +43,13 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Email.$error" class="error-message">
+          <span v-if="!v$.formData.Email.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Email.email.$response">Email is not properly written</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email[0] }}</span>
       </div>
+
       <div class="input-form">
         <label>Login: </label>
         <input
@@ -43,16 +58,32 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.LoginName.$error" class="error-message">
+          <span v-if="!v$.formData.LoginName.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.LoginName.maxLength.$response">Name must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.LoginName.onlyLetters.$response">Name must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.LoginName">{{ state.errors.LoginName[0] }}</span>
       </div>
+
+
       <div class="input-form">
         <label>Password: </label>
         <input
             v-model="state.formData.Password"
             class="input"
-            type="text"
+            type="password"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Password.$error" class="error-message">
+          <span v-if="!v$.formData.Password.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Password.maxLength.$response">Name must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Password.onlyLetters.$response">Name must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Password">{{ state.errors.Password[0] }}</span>
       </div>
+
+
       <div class="input-form">
         <label>Company name: </label>
         <input
@@ -61,7 +92,15 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Title.$error" class="error-message">
+          <span v-if="!v$.formData.Title.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Title.onlyLetters.$response">Title must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Title">{{ state.errors.Title[0] }}</span>
       </div>
+
+
       <div class="input-form">
         <label>Country: </label>
         <input
@@ -70,7 +109,15 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Country.$error" class="error-message">
+          <span v-if="!v$.formData.Country.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Country.maxLength.$response">Title must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Country.onlyLetters.$response">Title must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Country">{{ state.errors.Country[0] }}</span>
       </div>
+
+
       <div class="input-form">
         <label>City: </label>
         <input
@@ -79,16 +126,32 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.City.$error" class="error-message">
+          <span v-if="!v$.formData.City.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.City.maxLength.$response">Title must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.City.onlyLetters.$response">Title must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.City">{{ state.errors.City[0] }}</span>
       </div>
+
+
       <div class="input-form">
-        <label>Address: </label>
+        <label>Street: </label>
         <input
             v-model="state.formData.Street"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Street.$error" class="error-message">
+          <span v-if="!v$.formData.Street.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Street.maxLength.$response">Title must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Street.onlyLetters.$response">Title must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Street">{{ state.errors.Street[0] }}</span>
       </div>
+
+
       <div class="input-form">
         <label>Postcode: </label>
         <input
@@ -97,26 +160,34 @@
             type="text"
             placeholder="Enter your last name"
         >
+        <span v-if="v$.formData.Postcode.$error" class="error-message">
+          <span v-if="!v$.formData.Postcode.required.$response">This field is required</span>
+          <span v-else-if="!v$.formData.Postcode.maxLength.$response">Title must be less than 20 characters</span>
+          <span v-else-if="!v$.formData.Postcode.onlyLetters.$response">Title must contain only letters</span>
+        </span>
+        <span class="error-message" v-if="state.errors.Postcode">{{ state.errors.Postcode[0] }}</span>
       </div>
-
+      <div class="registration-class">
+        <router-link class="registration-btn" to="/">Cancel</router-link>
+        <button class="registration-btn" type="submit">Confirm</button>
+      </div>
     </form>
-    <div class="registration-class">
-      <router-link class="registration-btn" to="/">Cancel</router-link>
-      <button class="registration-btn" type="submit" >Confirm</button>
-    </div>
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, email, maxLength, helpers } from '@vuelidate/validators';
+import { required, email, maxLength } from '@vuelidate/validators';
 import axios from 'axios';
 import {useRouter} from "vue-router/dist/vue-router";
+import {useStore} from "vuex";
 
 export default {
   name: "Registration",
   setup() {
+    const store = useStore();
+
     const router = useRouter();
     const state = reactive({
       formData: {
@@ -140,37 +211,45 @@ export default {
 
     const rules = {
       formData: {
-        Name: { required, maxLength: maxLength(50), onlyLetters },
-        Surname: { required, maxLength: maxLength(50), onlyLetters },
+        Name: { required, maxLength: maxLength(20), onlyLetters },
+        Surname: { required, maxLength: maxLength(20), onlyLetters },
         Email: { required, email },
-        LoginName: { required, maxLength: maxLength(30) },
-        Password: { required, maxLength: maxLength(30) },
-        Title: { required, maxLength: maxLength(100) },
-        City: { required, maxLength: maxLength(100), onlyLetters },
-        Country: { required, maxLength: maxLength(100), onlyLetters },
-        Street: { required, maxLength: maxLength(100) },
+        LoginName: { required, maxLength: maxLength(20) },
+        Password: { required, maxLength: maxLength(20) },
+        Title: { required, maxLength: maxLength(20) },
+        City: { required, maxLength: maxLength(20), onlyLetters },
+        Country: { required, maxLength: maxLength(20), onlyLetters },
+        Street: { required, maxLength: maxLength(20) },
         Postcode: { required, maxLength: maxLength(15) }
       }
     };
 
-    const v$ = useVuelidate(rules, state.formData);
+    const v$ = useVuelidate(rules, state);
 
-    async function create(){
+
+    async function addCompany(){
       v$.value.$validate();
-      console.log(state.formData)
+      console.log("hello")
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Hotel', state.formData);
+          const response = await axios.post('https://localhost:44384/api/Hotel', state.formData, {
+            headers: {
+              'Authorization': `Bearer ${store.getters.getToken}`
+            }
+          });
           console.log('Success:', response.data);
           if (response.data && response.data.httpStatusCode === 200) {
             await router.push('/');
           }
         } catch (error) {
-          console.log('Error:', error);
+          if (error.response && error.response.data && error.response.data.errors) {
+            state.errors = error.response.data.errors;
+          }
+          console.log('Error', error);
         }
       }
     }
-    return { state, create, v$ };
+    return { state, addCompany, v$ };
   }
 }
 </script>
@@ -193,6 +272,8 @@ export default {
 }
 
 .registration-btn{
+  display: flex;
+  justify-content: space-between;
   text-decoration: none;
   background-color: #8D7B68;
   padding: 10px;
@@ -201,13 +282,15 @@ export default {
   font-weight: bold;
   color: white;
   cursor: pointer;
+  margin: 5px;
 }
 
 .registration-class{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 10vw;
+  width: 100%;
+  max-width: 300px;
 }
 
 .input-form {
@@ -222,7 +305,8 @@ export default {
   color: #FFFFFF;
 }
 
-.input-form input[type="text"] {
+.input-form input[type="text"],
+.input-form input[type="password"]{
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;

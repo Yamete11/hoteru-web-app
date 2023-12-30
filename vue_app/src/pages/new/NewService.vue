@@ -17,7 +17,7 @@
           >
           <span class="error-message" v-if="v$.formData.Title.$error">
             <span v-if="!v$.formData.Title.required.$response">Title is required*</span>
-            <span v-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters*</span>
+            <span v-else-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters*</span>
           </span>
           <span class="error-message" v-if="state.errors.Title">{{ state.errors.Title[0] }}</span>
         </div>
