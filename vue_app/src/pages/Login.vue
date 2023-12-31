@@ -12,6 +12,7 @@
             type="text"
             placeholder="login"
         />
+        <span class="error-message" v-if="errors.TelNumber">{{ errors.TelNumber[0] }}</span>
         <my-input
             class="login-input"
             v-model="password"
@@ -19,6 +20,7 @@
             placeholder="password"
         />
         <button class="login-btn" type="submit">LOG IN</button>
+        <span class="error-message" v-if="errors.TelNumber">{{ errors.TelNumber[0] }}</span>
 
       </form>
     </div>
@@ -33,7 +35,8 @@ export default {
   data() {
     return {
       login: '',
-      password: ''
+      password: '',
+      errors: {}
     }
   },
   methods: {
