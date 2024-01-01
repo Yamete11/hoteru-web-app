@@ -152,8 +152,8 @@ export default {
     }
 
     async function addRoom() {
-      v$.value.$touch();
-      if (!v$.value.$error) {
+      /*v$.value.$touch();
+      if (!v$.value.$error) {*/
         try {
           const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
             headers: {
@@ -170,7 +170,7 @@ export default {
           }
           console.log('Error', error);
         }
-      }
+      /*}*/
     }
 
     return { state, v$, addRoom, fetchRoomTypes };

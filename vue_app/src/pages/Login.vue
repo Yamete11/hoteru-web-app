@@ -12,7 +12,7 @@
             type="text"
             placeholder="login"
         />
-        <span class="error-message" v-if="errors.TelNumber">{{ errors.TelNumber[0] }}</span>
+        <span class="error-message" v-if="errors.login">{{ errors.login[0] }}</span>
         <my-input
             class="login-input"
             v-model="password"
@@ -20,7 +20,7 @@
             placeholder="password"
         />
         <button class="login-btn" type="submit">LOG IN</button>
-        <span class="error-message" v-if="errors.TelNumber">{{ errors.TelNumber[0] }}</span>
+        <span class="error-message" v-if="errors.password">{{ errors.password[0] }}</span>
 
       </form>
     </div>
