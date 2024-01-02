@@ -127,6 +127,19 @@ namespace hoteru_be.Services.Implementations
 
             var checkRoom = await _context.Rooms.FirstOrDefaultAsync(r => r.Number == roomDTO.Number);
 
+            if (checkRoom != null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Room number already exists.",
+                    Errors = new Dictionary<string, List<string>>
+                    {
+                        { "Number", new List<string> { "Room number already exists." } }
+                    }
+                };
+            }
+
 
 
             Room room = new Room
@@ -150,7 +163,7 @@ namespace hoteru_be.Services.Implementations
         }
 
 
-        public async Task<MethodResultDTO> UpdateRoom(SpecificRoomDTO roomDTO)
+        public async Task<MethodResultDTO> UpdateRoom(RoomDTO roomDTO)
         {
             var room = await _context.Rooms
                              .Include(r => r.RoomStatus)
@@ -174,15 +187,19 @@ namespace hoteru_be.Services.Implementations
                 return new MethodResultDTO
                 {
                     HttpStatusCode = HttpStatusCode.BadRequest,
-                    Message = "Another room with this number already exists"
+                    Message = "Another room with this number already exists",
+                    Errors = new Dictionary<string, List<string>>
+                    {
+                        { "Number", new List<string> { "The Room number already exists." } }
+                    }
                 };
             }
 
             room.Number = roomDTO.Number;
-            room.Capacity = roomDTO.Capacity;
-            room.Price = roomDTO.Price;
-            room.IdRoomStatus = roomDTO.Status;
-            room.IdRoomType = roomDTO.Type;
+            room.Capacity = roomDTO.Capacity.Value;
+            room.Price = roomDTO.Price.Value;
+            room.IdRoomStatus = int.Parse(roomDTO.Status);
+            room.IdRoomType = int.Parse(roomDTO.Type);
 
             await _context.SaveChangesAsync();
             return new MethodResultDTO

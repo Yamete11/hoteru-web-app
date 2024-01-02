@@ -15,6 +15,6 @@ namespace hoteru_be.Services.Interfaces
 
         public Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom);
 
-        public Task<MethodResultDTO> UpdateRoom(SpecificRoomDTO roomDTO);
+        public Task<MethodResultDTO> UpdateRoom(RoomDTO roomDTO);
     }
 }

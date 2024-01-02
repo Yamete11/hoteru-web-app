@@ -46,7 +46,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateRoom([FromBody] SpecificRoomDTO roomDTO)
+        public async Task<MethodResultDTO> UpdateRoom([FromBody] RoomDTO roomDTO)
         {
             return await _service.UpdateRoom(roomDTO);
         }

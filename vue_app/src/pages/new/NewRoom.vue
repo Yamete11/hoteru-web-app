@@ -28,7 +28,7 @@
           <input
               v-model="state.formData.Capacity"
               class="input"
-              type="text"
+              type="number"
               placeholder="Enter room capacity"
               @input="v$.formData.Capacity.$touch()"
           >
@@ -36,6 +36,7 @@
             <span v-if="!v$.formData.Capacity.required.$response">Capacity is required*</span>
             <span v-else-if="!v$.formData.Capacity.numeric.$response">Capacity must be a number*</span>
             <span v-else-if="!v$.formData.Capacity.maxValue.$response">Capacity must be less than or equal to 10*</span>
+            <span v-else-if="!v$.formData.Capacity.minValue.$response">Capacity must be more than 0*</span>
           </span>
           <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
         </div>
@@ -46,7 +47,7 @@
           <input
               v-model="state.formData.Price"
               class="input"
-              type="text"
+              type="number"
               placeholder="Enter room price"
               @input="v$.formData.Price.$touch()"
           >
@@ -54,6 +55,7 @@
             <span v-if="!v$.formData.Price.required.$response">Price is required*</span>
             <span v-else-if="!v$.formData.Price.numeric.$response">Price must be a number*</span>
             <span v-else-if="!v$.formData.Price.maxValue.$response">Price must be less than or equal to 1,000,000*</span>
+            <span v-else-if="!v$.formData.Price.minValue.$response">Price must be more than 0*</span>
           </span>
           <span class="error-message" v-if="state.errors.Price">{{ state.errors.Price[0] }}</span>
         </div>
@@ -97,7 +99,7 @@
 <script>
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
+import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -112,8 +114,8 @@ export default {
       roomStatuses: [],
       formData: {
         Number: '',
-        Capacity: '',
-        Price: '',
+        Capacity: 0,
+        Price: 0,
         Type: '',
         Status: ''
       },
@@ -123,8 +125,8 @@ export default {
     const rules = {
       formData: {
         Number: { required, maxLength: maxLength(20) },
-        Capacity: { required, numeric, maxValue: maxValue(10) },
-        Price: { required, numeric, maxValue: maxValue(1000000) },
+        Capacity: { required, numeric, maxValue: maxValue(10), minValue: minValue(1) },
+        Price: { required, numeric, maxValue: maxValue(1000000), minValue: minValue(1) },
         Type: { required },
         Status: { required }
       }
@@ -152,8 +154,8 @@ export default {
     }
 
     async function addRoom() {
-      /*v$.value.$touch();
-      if (!v$.value.$error) {*/
+      v$.value.$touch();
+      if (!v$.value.$error) {
         try {
           const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
             headers: {
@@ -161,7 +163,12 @@ export default {
             }
           });
           console.log('Response:', response.data);
-          if (response.data && response.data.httpStatusCode === 200) {
+          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
+            state.errors = response.data.errors || {};
+            console.log('Error', response.data.message);
+
+          } else {
+
             await router.push('/rooms');
           }
         } catch (error) {
@@ -170,7 +177,7 @@ export default {
           }
           console.log('Error', error);
         }
-      /*}*/
+      }
     }
 
     return { state, v$, addRoom, fetchRoomTypes };
@@ -235,7 +242,8 @@ export default {
   color: black;
 }
 
-.input-form input[type="text"] {
+.input-form input[type="text"],
+.input-form input[type="number"] {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;

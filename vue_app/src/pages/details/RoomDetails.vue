@@ -4,48 +4,87 @@
     <sidebar></sidebar>
     <div class="main">
       <h1>Room Details</h1>
-      <form @submit.prevent class="creating-form">
+      <form @submit.prevent="toggleEdit" class="creating-form">
+
         <div class="input-form">
           <label>Number: </label>
-          <input v-model="room.number"
+          <input v-model="state.formData.number"
                  class="input"
                  type="text"
                  placeholder="Enter room number"
-                 :readonly="!isEditing">
+                 :readonly="!state.isEditing"
+                 @input="v$.formData.number.$touch()"
+          >
+          <span class="error-message" v-if="v$.formData.number.$error">
+            <span v-if="!v$.formData.number.required.$response">Number is required*</span>
+            <span v-if="!v$.formData.number.maxLength.$response">Number must be less than 20 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.number">{{ state.errors.number[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Capacity: </label>
-          <input v-model="room.capacity"
+          <input v-model="state.formData.capacity"
                  class="input"
-                 type="text"
+                 type="number"
                  placeholder="Enter room capacity"
-                 :readonly="!isEditing">
+                 :readonly="!state.isEditing"
+                 @input="v$.formData.capacity.$touch()"
+          >
+          <span class="error-message" v-if="v$.formData.capacity.$error">
+            <span v-if="!v$.formData.capacity.required.$response">Capacity is required*</span>
+            <span v-else-if="!v$.formData.capacity.numeric.$response">Capacity must be a number*</span>
+            <span v-else-if="!v$.formData.capacity.maxValue.$response">Capacity must be less than or equal to 10*</span>
+            <span v-else-if="!v$.formData.capacity.minValue.$response">Capacity must be more than 0*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.capacity">{{ state.errors.capacity[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Price: </label>
-          <input v-model="room.price"
+          <input v-model="state.formData.price"
                  class="input"
-                 type="text"
+                 type="number"
                  placeholder="Enter room price"
-                 :readonly="!isEditing">
+                 :readonly="!state.isEditing"
+                 @input="v$.formData.price.$touch()"
+          >
+          <span class="error-message" v-if="v$.formData.price.$error">
+            <span v-if="!v$.formData.price.required.$response">Price is required*</span>
+            <span v-else-if="!v$.formData.price.numeric.$response">Price must be a number*</span>
+            <span v-else-if="!v$.formData.price.maxValue.$response">Price must be less than or equal to 1,000,000*</span>
+            <span v-else-if="!v$.formData.price.minValue.$response">Price must be more than 0*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.price">{{ state.errors.price[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Type: </label>
-          <input v-if="!isEditing" class="input" type="text" :value="typeTitle" readonly>
-          <select v-else v-model="room.type" class="input">
-            <option v-for="type in roomTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
+          <input v-if="!state.isEditing" class="input" type="text" :value="state.typeTitle" readonly>
+          <select v-else v-model="state.formData.type" class="input" @change="v$.formData.Type.$touch()">
+            <option v-for="type in state.roomTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
           </select>
+          <span class="error-message" v-if="v$.formData.type.$error">
+            <span v-if="!v$.formData.type.required.$response">Type is required*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.type">{{ state.errors.type[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Status: </label>
-          <input v-if="!isEditing" class="input" type="text" :value="statusTitle" readonly>
-          <select v-else v-model="room.status" class="input">
-            <option v-for="status in roomStatuses" :value="status.idStatus" :key="status.idStatus">{{ status.title }}</option>
+          <input v-if="!state.isEditing" class="input" type="text" :value="state.statusTitle" readonly>
+          <select v-else v-model="state.formData.status" class="input" @change="v$.formData.Status.$touch()">
+            <option v-for="status in state.roomStatuses" :value="status.idStatus" :key="status.idStatus">{{ status.title }}</option>
           </select>
+          <span class="error-message" v-if="v$.formData.status.$error">
+            <span v-if="!v$.formData.status.required.$response">Status is required*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.status">{{ state.errors.status[0] }}</span>
         </div>
+
         <div class="registration-class">
           <router-link class="registration-btn" to="/rooms">Back</router-link>
-          <button type="button" class="registration-btn" @click="toggleEdit">{{ isEditing ? 'Save' : 'Edit' }}</button>
+          <button type="submit" class="registration-btn">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
         </div>
       </form>
     </div>
@@ -53,83 +92,112 @@
 </template>
 
 <script>
-import axios from "axios";
+import { reactive } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
+import axios from 'axios';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "RoomDetails",
-  data() {
-    return {
-      isEditing: false,
-      room: {
-        idRoom: '',
-        number: '',
-        capacity: '',
-        price: '',
-        type: '',
-        status: ''
-      },
-      typeTitle: '',
-      statusTitle: '',
-      roomTypes: [],
-      roomStatuses: []
-    }
-  },
   props: {
     idRoom: {
       type: Number,
       required: true
     }
   },
-  methods: {
-    async toggleEdit() {
-      this.isEditing = !this.isEditing;
-      if (!this.isEditing) {
-        const foundType = this.roomTypes.find(type => type.idType === this.room.type);
-        this.typeTitle = foundType ? foundType.title : 'Type not found';
+  setup() {
+    const store = useStore();
+    const router = useRouter();
+    const state = reactive( {
+      isEditing: false,
+      formData: {
+        idRoom: '',
+        number: '',
+        capacity: 0,
+        price: 0,
+        type: '',
+        status: ''
+      },
+      typeTitle: '',
+      statusTitle: '',
+      roomTypes: [],
+      roomStatuses: [],
+      errors: {}
+    });
 
-        const foundStatus = this.roomStatuses.find(status => status.idStatus === this.room.status);
-        this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
-        try {
-          const response = await axios.put('https://localhost:44384/api/Room', this.room);
-          console.log('Success:', response.data);
-        } catch (error) {
-          console.log('Error:', error);
-        }
+    const rules = {
+      formData: {
+        number: { required, maxLength: maxLength(20) },
+        capacity: { required, numeric, maxValue: maxValue(10), minValue: minValue(1) },
+        price: { required, numeric, maxValue: maxValue(1000000), minValue: minValue(1) },
+        type: { required },
+        status: { required }
       }
-    },
-    async fetchSpecificRoom(idRoom) {
+    };
+
+    const v$ = useVuelidate(rules, state);
+
+    async function toggleEdit() {
+      if (state.isEditing) {
+        v$.value.$touch();
+        if (!v$.value.$error) {
+          try {
+            const response = await axios.put('https://localhost:44384/api/Room', state.formData, {
+              headers: {
+                'Authorization': `Bearer ${store.getters.getToken}`
+              },
+            });
+            console.log('Success:', response.data);
+            state.isEditing = false;
+          } catch (error) {
+            console.log('Error:', error);
+
+          }
+        }
+      } else {
+        state.isEditing = true;
+      }
+    }
+
+    async function fetchSpecificRoom(idRoom) {
       try {
         const response = await axios.get('https://localhost:44384/api/Room/' + idRoom,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        this.room = response.data;
+        state.formData = response.data;
 
         const responseType = await axios.get('https://localhost:44384/api/RoomType',{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        this.roomTypes = responseType.data;
+        state.roomTypes = responseType.data;
 
         const responseStatus = await axios.get('https://localhost:44384/api/RoomStatus',{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        this.roomStatuses = responseStatus.data;
+        state.roomStatuses = responseStatus.data;
 
-        const foundType = this.roomTypes.find(type => type.idType === this.room.type);
-        this.typeTitle = foundType ? foundType.title : 'Type not found';
+        const foundType = state.roomTypes.find(type => type.idType === state.formData.type);
+        state.typeTitle = foundType ? foundType.title : 'Type not found';
 
-        const foundStatus = this.roomStatuses.find(status => status.idStatus === this.room.status);
-        this.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
+        const foundStatus = state.roomStatuses.find(status => status.idStatus === state.formData.status);
+        state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
       } catch (error) {
         console.error(error);
       }
-    },
+    }
+
+    return { state, v$, toggleEdit, fetchSpecificRoom };
+
   },
+
   mounted() {
     this.fetchSpecificRoom(this.idRoom);
   }
@@ -189,7 +257,8 @@ export default {
   color: black;
 }
 
-.input-form input[type="text"] {
+.input-form input[type="text"],
+.input-form input[type="number"]{
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -209,5 +278,10 @@ h1 {
   margin-bottom: 10px;
   background-color: white;
   color: black;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 </style>

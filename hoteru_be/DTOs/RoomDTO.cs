@@ -16,7 +16,7 @@ namespace hoteru_be.DTOs
         public int? Capacity { get; set; }
 
         [Required(ErrorMessage = "Price is required")]
-        [Range(0.01, 1000000, ErrorMessage = "Price must be a number between 0.01 and 1,000,000")]
+        [Range(1, 1000000, ErrorMessage = "Price must be a number between 1 and 1,000,000")]
         public float? Price { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
