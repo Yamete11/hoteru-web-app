@@ -158,7 +158,6 @@ export default {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
-
 }
 .header.out {
   display: flex;

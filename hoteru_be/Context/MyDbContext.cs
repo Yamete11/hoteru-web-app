@@ -132,7 +132,7 @@ namespace hoteru_be.Context
             {
                 t.HasData(
                     new User { IdPerson = 3, LoginName = "asd", Password = "asd", IdUserType = 3 },
-                    new User { IdPerson = 4, LoginName = "qwe", Password = "qwe", IdUserType = 3 });
+                    new User { IdPerson = 4, LoginName = "qwe", Password = "qwe", IdUserType = 1 });
 
             });
 

@@ -3,6 +3,7 @@ using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -17,6 +18,41 @@ namespace hoteru_be.Services.Implementations
         public UserService(MyDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<MethodResultDTO> DeleteUser(int IdPerson)
+        {
+            Person person = await _context.Persons.SingleOrDefaultAsync(x => x.IdPerson == IdPerson);
+            var user = await _context.Users.Include(u => u.Reservations).SingleOrDefaultAsync(x => x.IdPerson == IdPerson);
+
+            if (user == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Not Found"
+                };
+            };
+
+            var superAdminUser = await _context.Users.FirstOrDefaultAsync(u => u.UserType.IdUserType == 1);
+
+            foreach (var reservation in user.Reservations)
+            {
+                reservation.IdUser = superAdminUser.IdPerson;
+            }
+
+            await _context.SaveChangesAsync();
+
+            _context.Users.Remove(user);
+            _context.Persons.Remove(person);
+
+            await _context.SaveChangesAsync();
+
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Deleted"
+            };
         }
 
         public async Task<FullUserDTO> GetFullUser(int idUser)
@@ -49,9 +85,37 @@ namespace hoteru_be.Services.Implementations
             }).FirstOrDefaultAsync();
         }
 
+        public async Task<List<ListUserDTO>> GetUsers()
+        {
+            return await _context.Users
+                .Include(r => r.UserType)
+                .Select(r => new ListUserDTO
+                {
+                    IdPerson = r.IdPerson,
+                    LoginName = r.LoginName,
+                    UserType = r.UserType.Title
+                }).ToListAsync();
+        }
+
         public async Task<MethodResultDTO> PostUser(NewUserDTO newUserDTO)
         {
             var hotel = await _context.Hotels.FirstOrDefaultAsync(r => r.IdHotel == 1);
+
+            var existingUser = await _context.Users
+                .AnyAsync(r => r.LoginName == newUserDTO.LoginName);
+
+            if (existingUser)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation failed",
+                    Errors = new Dictionary<string, List<string>>
+                    {
+                        { "LoginName", new List<string> { "Another guest with this Login already exists." } }
+                    }
+                };
+            }
 
             Person person = new Person
             {
@@ -63,7 +127,7 @@ namespace hoteru_be.Services.Implementations
 
             User user = new User
             {
-                LoginName = newUserDTO.Login,
+                LoginName = newUserDTO.LoginName,
                 Password = newUserDTO.Password,
                 IdUserType = newUserDTO.IdUserType,
                 Person = person
@@ -78,6 +142,53 @@ namespace hoteru_be.Services.Implementations
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Created"
+            };
+        }
+
+        public async Task<MethodResultDTO> UpdateUser(NewUserDTO newUserDTO)
+        {
+            var user = await _context.Users
+                              .Include(r => r.UserType)
+                              .FirstOrDefaultAsync(r => r.IdPerson == newUserDTO.IdPerson);
+
+            var person = await _context.Persons.FirstOrDefaultAsync(r => r.IdPerson == newUserDTO.IdPerson);
+
+            if (user == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "User not found"
+                };
+            }
+
+            var existingUser = await _context.Users
+                .AnyAsync(r => r.LoginName == newUserDTO.LoginName && r.IdPerson != newUserDTO.IdPerson);
+
+            if (existingUser)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation failed",
+                    Errors = new Dictionary<string, List<string>>
+                    {
+                        { "LoginName", new List<string> { "Another guest with this Login already exists." } }
+                    }
+                };
+            }
+
+            user.LoginName = newUserDTO.LoginName;
+            user.IdUserType = newUserDTO.IdUserType;
+            person.Name = newUserDTO.Name;
+            person.Surname = newUserDTO.Surname;
+            person.Email = newUserDTO.Email;
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Updated"
             };
         }
     }
