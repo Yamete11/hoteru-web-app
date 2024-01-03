@@ -31,7 +31,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPost]
-        public async Task<MethodResultDTO> PostRoom([FromBody] NewUserDTO newUserDTO)
+        public async Task<MethodResultDTO> PostГыук([FromBody] NewUserDTO newUserDTO)
         {
             return await _service.PostUser(newUserDTO);
         }

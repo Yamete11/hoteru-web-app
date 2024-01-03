@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <div class="navbar-title">
-      <h1>HOTERU ホテル</h1>
+      <h1 @click="goToArrivals">HOTERU ホテル</h1>
       <h2>{{ companyName }}</h2>
     </div>
     <div class="navbar-links">
@@ -14,7 +14,6 @@
   </div>
 </template>
 
-
 <script>
 export default {
   name: "Navbar",
@@ -22,6 +21,9 @@ export default {
     logout() {
       localStorage.removeItem('token');
       this.$router.push('/');
+    },
+    goToArrivals() {
+      this.$router.push('/arrivals');
     }
   },
   computed:{
@@ -52,7 +54,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  width: 25%
+  width: 25%;
 }
 
 .navbar-links{
@@ -81,5 +83,9 @@ export default {
 
 .navbar h1, .navbar h2 {
   margin: 0;
+}
+
+.navbar h1 {
+  cursor: pointer;
 }
 </style>

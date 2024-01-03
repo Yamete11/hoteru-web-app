@@ -8,36 +8,56 @@
         <div class="input-form">
           <label>Title: </label>
           <input
-              v-model="service.title"
+              v-model="state.formData.title"
               class="input"
               type="text"
               placeholder="Enter room number"
-              :readonly="!isEditing"
+              :readonly="!state.isEditing"
+              @input="v$.formData.title.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.title.$error">
+            <span v-if="!v$.formData.title.required.$response">Title is required*</span>
+            <span v-else-if="!v$.formData.title.maxLength.$response">Title must be less than 20 characters*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Title">{{ state.errors.Title[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Price: </label>
           <input
-              v-model="service.sum"
+              v-model="state.formData.sum"
               class="input"
               type="text"
               placeholder="Enter room capacity"
-              :readonly="!isEditing"
+              :readonly="!state.isEditing"
+              @input="v$.formData.sum.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.sum.$error">
+          <span v-if="!v$.formData.sum.numeric.$response">Price must be a number*</span>
+          <span v-else-if="!v$.formData.sum.required.$response">Price is required*</span>
+          <span v-else-if="!v$.formData.sum.minValue.$response">Price must be at least 1*</span>
+          <span v-else-if="!v$.formData.sum.maxValue.$response">Price must not exceed 1,000,000*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Sum">{{ state.errors.Sum[0] }}</span>
         </div>
+
         <div class="input-form">
           <label>Description: </label>
           <input
-              v-model="service.description"
+              v-model="state.formData.description"
               class="input"
               type="text"
               placeholder="Enter room price"
-              :readonly="!isEditing"
+              :readonly="!state.isEditing"
+              @input="v$.formData.description.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.description.$error">Description can have only 50 symbols*</span>
+          <span class="error-message" v-if="state.errors.Description">{{ state.errors.Description[0] }}</span>
         </div>
+
         <div class="registration-class">
           <router-link class="registration-btn" to="/services">Back</router-link>
-          <button type="button" class="registration-btn" @click="toggleEdit">{{ isEditing ? 'Save' : 'Edit' }}</button>
+          <button type="button" class="registration-btn" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
         </div>
       </form>
     </div>
@@ -46,7 +66,12 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
 import axios from 'axios';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 export default {
   name: "ServiceDetails",
   props: {
@@ -55,41 +80,74 @@ export default {
       required: true
     }
   },
-  data(){
-    return {
+  setup(){
+    const store = useStore();
+    const router = useRouter();
+    const state = reactive( {
       isEditing: false,
-      service: {
+      formData: {
         idService: '',
         title: '',
-        sum: '',
+        sum: 0,
         description: ''
+      },
+      errors: {}
+    })
+
+    const rules = {
+      formData: {
+        title: { required, maxLength: maxLength(20) },
+        sum: { required, numeric, minValue: minValue(1), maxValue: maxValue(1000000) },
+        description: { maxLength: maxLength(50) }
+      }
+    };
+
+    const v$ = useVuelidate(rules, state);
+
+
+    async function toggleEdit() {
+      if (state.isEditing) {
+        v$.value.$touch();
+        if (!v$.value.$error) {
+          try {
+            const response = await axios.put('https://localhost:44384/api/Service', state.formData, {
+              headers: {
+                'Authorization': `Bearer ${store.getters.getToken}`
+              },
+            });
+            if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
+              state.errors = response.data.errors || {};
+              console.log('Error', response.data.message);
+            } else {
+              console.log('Success:', response.data);
+              state.isEditing = false;
+            }
+          } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+              state.errors = error.response.data.errors;
+            }
+            console.log('Error:', error);
+          }
+        }
+      } else {
+        state.isEditing = true;
       }
     }
-  },
-  methods:{
-    async toggleEdit() {
-      this.isEditing = !this.isEditing;
-      if (!this.isEditing) {
-        try {
-          const response = await axios.put('https://localhost:44384/api/Service', this.service);
-          console.log('Success:', response.data);
-        } catch (error) {
-          console.log('Error:', error);
-        }
-      }
-    },
-    async fetchSpecificService(idService) {
+
+    async function fetchSpecificService(idService) {
       try {
         const response = await axios.get('https://localhost:44384/api/Service/' + idService,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        this.service = response.data;
+        state.formData = response.data;
       } catch (error) {
         console.error(error);
       }
-    },
+    }
+
+    return { state, v$, toggleEdit, fetchSpecificService}
   },
   mounted() {
     this.fetchSpecificService(this.idService);
@@ -170,5 +228,10 @@ h1 {
   margin-bottom: 10px;
   background-color: white;
   color: black;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 </style>

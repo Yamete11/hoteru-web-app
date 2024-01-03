@@ -238,7 +238,10 @@ export default {
             }
           });
           console.log('Success:', response.data);
-          if (response.data && response.data.httpStatusCode === 200) {
+          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
+            state.errors = response.data.errors || {};
+            console.log('Error', response.data.message);
+          } else {
             await router.push('/');
           }
         } catch (error) {
@@ -260,9 +263,10 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #252525;
 }
+
 
 .registration-form {
   display: flex;

@@ -10,6 +10,7 @@ namespace hoteru_be.DTOs
         public string Out { get; set; }
         public int Capacity { get; set; }
         public int IdRoom { get; set; }
+        public int IdRoomType { get; set; }
         public int IdGuest { get; set; }
         public int IdDeposit { get; set; }
         public float Price { get; set; }

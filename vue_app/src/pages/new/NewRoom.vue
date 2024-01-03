@@ -166,9 +166,7 @@ export default {
           if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
             state.errors = response.data.errors || {};
             console.log('Error', response.data.message);
-
           } else {
-
             await router.push('/rooms');
           }
         } catch (error) {

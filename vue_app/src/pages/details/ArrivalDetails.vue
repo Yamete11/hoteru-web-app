@@ -8,19 +8,19 @@
         <div class="input-form">
           <label>In: </label>
           <input
-              v-model="state.reservation.in"
+              v-model="state.formData.in"
               class="input"
               type="date"
-              readonly
+              :readonly="!state.isEditing"
           >
         </div>
         <div class="input-form">
           <label>Out: </label>
           <input
-              v-model="state.reservation.out"
+              v-model="state.formData.out"
               class="input"
               type="date"
-              readonly
+              :readonly="!state.isEditing"
           >
         </div>
       </div>
@@ -30,16 +30,17 @@
           <div class="input-form">
             <label>Capacity: </label>
             <input
-                v-model="state.reservation.capacity"
+                v-model="state.formData.capacity"
                 class="input"
                 type="number"
                 placeholder="Enter room capacity"
+                :readonly="!state.isEditing"
             >
           </div>
           <div class="input-form">
             <label>Type: </label>
-            <input v-if="!isEditing" class="input" type="text" :value="state.roomType" readonly>
-            <select v-else v-model="state.roomType" class="input">
+            <input v-if="!state.isEditing" class="input" type="text" :value="state.roomType" readonly>
+            <select v-else v-model="state.formData.idRoomType" class="input">
               <option disabled value="">Select type</option>
               <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="roomType.idType">{{ roomType.title }}</option>
             </select>
@@ -48,11 +49,12 @@
 
         <div class="input-form">
           <label>Room Selection: </label>
-          <select v-model="state.reservation.idRoom">
+          <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedRoom" readonly>
+          <select v-else v-model="state.formData.idRoom">
             <option disabled value="">Select a room</option>
             <option v-for="room in state.rooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
           </select>
-          <label>Price: {{state.reservation.price}}</label>
+          <label>Price: {{state.formData.price}}</label>
         </div>
       </div>
 
@@ -60,63 +62,65 @@
         <label>Guest personal information</label>
         <div class="input-form">
           <label>Guest Selection: </label>
-          <select v-model="state.reservation.idGuest">
+          <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedGuest" readonly>
+          <select v-else v-model="state.formData.idGuest">
             <option disabled value="">Select a guest</option>
             <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
               {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
             </option>
           </select>
-          <router-link class="form-btn" to="/new-guest">Add new guest</router-link>
+          <router-link v-if="state.isEditing" class="form-btn" to="/new-guest">Add new guest</router-link>
         </div>
       </div>
 
-<!--      <div class="guest">
+      <div class="guest">
         <label>Deposit option</label>
         <div class="input-form">
           <label>Deposit sum: </label>
           <input
-              v-model="state.formData.Sum"
+              v-model="state.selectedDeposit.sum"
               class="input"
               type="number"
-              placeholder="Enter room capacity"
+              placeholder="Enter deposit sum"
+              :readonly="!state.isEditing"
           >
           <label>Choose type: </label>
-          <select v-model="state.formData.IdDepositType">
-            <option disabled value="">Select type</option>
-            <option v-for="type in state.depositTypes" :key="type.idDepositType" :value="type.idDepositType">
+          <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDeposit.idDepositType" readonly>
+          <select v-else v-model="state.selectedDeposit.idDepositType">
+            <option disabled value="0">Select type</option>
+            <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
               {{ type.title }}
             </option>
           </select>
         </div>
-      </div>-->
+      </div>
 
-<!--      <div class="guest">
+      <div class="guest">
         <label>Service option</label>
         <div class="input-form">
-          <label>Choose a service</label>
-          <select v-model="state.selectedService" class="input">
-            <option disabled value="">Select service</option>
+          <label v-if="state.isEditing">Choose a service</label>
+          <label v-else>Added services</label>
+          <select v-if="state.isEditing" v-model="state.selectedService" class="input">
+            <option disabled value="0">Select service</option>
             <option v-for="service in state.services" :key="service.idService" :value="service">
               {{ service.title }}: {{ service.sum }}
             </option>
           </select>
-          <button @click.prevent="addService" class="form-btn">Add</button>
-          <div class="service-list" v-if="state.formData.services.length > 0">
+          <button v-if="state.isEditing" @click.prevent="addService" class="form-btn">Add</button>
+          <div class="service-list" v-if="state.formData.services && state.formData.services.length > 0">
             <ul class="added-services-list">
               <li class="element" v-for="(service, index) in state.formData.services" :key="index">
-                {{ service.title }}: {{ service.sum }} <button @click.prevent="removeService(index)">Remove</button>
+                {{ service.title }}: {{ service.sum }} <button v-if="state.isEditing" @click.prevent="removeService(index)">Remove</button>
               </li>
             </ul>
           </div>
         </div>
-      </div>-->
-
-
+      </div>
 
 
       <div class="registration-class">
-        <router-link class="registration-btn" to="/rooms">Cancel</router-link>
-        <button class="registration-btn" type="submit">Confirm</button>
+        <router-link class="registration-btn" to="/arrivals">Cancel</router-link>
+        <button class="registration-btn" type="button" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
       </div>
     </form>
   </div>
@@ -143,13 +147,24 @@ export default {
     const router = useRouter();
     const today = new Date().toISOString().split('T')[0];
     const state = reactive({
-      reservation: '',
-      rooms: '',
+      formData: '',
+      selectedRoom: '',
+      selectedGuest: '',
+      selectedDeposit: '',
+      selectedService: '',
+      selectedDepositType: '',
+      selectedRoomType: '',
+      rooms: [],
       roomType: '',
-      roomTypes: '',
-      guests: '',
-      depositTypes: '',
+      roomTypes: [],
+      guests: [],
+      depositTypes: [],
+      isEditing: false
     });
+
+    async function toggleEdit(){
+      state.isEditing = !state.isEditing;
+    }
 
     async function fetchReservation(idReservation){
       console.log(idReservation)
@@ -160,14 +175,14 @@ export default {
           },
         });
 
-        state.reservation = response.data;
-        console.log(state.reservation)
+        state.formData = response.data;
+        console.log(state.formData)
       } catch(error){
         console.log(error);
       }
 
       try{
-        const response = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.reservation.idRoom,{
+        const response = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.formData.idRoom,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -181,9 +196,9 @@ export default {
         });
         state.roomTypes = response2.data;
 
-        const foundRoom = this.guestStatuses.find(status => status.idRoom === state.reservation.idRoom);
-        const foundStatus = this.guestStatuses.find(status => status.idType === foundRoom.idType);
-        state.roomType = foundStatus ? foundStatus.title : 'Status not found';
+        const foundRoom = state.rooms.find(status => status.idRoom === state.formData.idRoom);
+        state.selectedRoom =  foundRoom.number + " - Capacity: " + foundRoom.capacity;
+        state.roomType = foundRoom.type;
 
         const response3 = await axios.get('https://localhost:44384/api/Guest',{
           headers: {
@@ -192,6 +207,16 @@ export default {
         });
         state.guests = response3.data.list;
 
+        const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest)
+        state.selectedGuest = foundGuest.name + " " + foundGuest.surname + ", " + foundGuest.passport
+
+        const responseDeposit = await axios.get('https://localhost:44384/api/Deposit/' + state.formData.idDeposit,{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
+        state.selectedDeposit = responseDeposit.data;
+
         const responseDepositType = await axios.get('https://localhost:44384/api/DepositType',{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
@@ -199,15 +224,36 @@ export default {
         });
         state.depositTypes = responseDepositType.data;
 
+        const responseServices = await axios.get('https://localhost:44384/api/Service',{
+          headers: {
+            'Authorization': `Bearer ${this.$store.getters.getToken}`
+          },
+        });
+        state.services = responseServices.data.list;
+
+
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     }
+
+    const removeService = (index) => {
+      state.formData.services.splice(index, 1);
+    };
+
+    const addService = () => {
+      if (state.selectedService && !state.formData.services.includes(state.selectedService)) {
+        state.formData.services.push(state.selectedService);
+      }
+    };
 
     return {
       state,
       today,
-      fetchReservation
+      fetchReservation,
+      removeService,
+      addService,
+      toggleEdit
     }
   }
   ,
@@ -239,6 +285,10 @@ export default {
   flex-direction: column;
   width: 100%;
   max-width: 30%;
+}
+
+form {
+  min-width: 30%;
 }
 
 .registration-class {
@@ -314,9 +364,6 @@ h1 {
   padding: 10px;
   margin-top: 20px;
 }
-
-
-
 
 
 .tab-switcher {

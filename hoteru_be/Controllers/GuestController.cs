@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GuestController : ControllerBase
@@ -39,7 +38,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateGuest([FromBody] SpecificGuestDTO guestDTO)
+        public async Task<MethodResultDTO> UpdateGuest([FromBody] GuestDTO guestDTO)
         {
             return await _service.UpdateGuest(guestDTO);
         }

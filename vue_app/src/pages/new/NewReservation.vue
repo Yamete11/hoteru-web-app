@@ -157,11 +157,11 @@ export default {
         Out: Date,
         Capacity: 0,
         Price: 0,
-        IdRoom: 0,
+        IdRoom: '',
         Confirmed: false,
         Sum: 0,
-        IdDepositType: 0,
-        idPerson: 0,
+        IdDepositType: '',
+        idPerson: '',
         services: [],
         idUser: idUser
       },
@@ -252,7 +252,7 @@ export default {
         });
         console.log('Response:', response.data);
         if (response.data && response.data.httpStatusCode === 200) {
-          await router.push('/reservations');
+          await router.push('/arrivals');
         }
       } catch (error) {
         console.error(error);

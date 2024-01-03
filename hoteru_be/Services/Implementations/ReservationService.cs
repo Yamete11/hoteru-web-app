@@ -283,8 +283,11 @@ namespace hoteru_be.Services.Implementations
                     Date = r.Date.ToString("yyyy-MM-dd")
                 }).ToListAsync();
 
+            var guest = await _context.GuestReservations.SingleOrDefaultAsync(r => r.IdReservation == IdArrival);
+
             return await _context.Reservations
                 .Where(r => r.IdReservation == IdArrival && r.Confirmed == false)
+                .Include(r => r.Room)
                 .Select(r => new ArrivalDTO
                 {
                    IdReservation = r.IdReservation,
@@ -293,7 +296,8 @@ namespace hoteru_be.Services.Implementations
                    Capacity = r.Capacity,
                    IdRoom = r.IdRoom,
                    IdDeposit = r.IdDeposit.HasValue ? r.IdDeposit.Value : 0,
-                   IdGuest = r.IdUser,
+                   IdGuest = guest.IdGuest,
+                   IdRoomType = r.Room.IdRoomType,
                    Services = services
 
                 }).FirstOrDefaultAsync();

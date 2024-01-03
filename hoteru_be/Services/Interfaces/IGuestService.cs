@@ -11,7 +11,7 @@ namespace hoteru_be.Services.Interfaces
         public Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson);
         public Task<MethodResultDTO> DeleteGuest(int IdPerson);
 
-        public Task<MethodResultDTO> UpdateGuest(SpecificGuestDTO guestDTO);
+        public Task<MethodResultDTO> UpdateGuest(GuestDTO guestDTO);
 
         public Task<MethodResultDTO> PostGuest(GuestDTO guestDTO);
     }

@@ -49,6 +49,7 @@ namespace hoteru_be
             services.AddScoped<IDepositTypeService, DepositTypeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserTypeService, UserTypeService>();
+            services.AddScoped<IDepositService, DepositService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

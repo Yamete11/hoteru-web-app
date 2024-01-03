@@ -4,26 +4,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GuestStatusController : ControllerBase
+    public class DepositController : ControllerBase
     {
-        private readonly IGuestStatusService _service;
+        private readonly IDepositService _service;
 
-        public GuestStatusController(IGuestStatusService service)
+        public DepositController(IDepositService service)
         {
             _service = service;
         }
 
+    
 
-        [HttpGet]
-        public async Task<IEnumerable<StatusDTO>> GetRoomStatuses()
+        [HttpGet("{IdDeposit}")]
+        public async Task<DepositDTO> GetDeposit(int IdDeposit)
         {
-            return await _service.GetGuestStatuses();
+            return await _service.GetDeposit(IdDeposit);
         }
     }
 }

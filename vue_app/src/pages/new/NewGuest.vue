@@ -99,7 +99,7 @@
           <label>Status: </label>
           <select v-model="state.formData.IdGuestStatus" @change="v$.formData.IdGuestStatus.$touch()">
             <option disabled value="">Select status</option>
-            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.idGuestStatus" :value="String(guestStatus.idGuestStatus)">{{ guestStatus.title }}</option>
+            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.idStatus" :value="String(guestStatus.idStatus)">{{ guestStatus.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.IdGuestStatus.$error">
             <span v-if="!v$.formData.IdGuestStatus.required.$response">Status is required*</span>
@@ -186,7 +186,10 @@ export default {
             }
           });
           console.log('Response:', response.data);
-          if (response.data && response.data.httpStatusCode === 200) {
+          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
+            state.errors = response.data.errors || {};
+            console.log('Error', response.data.message);
+          } else {
             await router.push('/guests');
           }
         } catch (error) {

@@ -7,25 +7,53 @@
     <form @submit.prevent class="creating-form">
       <div class="input-form">
         <label>Name: </label>
-        <input v-model="state.user.name" class="input" type="text" placeholder="Enter room number" :readonly="!state.isEditing">
+        <input v-model="state.user.name"
+               class="input"
+               type="text"
+               placeholder="Enter room number"
+               :readonly="!state.isEditing"
+               @input="v$.user.name.$touch()"
+        >
+        <span class="error-message" v-if="v$.user.name.$error">
+            <span v-if="!v$.user.name.required.$response">Name is required*</span>
+            <span v-else-if="!v$.user.name.maxLength.$response">Name must be less than 20 characters*</span>
+            <span v-else-if="!v$.user.name.onlyLetters.$response">Name must contain only letters*</span>
+          </span>
+        <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
       </div>
+
       <div class="input-form">
         <label>Surname: </label>
-        <input v-model="state.user.surname" class="input" type="text" placeholder="Enter room capacity" :readonly="!state.isEditing">
+        <input v-model="state.user.surname"
+               class="input"
+               type="text"
+               placeholder="Enter room capacity"
+               :readonly="!state.isEditing">
       </div>
+
       <div class="input-form">
         <label>Email: </label>
-        <input v-model="state.user.email" class="input" type="text" placeholder="Enter room price" :readonly="!state.isEditing">
+        <input v-model="state.user.email"
+               class="input"
+               type="text"
+               placeholder="Enter room price"
+               :readonly="!state.isEditing">
       </div>
+
       <div class="input-form">
         <label>Login: </label>
-        <input v-model="state.user.loginName" class="input" type="text" placeholder="Enter room price" :readonly="!state.isEditing">
+        <input v-model="state.user.loginName"
+               class="input"
+               type="text"
+               placeholder="Enter room price"
+               :readonly="!state.isEditing">
       </div>
+
       <div class="input-form">
         <label>Type: </label>
         <input v-if="!state.isEditing" class="input" type="text" :value="state.typeTitle" readonly>
         <select v-else v-model="state.user.idUserType" class="input">
-          <option v-for="type in state.userTypes" :value="type.idUserType" :key="type.idUserType">{{ type.title }}</option>
+          <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
         </select>
       </div>
 
@@ -40,27 +68,48 @@
     <form @submit.prevent class="creating-form">
       <div class="input-form">
         <label>Name: </label>
-        <input v-model="state.newUser.name" class="input" type="text" placeholder="Enter name">
+        <input v-model="state.newUser.name"
+               class="input"
+               type="text"
+               placeholder="Enter name">
       </div>
+
       <div class="input-form">
         <label>Surname: </label>
-        <input v-model="state.newUser.surname" class="input" type="text" placeholder="Enter surname">
+        <input v-model="state.newUser.surname"
+               class="input"
+               type="text"
+               placeholder="Enter surname">
       </div>
+
       <div class="input-form">
         <label>Email: </label>
-        <input v-model="state.newUser.email" class="input" type="text" placeholder="Enter email">
+        <input v-model="state.newUser.email"
+               class="input"
+               type="text"
+               placeholder="Enter email">
       </div>
+
       <div class="input-form">
         <label>Login: </label>
-        <input v-model="state.newUser.login" class="input" type="text" placeholder="Enter login">
+        <input v-model="state.newUser.login"
+               class="input"
+               type="text"
+               placeholder="Enter login">
       </div>
+
       <div class="input-form">
         <label>Password: </label>
-        <input v-model="state.newUser.password" class="input" type="text" placeholder="Enter password">
+        <input v-model="state.newUser.password"
+               class="input"
+               type="text"
+               placeholder="Enter password">
       </div>
+
       <div class="input-form">
         <label>Type: </label>
         <select v-model="state.newUser.idUserType" class="input">
+          <option disabled value="">Select type</option>
           <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
         </select>
       </div>
@@ -81,6 +130,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {reactive} from "vue";
+import {email} from "@vuelidate/validators";
 
 export default {
   name: "Settings",
@@ -103,15 +153,42 @@ export default {
         email: '',
         login: '',
         password: '',
-        idUserType: 0
+        idUserType: ''
       },
       newUserTypeTitle: '',
       userTypes: [],
-      typeTitle: ''
+      typeTitle: '',
+      errors: {}
     });
 
+    function onlyLetters(value) {
+      return /^[A-Za-z]+$/.test(value);
+    }
+
+    const rules = {
+      user: {
+        name: { required, maxLength: maxLength(20), onlyLetters },
+        surname: { required, maxLength: maxLength(20), onlyLetters},
+        email: { required, email },
+        loginName: { required, maxLength: maxLength(15), onlyLetters },
+        idUserType: { required }
+      },
+      newUser: {
+        name: { required, maxLength: maxLength(20), onlyLetters },
+        surname: { required, maxLength: maxLength(20), onlyLetters},
+        email: { required, email },
+        loginName: { required, maxLength: maxLength(15), onlyLetters },
+        password: { required, maxLength: maxLength(15)},
+        idUserType: { required }
+      }
+    }
+
+    const v$ = useVuelidate(rules, state);
+
+
+
     async function toggleEdit() {
-      this.isEditing = !this.isEditing;
+      state.isEditing = !state.isEditing;
     }
 
     async function fetchUser(idUser){
@@ -130,11 +207,11 @@ export default {
         });
         state.userTypes = responseUserTypes.data;
 
-        console.log(state.userTypes)
-        console.log(state.user)
 
         const foundType = state.userTypes.find(status => status.idType === state.user.idUserType);
         state.typeTitle = foundType ? foundType.title : 'Status not found';
+
+        console.log(state.user)
 
       } catch (error) {
         console.error(error);
@@ -162,7 +239,7 @@ export default {
     }
 
 
-    return {state, toggleEdit, fetchUser, addUser}
+    return {state, toggleEdit, fetchUser, addUser, v$}
   },
   mounted(){
     this.fetchUser(this.$store.getters.getUserData.idUser);
@@ -202,6 +279,7 @@ export default {
   font-weight: bold;
   color: white;
   margin: 10px;
+  cursor: pointer;
 }
 
 .registration-class{
@@ -243,5 +321,10 @@ h1 {
   margin-bottom: 10px;
   background-color: white;
   color: black;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 </style>

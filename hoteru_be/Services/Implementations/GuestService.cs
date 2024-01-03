@@ -97,8 +97,43 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> PostGuest(GuestDTO guestDTO)
         {
-            var hotel = await _context.Hotels.FirstOrDefaultAsync(r => r.IdHotel == 1);
+            var errors = new Dictionary<string, List<string>>();
 
+
+            var existingEmailGuest = await _context.Guests
+                .Include(r => r.Person)
+                .AnyAsync(r => r.Person.Email == guestDTO.Email);
+            if (existingEmailGuest)
+            {
+                errors.Add("Email", new List<string> { "Another guest with this email already exists." });
+            }
+
+
+            var existingTelNumberGuest = await _context.Guests
+                .AnyAsync(r => r.TelNumber == guestDTO.TelNumber);
+            if (existingTelNumberGuest)
+            {
+                errors.Add("TelNumber", new List<string> { "Another guest with this tel. number already exists." });
+            }
+
+            var existingPassportGuest = await _context.Guests
+                .AnyAsync(r => r.Passport == guestDTO.Passport);
+            if (existingPassportGuest)
+            {
+                errors.Add("Passport", new List<string> { "Another guest with this passport already exists." });
+            }
+
+            if (errors.Any())
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation failed",
+                    Errors = errors
+                };
+            }
+
+            var hotel = await _context.Hotels.FirstOrDefaultAsync(r => r.IdHotel == 1);
             Person person = new Person
             {
                 Name = guestDTO.Name,
@@ -115,7 +150,6 @@ namespace hoteru_be.Services.Implementations
                 Person = person
             };
 
-
             _context.Persons.Add(person);
             _context.Guests.Add(guest);
             await _context.SaveChangesAsync();
@@ -127,7 +161,8 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<MethodResultDTO> UpdateGuest(SpecificGuestDTO guestDTO)
+
+        public async Task<MethodResultDTO> UpdateGuest(GuestDTO guestDTO)
         {
             var guest = await _context.Guests
                              .Include(r => r.GuestStatus)
@@ -152,13 +187,17 @@ namespace hoteru_be.Services.Implementations
                 return new MethodResultDTO
                 {
                     HttpStatusCode = HttpStatusCode.BadRequest,
-                    Message = "Another guest with this email already exists"
+                    Message = "Another guest with this email already exists",
+                    Errors = new Dictionary<string, List<string>>
+                    {
+                        { "Email", new List<string> { "Another guest with this email already exists." } }
+                    }
                 };
             }*/
 
             guest.TelNumber = guestDTO.TelNumber;
             guest.Passport = guestDTO.Passport;
-            guest.IdGuestStatus = guestDTO.IdGuestStatus;
+            guest.IdGuestStatus = int.Parse(guestDTO.IdGuestStatus);
             person.Name = guestDTO.Name;
             person.Surname = guestDTO.Surname;
             person.Email = guestDTO.Email;

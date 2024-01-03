@@ -103,7 +103,8 @@ namespace hoteru_be.Context
             modelBuilder.Entity<GuestStatus>(t =>
             {
                 t.HasData(
-                    new GuestStatus { IdGuestStatus = 1, Title = "VIP"});
+                    new GuestStatus { IdGuestStatus = 1, Title = "VIP"},
+                    new GuestStatus { IdGuestStatus = 2, Title = "Regular"});
 
             });
 
