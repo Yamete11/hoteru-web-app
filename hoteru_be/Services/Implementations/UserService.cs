@@ -43,6 +43,8 @@ namespace hoteru_be.Services.Implementations
 
             await _context.SaveChangesAsync();
 
+
+
             _context.Users.Remove(user);
             _context.Persons.Remove(person);
 
