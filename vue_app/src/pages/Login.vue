@@ -12,15 +12,14 @@
             type="text"
             placeholder="login"
         />
-        <span class="error-message" v-if="errors.login">{{ errors.login[0] }}</span>
         <my-input
             class="login-input"
             v-model="password"
             type="password"
             placeholder="password"
         />
+        <p class="error-message" v-if="errors.validation">{{ errors.validation }}</p>
         <button class="login-btn" type="submit">LOG IN</button>
-        <span class="error-message" v-if="errors.password">{{ errors.password[0] }}</span>
 
       </form>
     </div>
@@ -42,6 +41,7 @@ export default {
   methods: {
     async loginIn() {
       console.log("Logging in");
+      this.errors = {};
       try {
         const response = await fetch('https://localhost:44384/api/Login', {
           method: 'POST',
@@ -49,7 +49,10 @@ export default {
           body: JSON.stringify({ Login: this.login, Password: this.password })
         });
 
-        if (!response.ok) throw new Error('Login failed');
+        if (!response.ok){
+          this.errors.validation = 'Validation failed, login or password is wrong';
+          throw new Error('Login failed');
+        }
 
         const data = await response.json();
         console.log(data);
@@ -132,6 +135,11 @@ export default {
   width: 10vw;
   display: flex;
   justify-content: center;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }
 </style>
 

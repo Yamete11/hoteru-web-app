@@ -286,7 +286,7 @@ namespace hoteru_be.Services.Implementations
             var guest = await _context.GuestReservations.SingleOrDefaultAsync(r => r.IdReservation == IdArrival);
 
             return await _context.Reservations
-                .Where(r => r.IdReservation == IdArrival && r.Confirmed == false)
+                .Where(r => r.IdReservation == IdArrival)
                 .Include(r => r.Room)
                 .Select(r => new ArrivalDTO
                 {

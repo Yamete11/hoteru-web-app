@@ -14,9 +14,11 @@ export default {
 </script>
 
 <style>
-body{
+
+body, html{
   background-color: #F1DEC9;
   margin: 0;
+  padding: 0;
   height: 100%;
 }
 h1{

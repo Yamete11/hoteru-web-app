@@ -27,9 +27,9 @@ const routes = [
     },
     {
         path: '/reservations/:idReservation',
-        component: ReservationDetails,
+        component: ArrivalDetails,
         name: 'ReservationDetails',
-        props: true
+        props: route => ({ idReservation: Number(route.params.idReservation), detailsType: 'Reservation' })
     },
     {
         path: '/reservations',
@@ -47,7 +47,7 @@ const routes = [
         path: '/arrivals/:idReservation',
         component: ArrivalDetails,
         name: 'ArrivalDetails',
-        props: true
+        props: route => ({ idReservation: Number(route.params.idReservation), detailsType: 'Arrival' })
     },
     {
         path: '/arrivals',

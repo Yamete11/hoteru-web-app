@@ -2,7 +2,7 @@
   <navbar></navbar>
   <sidebar></sidebar>
   <div class="main">
-    <h1>Arrival Details</h1>
+    <h1>{{ detailsType }} Details</h1>
     <form>
       <div class="date-inputs">
         <div class="input-form">
@@ -59,7 +59,6 @@
       </div>
 
       <div class="guest">
-        <label>Guest personal information</label>
         <div class="input-form">
           <label>Guest Selection: </label>
           <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedGuest" readonly>
@@ -74,24 +73,29 @@
       </div>
 
       <div class="guest">
-        <label>Deposit option</label>
         <div class="input-form">
-          <label>Deposit sum: </label>
-          <input
-              v-model="state.selectedDeposit.sum"
-              class="input"
-              type="number"
-              placeholder="Enter deposit sum"
-              :readonly="!state.isEditing"
-          >
-          <label>Choose type: </label>
-          <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDeposit.idDepositType" readonly>
-          <select v-else v-model="state.selectedDeposit.idDepositType">
-            <option disabled value="0">Select type</option>
-            <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
-              {{ type.title }}
-            </option>
-          </select>
+          <label>Deposit</label>
+          <template v-if="!state.isEditing && state.formData.idDeposit == 0">
+            <p>There is no deposit.</p>
+          </template>
+          <template v-else>
+            <label>Deposit sum: </label>
+            <input
+                v-model="state.selectedDeposit.sum"
+                class="input"
+                type="number"
+                placeholder="Enter deposit sum"
+                :readonly="!state.isEditing"
+            >
+            <label>Choose type: </label>
+            <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDeposit.idDepositType" readonly>
+            <select v-else v-model="state.selectedDeposit.idDepositType">
+              <option disabled value="0">Select type</option>
+              <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
+                {{ type.title }}
+              </option>
+            </select>
+          </template>
         </div>
       </div>
 
@@ -99,7 +103,8 @@
         <label>Service option</label>
         <div class="input-form">
           <label v-if="state.isEditing">Choose a service</label>
-          <label v-else>Added services</label>
+          <label v-if="!state.isEditing && state.formData.services && state.formData.services.length > 0">Added services</label>
+          <label v-if="!state.isEditing && (!state.formData.services || state.formData.services.length === 0)">There are no services</label>
           <select v-if="state.isEditing" v-model="state.selectedService" class="input">
             <option disabled value="0">Select service</option>
             <option v-for="service in state.services" :key="service.idService" :value="service">
@@ -110,12 +115,16 @@
           <div class="service-list" v-if="state.formData.services && state.formData.services.length > 0">
             <ul class="added-services-list">
               <li class="element" v-for="(service, index) in state.formData.services" :key="index">
-                {{ service.title }}: {{ service.sum }} <button v-if="state.isEditing" @click.prevent="removeService(index)">Remove</button>
+                <span>{{ service.title }}: {{ service.sum }} $</span>
+                <button class="btn" v-if="state.isEditing" @click.prevent="removeService(index)">Remove</button>
               </li>
             </ul>
           </div>
         </div>
       </div>
+
+
+
 
 
       <div class="registration-class">
@@ -140,6 +149,10 @@ export default {
     idReservation: {
       type: Number,
       required: true
+    },
+    detailsType: {
+      type: String,
+      default: 'Arrival'
     }
   },
   setup() {
@@ -176,6 +189,7 @@ export default {
         });
 
         state.formData = response.data;
+        state.formData.services = state.formData.services || [];
         console.log(state.formData)
       } catch(error){
         console.log(error);
@@ -259,6 +273,9 @@ export default {
   ,
   mounted() {
     this.fetchReservation(this.idReservation);
+  },
+  computed(){
+
   }
 }
 </script>
@@ -365,13 +382,6 @@ h1 {
   margin-top: 20px;
 }
 
-
-.tab-switcher {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
 .tab-switcher span {
   cursor: pointer;
   padding: 10px;
@@ -397,34 +407,45 @@ h1 {
   max-width: 110px;
 }
 
-.element{
+.element {
   display: flex;
-  justify-content: space-around;
-  width: 100%;
-  background-color:#C8B6A6;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #C8B6A6;
   border-radius: 5px;
   font-weight: bold;
   font-size: 15px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .service-list ul {
-  padding-left: 0;
   list-style-type: none;
-  width: 100%;
+  padding: 0;
+  margin: 0;
+  max-width: 800px;
 }
 
 .service-list {
-  max-height: 200px;
   overflow-y: auto;
-  width: 96%;
   border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
   margin-top: 10px;
+}
 
+
+.btn {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 10px;
+  border: 1px solid #D3C1AC;
+  background-color: #444444;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 </style>
