@@ -3,8 +3,8 @@
   <navbar></navbar>
   <sidebar></sidebar>
   <div class="main">
-    <h1>Account Details</h1>
     <form @submit.prevent="toggleEdit" class="creating-form">
+      <h1>Account Details</h1>
       <div class="input-form">
         <label>Name: </label>
         <input v-model="state.formData.name"
@@ -91,8 +91,9 @@
       </div>
     </form>
 
-    <h1>Add new user</h1>
+    <div class="newUser-section">
     <form @submit.prevent="addUser" class="creating-form">
+      <h1>Add new user</h1>
       <div class="input-form">
         <label>Name: </label>
         <input v-model="state.newUser.name"
@@ -188,17 +189,18 @@
       </div>
     </form>
 
-    <div>
+    <div class="user-list">
       <label class="service-label">Services: </label>
       <div class="service-list">
-        <ul>
+        <ul class="added-services-list">
           <li class="element" v-for="user in state.users" :key="user.idPerson">
-            Login: {{ user.loginName }} - Type: {{ user.userType }} <button @click.prevent="removeUser(idPerson)">Remove</button>
+            <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
+            <button class="btn" @click.prevent="removeUser(idPerson)">Remove</button>
           </li>
         </ul>
       </div>
     </div>
-
+    </div>
   </div>
   </div>
 </template>
@@ -396,18 +398,30 @@ export default {
 }
 .main {
   display: flex;
-  align-items: center;
-  flex-direction: column;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
   flex-grow: 1;
   padding-top: 8vh;
   margin: 5%;
 }
 
-.creating-form {
+.newUser-section{
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: space-around;
+  min-width: 40%;
+}
+
+.creating-form {
   width: 100%;
   max-width: 300px;
+}
+
+.user-list{
+  min-width: 50%;
 }
 
 .registration-btn{
@@ -469,23 +483,24 @@ h1 {
   margin: 10px 0;
 }
 
-.element{
+.element {
   display: flex;
-  justify-content: center;
-  width: 100%;
-  background-color:#C8B6A6;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #C8B6A6;
   border-radius: 5px;
   font-weight: bold;
   font-size: 15px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .service-list ul {
-  padding-left: 0;
   list-style-type: none;
-  width: 100%;
+  padding: 0;
+  margin: 0;
+  max-width: 800px;
 }
 
 .service-list {
@@ -503,6 +518,18 @@ h1 {
   color: black;
   align-self: flex-start;
   margin-bottom: 5px;
+}
+
+.btn {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 10px;
+  border: 1px solid #D3C1AC;
+  background-color: #444444;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 </style>
