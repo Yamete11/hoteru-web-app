@@ -115,7 +115,8 @@
             <div class="service-list" v-if="state.formData.services.length > 0">
               <ul class="added-services-list">
                 <li class="element" v-for="(service, index) in state.formData.services" :key="index">
-                  {{ service.title }}: {{ service.sum }} <button @click.prevent="removeService(index)">Remove</button>
+                  <span>{{ service.title }}: {{ service.sum }} </span>
+                  <button class="btn" @click.prevent="removeService(index)">Remove</button>
                 </li>
               </ul>
             </div>
@@ -259,25 +260,6 @@ export default {
       }
     }
 
-    async function addGuest(){
-      try {
-        const response = await axios.post('https://localhost:44384/api/Guest', state.formData.guest,{
-          headers: {
-            'Authorization': `Bearer ${store.getters.getToken}`
-          }
-        });
-        console.log('Response:', response.data);
-        if (response.data && response.data.httpStatusCode === 200) {
-          await router.push('/guests');
-        }
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          state.errors = error.response.data.errors;
-        }
-        console.log('Error', error);
-      }
-    }
-
     const filteredRooms = computed(() => {
       const selectedRoomType = state.roomTypes.find(rt => rt.idType.toString() === state.roomType)?.title;
       console.log(state.roomType)
@@ -349,7 +331,7 @@ export default {
     };
 
 
-    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, addReservation, calculatedPrice, maxInDate, addGuest, addService, removeService }
+    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, addReservation, calculatedPrice, maxInDate, addService, removeService }
   },
   mounted() {
     this.fetchRooms();
@@ -458,9 +440,6 @@ h1 {
 }
 
 
-
-
-
 .tab-switcher {
   display: flex;
   justify-content: center;
@@ -506,20 +485,31 @@ h1 {
 }
 
 .service-list ul {
-  padding-left: 0;
   list-style-type: none;
-  width: 100%;
+  padding: 0;
+  margin: 0;
+  max-width: 800px;
 }
 
 .service-list {
-  max-height: 200px;
   overflow-y: auto;
-  width: 96%;
   border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
   margin-top: 10px;
+}
 
+
+.btn {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 10px;
+  border: 1px solid #D3C1AC;
+  background-color: #444444;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 </style>
