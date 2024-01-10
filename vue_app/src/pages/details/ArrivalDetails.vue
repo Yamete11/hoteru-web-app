@@ -52,7 +52,7 @@
           <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedRoom" readonly>
           <select v-else v-model="state.formData.idRoom">
             <option disabled value="">Select a room</option>
-            <option v-for="room in state.rooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
+            <option v-for="room in sortedFilteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
           </select>
           <label>Price: {{state.formData.price}}</label>
         </div>
@@ -75,27 +75,28 @@
       <div class="guest">
         <div class="input-form">
           <label>Deposit</label>
-          <template v-if="!state.isEditing && state.formData.idDeposit == 0">
+          <template v-if="!state.isEditing && state.formData.idDepositType == 0">
             <p>There is no deposit.</p>
           </template>
           <template v-else>
             <label>Deposit sum: </label>
             <input
-                v-model="state.selectedDeposit.sum"
+                v-model="state.formData.depositSum"
                 class="input"
                 type="number"
                 placeholder="Enter deposit sum"
                 :readonly="!state.isEditing"
             >
             <label>Choose type: </label>
-            <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDeposit.idDepositType" readonly>
-            <select v-else v-model="state.selectedDeposit.idDepositType">
+            <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDepositType" readonly>
+            <select v-else v-model="state.formData.idDepositType">
               <option disabled value="0">Select type</option>
               <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
                 {{ type.title }}
               </option>
             </select>
           </template>
+          <button v-if="state.isEditing" @click.prevent="deleteDeposit" class="form-btn">Delete Deposit</button>
         </div>
       </div>
 
@@ -136,13 +137,14 @@
 </template>
 
 <script>
-import {computed, reactive, ref, watch} from 'vue';
+import {computed, reactive, watch} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
+import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { differenceInCalendarDays } from 'date-fns';
+import {differenceInCalendarDays} from "date-fns";
+
 export default {
   name: "ArrivalDetails",
   props: {
@@ -163,73 +165,104 @@ export default {
       formData: '',
       selectedRoom: '',
       selectedGuest: '',
-      selectedDeposit: '',
       selectedService: '',
-      selectedDepositType: '',
       selectedRoomType: '',
+      selectedDepositType: '',
       rooms: [],
       roomType: '',
       roomTypes: [],
       guests: [],
       depositTypes: [],
-      isEditing: false
+      isEditing: false,
+      roomPrice: 0,
     });
 
-    async function toggleEdit(){
-      state.isEditing = !state.isEditing;
+    const rules = {
+      formData: {
+        in: {},
+        out: {},
+        capacity: {},
+        idRoom: {},
+        idRoomType: {},
+        idGuest: {},
+        idDepositType: {},
+        depositSum: {},
+      }
+    };
+
+    const v$ = useVuelidate(rules, state);
+
+    async function toggleEdit() {
+      if (state.isEditing) {
+        v$.value.$touch();
+        if (!v$.value.$error) {
+          try {
+            const response = await axios.put('https://localhost:44384/api/Reservation', state.formData, {
+              headers: {
+                'Authorization': `Bearer ${store.getters.getToken}`
+              },
+            });
+            console.log('Success:', response.data);
+            state.isEditing = false;
+
+            const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest)
+            state.selectedGuest = foundGuest.name + " " + foundGuest.surname + ", " + foundGuest.passport
+
+            const foundDeposit = state.depositTypes.find(guest => guest.idType === state.formData.idDepositType)
+            if(foundDeposit !== undefined){
+              state.selectedDepositType = foundDeposit.title
+            }
+          } catch (error) {
+            console.log('Error:', error);
+          }
+        }
+      } else {
+        state.isEditing = true;
+      }
     }
 
     async function fetchReservation(idReservation){
       console.log(idReservation)
       try{
-        const response = await axios.get('https://localhost:44384/api/Reservation/arrival/' + idReservation,{
+        const responseReservation = await axios.get('https://localhost:44384/api/Reservation/arrival/' + idReservation,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
 
-        state.formData = response.data;
+        state.formData = responseReservation.data;
         state.formData.services = state.formData.services || [];
-        console.log(state.formData)
-      } catch(error){
-        console.log(error);
-      }
+        state.formData.in = isoToLocalDate(state.formData.in);
+        state.formData.out = isoToLocalDate(state.formData.out);
 
-      try{
-        const response = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.formData.idRoom,{
+
+        const responseRooms = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.formData.idRoom,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        state.rooms = response.data;
+        state.rooms = responseRooms.data;
 
-        const response2 = await axios.get('https://localhost:44384/api/RoomType',{
+        const responseRoomTypes = await axios.get('https://localhost:44384/api/RoomType',{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        state.roomTypes = response2.data;
+        state.roomTypes = responseRoomTypes.data;
 
         const foundRoom = state.rooms.find(status => status.idRoom === state.formData.idRoom);
         state.selectedRoom =  foundRoom.number + " - Capacity: " + foundRoom.capacity;
         state.roomType = foundRoom.type;
 
-        const response3 = await axios.get('https://localhost:44384/api/Guest',{
+        const responseGuests = await axios.get('https://localhost:44384/api/Guest',{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
-        state.guests = response3.data.list;
+        state.guests = responseGuests.data.list;
 
         const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest)
         state.selectedGuest = foundGuest.name + " " + foundGuest.surname + ", " + foundGuest.passport
-
-        const responseDeposit = await axios.get('https://localhost:44384/api/Deposit/' + state.formData.idDeposit,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.selectedDeposit = responseDeposit.data;
 
         const responseDepositType = await axios.get('https://localhost:44384/api/DepositType',{
           headers: {
@@ -237,6 +270,11 @@ export default {
           },
         });
         state.depositTypes = responseDepositType.data;
+
+        const foundDeposit = state.depositTypes.find(guest => guest.idType === state.formData.idDepositType)
+        if(foundDeposit !== undefined){
+          state.selectedDepositType = foundDeposit.title
+        }
 
         const responseServices = await axios.get('https://localhost:44384/api/Service',{
           headers: {
@@ -246,6 +284,8 @@ export default {
         state.services = responseServices.data.list;
 
 
+        const nights = differenceInCalendarDays(new Date(state.formData.out), new Date(state.formData.in));
+        state.roomPrice = foundRoom.price * nights;
       } catch (error) {
         console.log(error);
       }
@@ -261,13 +301,67 @@ export default {
       }
     };
 
+    watch(() => state.formData.capacity, (newCapacity) => {
+      const selectedRoom = state.rooms.find(room => room.idRoom === state.formData.idRoom);
+      if (selectedRoom && selectedRoom.capacity < newCapacity) {
+        state.formData.idRoom = '';
+      }
+    });
+
+    watch(() => state.formData.idRoomType, (newRoomType) => {
+      const selectedRoom = state.rooms.find(room => room.idRoom === state.formData.idRoom);
+      const selectedRoomType = state.roomTypes.find(type => type.idType === newRoomType);
+      if (selectedRoom && selectedRoomType && selectedRoom.type !== selectedRoomType.title) {
+        state.formData.idRoom = '';
+      }
+    });
+
+    const sortedFilteredRooms = computed(() => {
+      let filteredRooms = state.rooms;
+      if (state.formData.idRoomType) {
+        const selectedRoomTypeTitle = state.roomTypes.find(type => type.idType === parseInt(state.formData.idRoomType))?.title;
+        filteredRooms = filteredRooms.filter(room => room.type === selectedRoomTypeTitle);
+      }
+      if (state.formData.capacity) {
+        filteredRooms = filteredRooms.filter(room => room.capacity >= parseInt(state.formData.capacity));
+      }
+      return filteredRooms.sort((a, b) => a.capacity - b.capacity);
+    });
+
+    function deleteDeposit() {
+      state.formData.depositSum = 0;
+      state.formData.idDepositType = 0;
+    }
+
+    function isoToLocalDate(isoStr) {
+      let date = new Date(isoStr);
+      let localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return localDate.toISOString().split('T')[0];
+    }
+
+    watch([() => state.formData.out, () => state.formData.in, () => state.formData.idRoom], ([newOut, newIn, newIdRoom]) => {
+      if (newOut && newIn && newIdRoom) {
+        const outDate = new Date(newOut);
+        const inDate = new Date(newIn);
+        const nights = differenceInCalendarDays(outDate, inDate);
+
+        const selectedRoom = state.rooms.find(room => room.idRoom === newIdRoom);
+        if (selectedRoom && nights >= 0) {
+          state.formData.price = selectedRoom.price * nights;
+        }
+      }
+    });
+
+
     return {
       state,
       today,
       fetchReservation,
       removeService,
       addService,
-      toggleEdit
+      toggleEdit,
+      sortedFilteredRooms,
+      deleteDeposit
     }
   }
   ,

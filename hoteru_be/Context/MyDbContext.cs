@@ -22,7 +22,7 @@ namespace hoteru_be.Context
         public virtual DbSet<Deposit> Deposits { get; set; }
         public virtual DbSet<GuestStatus> GuestStatuses { get; set; }
         public virtual DbSet<Reservation> Reservations { get; set; }
-        public virtual DbSet<ReservationService> ReservationService { get; set; }
+        public virtual DbSet<ReservationService> ReservationServices { get; set; }
         public virtual DbSet<GuestReservation> GuestReservations { get; set; }
         public virtual DbSet<Bill> Bills { get; set; }
 

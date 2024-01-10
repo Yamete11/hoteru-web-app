@@ -17,5 +17,7 @@ namespace hoteru_be.Services.Interfaces
         public Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation);
 
         public Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO);
+
+        public Task<MethodResultDTO> UpdateReservation(ArrivalDTO arrivalDTO);
     }
 }

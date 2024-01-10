@@ -139,7 +139,7 @@ namespace hoteru_be.Services.Implementations
         public async Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation)
         {
 
-            var services = await _context.ReservationService
+            var services = await _context.ReservationServices
                 .Where(r => r.IdReservation == IdReservation)
                 .Include(r => r.Service)
                 .Select(r => new ServiceHistoryDTO
@@ -254,7 +254,7 @@ namespace hoteru_be.Services.Implementations
                         Reservation = reservation,
                         Service = service
                     };
-                    _context.ReservationService.Add(reservationService);
+                    _context.ReservationServices.Add(reservationService);
                 }
             }
 
@@ -272,7 +272,7 @@ namespace hoteru_be.Services.Implementations
         public async Task<ArrivalDTO> GetSpecificArrival(int IdArrival)
         {
 
-            var services = await _context.ReservationService
+            var services = await _context.ReservationServices
                 .Where(r => r.IdReservation == IdArrival)
                 .Include(r => r.Service)
                 .Select(r => new ServiceHistoryDTO
@@ -288,19 +288,90 @@ namespace hoteru_be.Services.Implementations
             return await _context.Reservations
                 .Where(r => r.IdReservation == IdArrival)
                 .Include(r => r.Room)
+                .Include(r => r.Deposit)
                 .Select(r => new ArrivalDTO
                 {
                    IdReservation = r.IdReservation,
-                   In = r.In.ToString("yyyy-MM-dd"),
-                   Out = r.Out.ToString("yyyy-MM-dd"),
+                   In = r.In,
+                   Out = r.Out,
                    Capacity = r.Capacity,
                    IdRoom = r.IdRoom,
-                   IdDeposit = r.IdDeposit.HasValue ? r.IdDeposit.Value : 0,
+                   IdDepositType = r.IdDeposit.HasValue ? r.Deposit.IdDepositType : 0,
                    IdGuest = guest.IdGuest,
                    IdRoomType = r.Room.IdRoomType,
-                   Services = services
-
+                   Services = services,
+                   Confirmed = r.Confirmed,
+                   DepositSum = r.IdDeposit.HasValue ? r.Deposit.Sum : 0,
+                   Price = r.Price
                 }).FirstOrDefaultAsync();
+        }
+
+        public async Task<MethodResultDTO> UpdateReservation(ArrivalDTO arrivalDTO)
+        {
+            var reservation = await _context.Reservations.SingleOrDefaultAsync(r => r.IdReservation == arrivalDTO.IdReservation);
+
+            var deposit = await _context.Deposits.SingleOrDefaultAsync(r => r.IdDeposit == reservation.IdDeposit);
+
+
+            if(deposit == null)
+            {
+                var depo = new Deposit
+                {
+                    Sum = arrivalDTO.Price,
+                    IdDepositType = arrivalDTO.IdDepositType
+                };
+                _context.Deposits.Add(depo);
+                reservation.Deposit = depo;
+            } else if(deposit != null && arrivalDTO.IdDepositType == 0)
+            {
+                _context.Deposits.Remove(deposit);
+            } else
+            {
+                deposit.IdDepositType = arrivalDTO.IdDepositType;
+                deposit.Sum = arrivalDTO.DepositSum;
+            }
+            
+           
+            
+
+            var guest = await _context.GuestReservations.SingleOrDefaultAsync(r => r.IdReservation == arrivalDTO.IdReservation);
+
+            guest.IdGuest = arrivalDTO.IdGuest;
+            
+
+            reservation.In = arrivalDTO.In;
+            reservation.Out = arrivalDTO.Out;
+            reservation.Capacity = arrivalDTO.Capacity;
+            reservation.IdRoom = arrivalDTO.IdRoom;
+            reservation.Price = arrivalDTO.Price;
+
+            var services = await _context.ReservationServices.Where(r => r.IdReservation == arrivalDTO.IdReservation).ToListAsync();
+
+            var arrivalServiceIds = arrivalDTO.Services.Select(s => s.IdService).ToList();
+
+            _context.ReservationServices.RemoveRange(
+                services.Where(s => !arrivalServiceIds.Contains(s.IdService)));
+
+            foreach (var serviceId in arrivalServiceIds)
+            {
+                if (!services.Any(s => s.IdService == serviceId))
+                {
+                    _context.ReservationServices.Add(new Entities.ReservationService
+                    {
+                        IdReservation = arrivalDTO.IdReservation,
+                        IdService = serviceId,
+                        Date = DateTime.Now
+                    });
+                }
+            }
+
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Updated"
+            };
         }
     }
 }

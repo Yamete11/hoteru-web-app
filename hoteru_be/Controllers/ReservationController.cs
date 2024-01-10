@@ -62,5 +62,12 @@ namespace hoteru_be.Controllers
             return await _service.PostReservation(reservationDTO);
         }
 
+        [HttpPut]
+        public async Task<MethodResultDTO> UpdateReservation([FromBody] ArrivalDTO arrivalDTO)
+        {
+
+            return await _service.UpdateReservation(arrivalDTO);
+        }
+
     }
 }
