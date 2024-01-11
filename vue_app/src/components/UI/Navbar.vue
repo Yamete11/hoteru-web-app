@@ -67,7 +67,7 @@ export default {
 .right-links{
   display: flex;
   justify-content: space-around;
-  width: 20%;
+  width: 30%;
 }
 
 .navbar-btn{
@@ -81,12 +81,8 @@ export default {
   background-color: #715d47;
   cursor: pointer;
 }
-
-.navbar h1, .navbar h2 {
-  margin: 0;
-}
-
 .navbar h1 {
   cursor: pointer;
 }
+
 </style>

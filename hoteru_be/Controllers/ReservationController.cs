@@ -65,9 +65,16 @@ namespace hoteru_be.Controllers
         [HttpPut]
         public async Task<MethodResultDTO> UpdateReservation([FromBody] ArrivalDTO arrivalDTO)
         {
-
             return await _service.UpdateReservation(arrivalDTO);
         }
+
+        [HttpPut("/confirm/{IdReservation}")]
+        public async Task<MethodResultDTO> ConfirmReservation(int IdReservation)
+        {
+            return await _service.ConfirmReservation(IdReservation);
+        }
+
+
 
     }
 }

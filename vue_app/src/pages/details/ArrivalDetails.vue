@@ -12,8 +12,17 @@
               class="input"
               type="date"
               :readonly="!state.isEditing"
+              :min="state.minInDate"
+              @input="v$.formData.in.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.in.$error">
+            <span v-if="!v$.formData.in.required.$response">The field is required*</span>
+            <span v-else-if="!v$.formData.in.minValue.$response">You can't use date before today's date*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.In">{{ state.errors.In[0] }}</span>
         </div>
+
+
         <div class="input-form">
           <label>Out: </label>
           <input
@@ -21,7 +30,14 @@
               class="input"
               type="date"
               :readonly="!state.isEditing"
+              :min="minOutDate"
+              @input="v$.formData.out.$touch()"
           >
+          <span class="error-message" v-if="v$.formData.out.$error">
+            <span v-if="!v$.formData.out.required.$response">The field is required*</span>
+            <span v-else-if="!v$.formData.out.minValue.$response">You can't use date before today's date*</span>
+          </span>
+          <span class="error-message" v-if="state.errors.Out">{{ state.errors.Out[0] }}</span>
         </div>
       </div>
       <div class="guest">
@@ -35,25 +51,41 @@
                 type="number"
                 placeholder="Enter room capacity"
                 :readonly="!state.isEditing"
+                @input="v$.formData.capacity.$touch()"
             >
+            <span class="error-message" v-if="v$.formData.capacity.$error">
+              <span v-if="!v$.formData.capacity.required.$response">The field is required*</span>
+              <span v-else-if="!v$.formData.capacity.numeric.$response">The filed must contain only numeric*</span>
+              <span v-else-if="!v$.formData.capacity.minValue.$response">The capacity must be more than 0*</span>
+              <span v-else-if="!v$.formData.capacity.maxValue.$response">The capacity must be equal or less than 40*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
           </div>
           <div class="input-form">
             <label>Type: </label>
             <input v-if="!state.isEditing" class="input" type="text" :value="state.roomType" readonly>
-            <select v-else v-model="state.formData.idRoomType" class="input">
+            <select v-else v-model="state.formData.idRoomType" class="input" @change="v$.formData.idRoomType.$touch()">
               <option disabled value="">Select type</option>
               <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="roomType.idType">{{ roomType.title }}</option>
             </select>
+            <span class="error-message" v-if="v$.formData.idRoomType.$error">
+              <span v-if="!v$.formData.idRoomType.required.$response">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.IdRoomType">{{ state.errors.IdRoomType[0] }}</span>
           </div>
         </div>
 
         <div class="input-form">
           <label>Room Selection: </label>
           <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedRoom" readonly>
-          <select v-else v-model="state.formData.idRoom">
+          <select v-else v-model="state.formData.idRoom" @change="v$.formData.idRoom.$touch()">
             <option disabled value="">Select a room</option>
             <option v-for="room in sortedFilteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
           </select>
+          <span class="error-message" v-if="v$.formData.idRoom.$error">
+              <span v-if="!v$.formData.idRoom.required.$response">The field is required*</span>
+            </span>
+          <span class="error-message" v-if="state.errors.IdRoom">{{ state.errors.IdRoom[0] }}</span>
           <label>Price: {{state.formData.price}}</label>
         </div>
       </div>
@@ -62,12 +94,16 @@
         <div class="input-form">
           <label>Guest Selection: </label>
           <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedGuest" readonly>
-          <select v-else v-model="state.formData.idGuest">
+          <select v-else v-model="state.formData.idGuest" @change="v$.formData.idGuest.$touch()">
             <option disabled value="">Select a guest</option>
             <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
               {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
             </option>
           </select>
+          <span class="error-message" v-if="v$.formData.idGuest.$error">
+              <span v-if="!v$.formData.idGuest.required.$response">The field is required*</span>
+            </span>
+          <span class="error-message" v-if="state.errors.IdGuest">{{ state.errors.IdGuest[0] }}</span>
           <router-link v-if="state.isEditing" class="form-btn" to="/new-guest">Add new guest</router-link>
         </div>
       </div>
@@ -75,10 +111,10 @@
       <div class="guest">
         <div class="input-form">
           <label>Deposit</label>
-          <template v-if="!state.isEditing && state.formData.idDepositType == 0">
-            <p>There is no deposit.</p>
+          <template v-if="!state.isEditing && !state.hasDeposit">
+            <label>There is no deposit.</label>
           </template>
-          <template v-else>
+          <template v-else-if="state.hasDeposit">
             <label>Deposit sum: </label>
             <input
                 v-model="state.formData.depositSum"
@@ -86,17 +122,31 @@
                 type="number"
                 placeholder="Enter deposit sum"
                 :readonly="!state.isEditing"
+                @change="v$.formData.depositSum.$touch()"
             >
+            <span class="error-message" v-if="v$.formData.depositSum.$error">
+              <span v-if="!v$.formData.depositSum.required.$response">The field is required*</span>
+              <span v-else-if="!v$.formData.depositSum.numeric.$response">The field can contain only digits*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.DepositSum">{{ state.errors.DepositSum[0] }}</span>
+
             <label>Choose type: </label>
             <input v-if="!state.isEditing" class="input" type="text" :value="state.selectedDepositType" readonly>
-            <select v-else v-model="state.formData.idDepositType">
+            <select v-else v-model="state.formData.idDepositType" @change="v$.formData.idDepositType.$touch()">
               <option disabled value="0">Select type</option>
               <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
                 {{ type.title }}
               </option>
             </select>
+            <span class="error-message" v-if="v$.formData.idDepositType.$error">
+              <span v-if="!v$.formData.idDepositType.required.$response">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.IdDepositType">{{ state.errors.IdDepositType[0] }}</span>
           </template>
-          <button v-if="state.isEditing" @click.prevent="deleteDeposit" class="form-btn">Delete Deposit</button>
+          <template v-else>
+            <label>There is no deposit.</label>
+          </template>
+          <button v-if="state.isEditing" @click.prevent="switchDeposit" class="form-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
         </div>
       </div>
 
@@ -107,7 +157,7 @@
           <label v-if="!state.isEditing && state.formData.services && state.formData.services.length > 0">Added services</label>
           <label v-if="!state.isEditing && (!state.formData.services || state.formData.services.length === 0)">There are no services</label>
           <select v-if="state.isEditing" v-model="state.selectedService" class="input">
-            <option disabled value="0">Select service</option>
+            <option disabled value="" selected>Select a service</option>
             <option v-for="service in state.services" :key="service.idService" :value="service">
               {{ service.title }}: {{ service.sum }}
             </option>
@@ -124,12 +174,9 @@
         </div>
       </div>
 
-
-
-
-
       <div class="registration-class">
         <router-link class="registration-btn" to="/arrivals">Cancel</router-link>
+        <button v-if="!state.isEditing" class="registration-btn" type="button" @click="confirmReservation">Confirm</button>
         <button class="registration-btn" type="button" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
       </div>
     </form>
@@ -175,19 +222,28 @@ export default {
       depositTypes: [],
       isEditing: false,
       roomPrice: 0,
+      minInDate: new Date().toISOString().split('T')[0],
+      minOutDate: '',
+      errors: {},
+      hasDeposit: false
     });
 
     const rules = {
       formData: {
-        in: {},
-        out: {},
-        capacity: {},
-        idRoom: {},
-        idRoomType: {},
-        idGuest: {},
-        idDepositType: {},
-        depositSum: {},
-      }
+        in: { required, minValue: val => new Date(val) >= new Date(today) },
+        out: { required, minValue: val => new Date(val) > new Date(state.formData.in) },
+        capacity: { required, numeric, minValue: value => value > 0, maxValue: value => value <= 40 },
+        idRoom: { required },
+        idRoomType: { required },
+        idGuest: { required },
+        idDepositType: {
+          required: () => !state.hasDeposit
+        },
+        depositSum: {
+          required: () => !state.hasDeposit,
+          numeric: () => !state.hasDeposit,
+        },
+      },
     };
 
     const v$ = useVuelidate(rules, state);
@@ -195,7 +251,9 @@ export default {
     async function toggleEdit() {
       if (state.isEditing) {
         v$.value.$touch();
+        console.log(v$)
         if (!v$.value.$error) {
+          console.log(state.formData)
           try {
             const response = await axios.put('https://localhost:44384/api/Reservation', state.formData, {
               headers: {
@@ -212,6 +270,10 @@ export default {
             if(foundDeposit !== undefined){
               state.selectedDepositType = foundDeposit.title
             }
+
+            const foundRoom = state.rooms.find(status => status.idRoom === state.formData.idRoom);
+            state.selectedRoom =  foundRoom.number + " - Capacity: " + foundRoom.capacity;
+            state.roomType = foundRoom.type;
           } catch (error) {
             console.log('Error:', error);
           }
@@ -286,20 +348,42 @@ export default {
 
         const nights = differenceInCalendarDays(new Date(state.formData.out), new Date(state.formData.in));
         state.roomPrice = foundRoom.price * nights;
+        state.hasDeposit = state.formData.idDepositType !== 0;
+        console.log(state.formData)
       } catch (error) {
         console.log(error);
       }
     }
+
+    async function confirmReservation() {
+      try {
+        const confirmResponse = await axios.put('https://localhost:44384/confirm/' + state.formData.idReservation,
+            {
+              headers: {
+                'Authorization': `Bearer ${store.getters.getToken}`
+              },
+            }
+        );
+
+        console.log('Confirmation Success:', confirmResponse.data);
+        await router.push('/arrivals');
+      } catch (error) {
+        console.error('Confirmation Error:', error);
+      }
+    }
+
 
     const removeService = (index) => {
       state.formData.services.splice(index, 1);
     };
 
     const addService = () => {
-      if (state.selectedService && !state.formData.services.includes(state.selectedService)) {
+      console.log(state.formData.services);
+      if (state.selectedService && !state.formData.services.some(service => service.idService === state.selectedService.idService)) {
         state.formData.services.push(state.selectedService);
       }
     };
+
 
     watch(() => state.formData.capacity, (newCapacity) => {
       const selectedRoom = state.rooms.find(room => room.idRoom === state.formData.idRoom);
@@ -328,7 +412,8 @@ export default {
       return filteredRooms.sort((a, b) => a.capacity - b.capacity);
     });
 
-    function deleteDeposit() {
+    function switchDeposit() {
+      state.hasDeposit = !state.hasDeposit;
       state.formData.depositSum = 0;
       state.formData.idDepositType = 0;
     }
@@ -352,6 +437,28 @@ export default {
       }
     });
 
+    const minOutDate = computed(() => {
+      if (state.formData.in) {
+        const inDate = new Date(state.formData.in);
+        inDate.setDate(inDate.getDate() + 1);
+        return inDate.toISOString().split('T')[0];
+      }
+      return '';
+    });
+
+
+    watch(() => state.formData.in, (newIn) => {
+      const newInDate = new Date(newIn);
+      const outDate = new Date(state.formData.out);
+
+      if (newInDate >= outDate) {
+        const newOutDate = new Date(newInDate);
+        newOutDate.setDate(newOutDate.getDate() + 1);
+        state.formData.out = newOutDate.toISOString().split('T')[0];
+      }
+      state.minOutDate = minOutDate.value;
+    });
+
 
     return {
       state,
@@ -361,7 +468,10 @@ export default {
       addService,
       toggleEdit,
       sortedFilteredRooms,
-      deleteDeposit
+      switchDeposit,
+      minOutDate,
+      confirmReservation,
+      v$
     }
   }
   ,
@@ -375,12 +485,6 @@ export default {
 </script>
 
 <style scoped>
-.newRoom-component {
-  display: flex;
-  flex-direction: column;
-  background-color: #F1DEC9;
-  height: 100vh;
-}
 
 .main {
   display: flex;
@@ -391,12 +495,6 @@ export default {
   margin: 5%;
 }
 
-.creating-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 30%;
-}
 
 form {
   min-width: 30%;

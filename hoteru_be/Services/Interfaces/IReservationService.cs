@@ -19,5 +19,6 @@ namespace hoteru_be.Services.Interfaces
         public Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO);
 
         public Task<MethodResultDTO> UpdateReservation(ArrivalDTO arrivalDTO);
+        public Task<MethodResultDTO> ConfirmReservation(int IdReservation);
     }
 }

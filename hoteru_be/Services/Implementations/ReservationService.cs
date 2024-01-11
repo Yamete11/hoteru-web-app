@@ -174,8 +174,8 @@ namespace hoteru_be.Services.Implementations
                 BookedBy = r.User.LoginName,
                 Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
                 Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname,
-                DepositSum = r.Deposit.Sum,
-                DepositType = r.Deposit.DepositType.Title,
+                DepositSum = r.IdDeposit.HasValue ? r.Deposit.Sum : 0,
+                DepositType = r.IdDeposit.HasValue ? r.Deposit.DepositType.Title : "",       
                 BillSum = r.Bill.Sum,
                 Created = r.Bill.Created.ToString("yyyy-MM-dd"),
                 Services = services
@@ -313,7 +313,7 @@ namespace hoteru_be.Services.Implementations
             var deposit = await _context.Deposits.SingleOrDefaultAsync(r => r.IdDeposit == reservation.IdDeposit);
 
 
-            if(deposit == null)
+            if(deposit == null && arrivalDTO.IdDepositType != 0)
             {
                 var depo = new Deposit
                 {
@@ -322,10 +322,12 @@ namespace hoteru_be.Services.Implementations
                 };
                 _context.Deposits.Add(depo);
                 reservation.Deposit = depo;
-            } else if(deposit != null && arrivalDTO.IdDepositType == 0)
+            } 
+            else if(deposit != null && arrivalDTO.IdDepositType == 0)
             {
                 _context.Deposits.Remove(deposit);
-            } else
+            } 
+            else if(deposit != null && arrivalDTO.IdDepositType != 0)
             {
                 deposit.IdDepositType = arrivalDTO.IdDepositType;
                 deposit.Sum = arrivalDTO.DepositSum;
@@ -371,6 +373,31 @@ namespace hoteru_be.Services.Implementations
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Updated"
+            };
+        }
+
+        public async Task<MethodResultDTO> ConfirmReservation(int IdReservation)
+        {
+            var reservation = await _context.Reservations.SingleOrDefaultAsync(r => r.IdReservation == IdReservation);
+            if(reservation.Confirmed == false)
+            {
+                reservation.Confirmed = true;
+
+            } else if(reservation.Confirmed == true)
+            {
+                var bill = new Bill
+                {
+                    Created = DateTime.Now,
+                    Sum = reservation.Price
+                };
+                reservation.Bill = bill;
+            }
+
+            await _context.SaveChangesAsync();
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = "Confirmed"
             };
         }
     }

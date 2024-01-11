@@ -22,7 +22,7 @@
                 type="date"
                 :min="today"
                 :max="maxInDate"
-                placeholder="Enter in"
+                @input="v$.formData.In.$touch()"
             >
           </div>
           <div class="input-form">
@@ -32,7 +32,7 @@
                 class="input"
                 type="date"
                 :min="today"
-                placeholder="Enter out"
+                @input="v$.formData.Out.$touch()"
             >
           </div>
         </div>
@@ -46,12 +46,13 @@
                   class="input"
                   type="number"
                   placeholder="Enter room capacity"
+                  @input="v$.formData.Capacity.$touch()"
               >
             </div>
             <div class="input-form">
               <label>Type: </label>
-              <select v-model="state.roomType">
-                <option disabled value="">Select type</option>
+              <select v-model="state.roomType" @change="v$.state.roomType.$touch()">
+                <option disabled value="0" selected>Select type</option>
                 <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
               </select>
             </div>
@@ -59,8 +60,8 @@
 
           <div class="input-form">
             <label>Room Selection: </label>
-            <select v-model="state.formData.IdRoom">
-              <option disabled value="">Select a room</option>
+            <select v-model="state.formData.IdRoom" @change="v$.formData.IdRoom.$touch()">
+              <option disabled value="0" selected>Select a room</option>
               <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
             </select>
             <label>Price: {{state.formData.Price}}</label>
@@ -71,9 +72,9 @@
           <label>Guest personal information</label>
           <div class="input-form">
             <label>Guest Selection: </label>
-            <select v-model="state.formData.idPerson">
-              <option disabled value="">Select a guest</option>
-              <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
+            <select v-model="state.formData.IdPerson" @change="v$.formData.IdPerson.$touch()">
+              <option disabled value="0">Select a guest</option>
+              <option v-for="guest in state.guests" :key="guest.IdPerson" :value="guest.IdPerson">
                 {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
               </option>
             </select>
@@ -83,7 +84,10 @@
 
         <div class="guest">
           <label>Deposit option</label>
-          <div class="input-form">
+          <div v-if="!state.hasDeposit">
+            <label>There is no deposit.</label>
+          </div>
+          <div v-else class="input-form">
             <label>Deposit sum: </label>
             <input
                 v-model="state.formData.Sum"
@@ -93,12 +97,13 @@
             >
             <label>Choose type: </label>
             <select v-model="state.formData.IdDepositType">
-              <option disabled value="">Select type</option>
+              <option disabled value="0">Select type</option>
               <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
                 {{ type.title }}
               </option>
             </select>
           </div>
+          <button @click.prevent="switchDeposit" class="form-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
         </div>
 
         <div class="guest">
@@ -106,7 +111,7 @@
           <div class="input-form">
             <label>Choose a service</label>
             <select v-model="state.selectedService" class="input">
-              <option disabled value="">Select service</option>
+              <option value="" disabled selected>Select a service</option>
               <option v-for="service in state.services" :key="service.idService" :value="service">
                 {{ service.title }}: {{ service.sum }}
               </option>
@@ -158,18 +163,18 @@ export default {
         Out: Date,
         Capacity: 0,
         Price: 0,
-        IdRoom: '',
+        IdRoom: 0,
         Confirmed: false,
         Sum: 0,
-        IdDepositType: '',
-        idPerson: '',
+        IdDepositType: 0,
+        IdPerson: 0,
         services: [],
         idUser: idUser
       },
-      selectedService: null,
+      selectedService: '',
       statusTitle: '',
       guestStatuses: [],
-      roomType: '',
+      roomType: 0,
       room: '',
       rooms: [],
       roomTypes: [],
@@ -179,21 +184,29 @@ export default {
       errors: {},
       guestSearchQuery: '',
       filteredGuests: [],
-      isGuestSelected: false
+      isGuestSelected: false,
+      hasDeposit: false
     });
 
 
     const rules = {
       formData: {
-        In: { required, maxLength: maxLength(20) },
-        Out: { required, numeric, maxValue: maxValue(10) },
-        Capacity: { required, numeric, maxValue: maxValue(1000000) },
-        Price: { required },
-        RoomNumber: { required },
-        BookedBy: {required},
-        Deposit: {required}
+        In: { required, minValue: val => new Date(val) >= new Date(today) },
+        Out: { required, minValue: val => new Date(val) > new Date(state.formData.In) },
+        Capacity: { required, numeric, minValue: value => value > 0, maxValue: value => value <= 40 },
+        IdRoom: { required },
+        IdPerson: { required },
+        IdDepositType: {
+          required: () => !state.hasDeposit
+        },
+        Sum: {
+          required: () => !state.hasDeposit,
+          numeric: () => !state.hasDeposit,
+        }
       }
     }
+
+    const v$ = useVuelidate(rules, state);
 
     async function fetchRooms() {
       try {
@@ -271,8 +284,6 @@ export default {
     });
 
 
-    const v$ = useVuelidate(rules, state);
-
     const minOutDate = ref('');
     watch(() => state.formData.In, (newValue) => {
       if (newValue) {
@@ -330,8 +341,27 @@ export default {
       state.formData.services.splice(index, 1);
     };
 
+    function switchDeposit() {
+      state.hasDeposit = !state.hasDeposit;
+      state.formData.Sum = 0;
+      state.formData.IdDepositType = 0;
+    }
 
-    return {state, v$, fetchRooms, filteredRooms, today, minOutDate, addReservation, calculatedPrice, maxInDate, addService, removeService }
+
+    return {
+      state,
+      v$,
+      fetchRooms,
+      filteredRooms,
+      today,
+      minOutDate,
+      addReservation,
+      calculatedPrice,
+      maxInDate,
+      addService,
+      removeService,
+      switchDeposit
+    }
   },
   mounted() {
     this.fetchRooms();
@@ -471,17 +501,17 @@ h1 {
   max-width: 110px;
 }
 
-.element{
+.element {
   display: flex;
-  justify-content: space-around;
-  width: 100%;
-  background-color:#C8B6A6;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #C8B6A6;
   border-radius: 5px;
   font-weight: bold;
   font-size: 15px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .service-list ul {
