@@ -229,7 +229,8 @@ export default {
 
     async function addCompany(){
       v$.value.$validate();
-      console.log("hello")
+      console.log(state.formData)
+      console.log(v$.value.$error)
       if (!v$.value.$error) {
         try {
           const response = await axios.post('https://localhost:44384/api/Hotel', state.formData, {

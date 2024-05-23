@@ -85,7 +85,8 @@ namespace hoteru_be.Services.Implementations
             {
                 LoginName = hotelDTO.LoginName,
                 Password = hotelDTO.Password,
-                Person = person
+                Person = person,
+                IdUserType = 1,
             };
 
             _context.Hotels.Add(hotel);

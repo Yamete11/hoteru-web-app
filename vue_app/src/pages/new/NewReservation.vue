@@ -20,7 +20,7 @@
                 v-model="state.formData.In"
                 class="input"
                 type="date"
-                :min="today"
+                :min="todayString"
                 :max="maxInDate"
                 @input="v$.formData.In.$touch()"
             >
@@ -31,7 +31,7 @@
                 v-model="state.formData.Out"
                 class="input"
                 type="date"
-                :min="today"
+                :min="tomorrowString"
                 @input="v$.formData.Out.$touch()"
             >
           </div>
@@ -154,12 +154,17 @@ export default {
   setup(){
     const store = useStore();
     const router = useRouter();
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowString = tomorrow.toISOString().split('T')[0];
+
     const idUser = store.getters.getUserData.idUser;
 
     const state = reactive({
       formData: {
-        In: today,
+        In: todayString,
         Out: Date,
         Capacity: 0,
         Price: 0,
@@ -204,7 +209,8 @@ export default {
           numeric: () => !state.hasDeposit,
         }
       }
-    }
+    };
+
 
     const v$ = useVuelidate(rules, state);
 
@@ -296,6 +302,7 @@ export default {
     });
 
 
+
     watch(() => state.guestSearchQuery, (newValue) => {
       if (!newValue) {
         state.isGuestSelected = false;
@@ -353,7 +360,8 @@ export default {
       v$,
       fetchRooms,
       filteredRooms,
-      today,
+      todayString,
+      tomorrowString,
       minOutDate,
       addReservation,
       calculatedPrice,

@@ -416,6 +416,13 @@ export default {
       state.hasDeposit = !state.hasDeposit;
       state.formData.depositSum = 0;
       state.formData.idDepositType = 0;
+
+      if (state.errors.depositSum) {
+        delete state.errors.depositSum;
+      }
+      if (state.errors.idDepositType) {
+        delete state.errors.idDepositType;
+      }
     }
 
     function isoToLocalDate(isoStr) {
