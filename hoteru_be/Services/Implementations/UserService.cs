@@ -147,15 +147,16 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<MethodResultDTO> UpdateUser(NewUserDTO newUserDTO)
+        public async Task<MethodResultDTO> UpdateUser(UpdateUserDTO updateUserDTO)
         {
             var user = await _context.Users
-                              .Include(r => r.UserType)
-                              .FirstOrDefaultAsync(r => r.IdPerson == newUserDTO.IdPerson);
+                                .Include(r => r.UserType)
+                                .FirstOrDefaultAsync(r => r.IdPerson == updateUserDTO.IdPerson);
 
-            var person = await _context.Persons.FirstOrDefaultAsync(r => r.IdPerson == newUserDTO.IdPerson);
+            var person = await _context.Persons
+                                .FirstOrDefaultAsync(r => r.IdPerson == updateUserDTO.IdPerson);
 
-            if (user == null)
+            if (user == null || person == null)
             {
                 return new MethodResultDTO
                 {
@@ -165,7 +166,7 @@ namespace hoteru_be.Services.Implementations
             }
 
             var existingUser = await _context.Users
-                .AnyAsync(r => r.LoginName == newUserDTO.LoginName && r.IdPerson != newUserDTO.IdPerson);
+                .AnyAsync(r => r.LoginName == updateUserDTO.LoginName && r.IdPerson != updateUserDTO.IdPerson);
 
             if (existingUser)
             {
@@ -174,24 +175,26 @@ namespace hoteru_be.Services.Implementations
                     HttpStatusCode = HttpStatusCode.BadRequest,
                     Message = "Validation failed",
                     Errors = new Dictionary<string, List<string>>
-                    {
-                        { "LoginName", new List<string> { "Another guest with this Login already exists." } }
-                    }
+            {
+                { "LoginName", new List<string> { "Another guest with this Login already exists." } }
+            }
                 };
             }
 
-            user.LoginName = newUserDTO.LoginName;
-            user.IdUserType = newUserDTO.IdUserType;
-            person.Name = newUserDTO.Name;
-            person.Surname = newUserDTO.Surname;
-            person.Email = newUserDTO.Email;
+            user.LoginName = updateUserDTO.LoginName;
+            user.IdUserType = updateUserDTO.IdUserType;
+            person.Name = updateUserDTO.Name;
+            person.Surname = updateUserDTO.Surname;
+            person.Email = updateUserDTO.Email;
 
             await _context.SaveChangesAsync();
+
             return new MethodResultDTO
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Updated"
             };
         }
+
     }
 }

@@ -34,6 +34,15 @@ namespace hoteru_be.Services.Implementations
                 };
             };
 
+            if(room.IdRoomStatus == 2)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotAcceptable,
+                    Message = "You cannot delete an occupied room"
+                };
+            }
+
             _context.Rooms.Remove(room);
 
             await _context.SaveChangesAsync();

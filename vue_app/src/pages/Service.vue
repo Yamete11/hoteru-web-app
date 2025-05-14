@@ -5,7 +5,7 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search service by title ..." />
+          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search service by its title ..." />
           <router-link to="/new-service" class="new-service-button">New Service</router-link>
         </div>
         <div class="main-bot">
@@ -131,7 +131,7 @@ export default {
 }
 
 .search-input {
-  width: 10%;
+  width: 12%;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;

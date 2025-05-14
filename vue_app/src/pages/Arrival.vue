@@ -45,7 +45,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$store.getters.getUserData.idUser);
+    console.log("Id User: " + this.$store.getters.getUserData.idUser);
     this.fetchReservations();
   }
   ,

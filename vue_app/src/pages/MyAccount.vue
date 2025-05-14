@@ -91,117 +91,9 @@
       </div>
     </form>
 
-    <div class="newUser-section">
-    <form @submit.prevent="addUser" class="creating-form">
-      <h1>Add new user</h1>
-      <div class="input-form">
-        <label>Name: </label>
-        <input v-model="state.newUser.name"
-               class="input"
-               type="text"
-               placeholder="Enter name"
-               @input="v$.newUser.name.$touch()"
-        >
-        <span class="error-message" v-if="v$.newUser.name.$error">
-            <span v-if="!v$.newUser.name.required.$response">Name is required*</span>
-            <span v-else-if="!v$.newUser.name.maxLength.$response">Name must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.name.onlyLetters.$response">Name must contain only letters*</span>
-          </span>
-        <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
-      </div>
 
-      <div class="input-form">
-        <label>Surname: </label>
-        <input v-model="state.newUser.surname"
-               class="input"
-               type="text"
-               placeholder="Enter surname"
-               @input="v$.newUser.surname.$touch()"
-        >
-        <span class="error-message" v-if="v$.newUser.surname.$error">
-            <span v-if="!v$.newUser.surname.required.$response">Surname is required*</span>
-            <span v-else-if="!v$.newUser.surname.maxLength.$response">Surname must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.surname.onlyLetters.$response">Name must contain only letters*</span>
-          </span>
-        <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
-      </div>
 
-      <div class="input-form">
-        <label>Email: </label>
-        <input v-model="state.newUser.email"
-               class="input"
-               type="text"
-               placeholder="Enter email"
-               @input="v$.newUser.email.$touch()"
-        >
-        <span class="error-message" v-if="v$.newUser.email.$error">
-            <span v-if="!v$.newUser.email.required.$response">Email is required*</span>
-            <span v-if="!v$.newUser.email.email.$response">Invalid email format*</span>
-          </span>
-        <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email[0] }}</span>
-      </div>
-
-      <div class="input-form">
-        <label>Login: </label>
-        <input v-model="state.newUser.loginName"
-               class="input"
-               type="text"
-               placeholder="Enter login"
-               @input="v$.newUser.loginName.$touch()"
-        >
-        <span class="error-message" v-if="v$.newUser.loginName.$error">
-            <span v-if="!v$.newUser.loginName.required.$response">Login is required*</span>
-            <span v-else-if="!v$.newUser.loginName.maxLength.$response">Login must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.loginName.onlyLetters.$response">Login must contain only letters*</span>
-          </span>
-        <span class="error-message" v-if="state.errors.Login">{{ state.errors.Login[0] }}</span>
-      </div>
-
-      <div class="input-form">
-        <label>Password: </label>
-        <input v-model="state.newUser.password"
-               class="input"
-               type="password"
-               placeholder="Enter password"
-               @input="v$.newUser.password.$touch()"
-        >
-        <span class="error-message" v-if="v$.newUser.password.$error">
-          <span v-if="!v$.newUser.password.required.$response">Password is required*</span>
-        </span>
-        <span class="error-message" v-if="state.errors.Password">{{ state.errors.Password[0] }}</span>
-      </div>
-
-      <div class="input-form">
-        <label>Type: </label>
-        <select v-model="state.newUser.idUserType" class="input"  @change="v$.newUser.idUserType.$touch()">
-          <option disabled value="">Select type</option>
-          <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
-        </select>
-        <span class="error-message" v-if="v$.newUser.idUserType.$error">
-            <span v-if="!v$.newUser.idUserType.required.$response">Type is required*</span>
-          </span>
-        <span class="error-message" v-if="state.errors.idUserType">{{ state.errors.idUserType[0] }}</span>
-      </div>
-
-      <div class="registration-class">
-        <button type="button" class="registration-btn" @click="clearNewUserForm">Clean</button>
-        <button type="submit" class="registration-btn">Add User</button>
-      </div>
-    </form>
-
-    <div class="user-list">
-      <label class="service-label">Services: </label>
-      <div class="service-list">
-        <ul class="added-services-list">
-          <li class="element" v-for="user in state.users" :key="user.idPerson">
-            <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
-            <button class="btn" @click.prevent="removeUser(idPerson)">Remove</button>
-          </li>
-        </ul>
-      </div>
     </div>
-    </div>
-  </div>
   </div>
 </template>
 
@@ -229,14 +121,6 @@ export default {
         loginName: '',
         idUserType: ''
       },
-      newUser:{
-        name: '',
-        surname: '',
-        email: '',
-        loginName: '',
-        password: '',
-        idUserType: ''
-      },
       newUserTypeTitle: '',
       userTypes: [],
       typeTitle: '',
@@ -255,14 +139,6 @@ export default {
         email: { required, email },
         loginName: { required, maxLength: maxLength(15), onlyLetters },
         idUserType: { required }
-      },
-      newUser: {
-        name: { required, maxLength: maxLength(20), onlyLetters },
-        surname: { required, maxLength: maxLength(20), onlyLetters },
-        email: { required, email },
-        loginName: { required, maxLength: maxLength(15), onlyLetters },
-        password: { required },
-        idUserType: { required }
       }
     }
 
@@ -272,7 +148,8 @@ export default {
 
     async function toggleEdit() {
       if (state.isEditing) {
-        v$.value.name.$touch();
+        v$.value.$touch();
+        console.log(state.formData)
         if (!v$.value.$error) {
           try {
             const response = await axios.put('https://localhost:44384/api/User', state.formData, {
@@ -330,61 +207,10 @@ export default {
       }
     }
 
-    async function fetchUsers() {
-      try {
-        const response = await axios.get('https://localhost:44384/api/User');
-        state.users = response.data;
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    }
-
-
-    async function addUser(){
-      console.log(state.newUser)
-      v$.value.$touch();
-      if (!v$.value.$error) {
-        try {
-          const response = await axios.post('https://localhost:44384/api/User', state.newUser, {
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
-          console.log('Response:', response.data);
-          if (response.data && response.data.httpStatusCode === 200) {
-            await router.push('/arrivals');
-          }
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
-        }
-      }
-    }
-
-    const removeUser = (index) => {
-      state.users.splice(index, 1);
-    };
-
-    function clearNewUserForm() {
-      state.newUser = {
-        name: '',
-        surname: '',
-        email: '',
-        loginName: '',
-        password: '',
-        idUserType: ''
-      };
-      v$.value.newUser.$reset();
-    }
-
-
-    return {state, toggleEdit, fetchUser, addUser, v$, clearNewUserForm, fetchUsers, removeUser}
+    return {state, toggleEdit, fetchUser, v$}
   },
   mounted(){
     this.fetchUser(this.$store.getters.getUserData.idUser);
-    this.fetchUsers();
   }
 }
 </script>

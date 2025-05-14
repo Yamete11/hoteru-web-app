@@ -182,19 +182,30 @@ namespace hoteru_be.Services.Implementations
             }).ToListAsync();
         }
 
-        public async Task<MethodResultDTO> DeleteSpecificReservation(int IdReservation)
+        public async Task<MethodResultDTO> DeleteSpecificReservation(int idReservation)
         {
-            Reservation reservation = _context.Reservations.SingleOrDefault(x => x.IdReservation == IdReservation);
+            var reservation = await _context.Reservations
+                .SingleOrDefaultAsync(x => x.IdReservation == idReservation);
 
             if (reservation == null)
             {
                 return new MethodResultDTO
                 {
                     HttpStatusCode = HttpStatusCode.NotFound,
-                    Message = "Not Found"
+                    Message = "Reservation not found"
                 };
-            };
+            }
 
+            var guestReservations = await _context.GuestReservations
+                .Where(x => x.IdReservation == idReservation)
+                .ToListAsync();
+
+            var reservationServices = await _context.ReservationServices
+                .Where(x => x.IdReservation == idReservation)
+                .ToListAsync();
+
+            _context.GuestReservations.RemoveRange(guestReservations);
+            _context.ReservationServices.RemoveRange(reservationServices);
             _context.Reservations.Remove(reservation);
 
             await _context.SaveChangesAsync();
@@ -202,22 +213,44 @@ namespace hoteru_be.Services.Implementations
             return new MethodResultDTO
             {
                 HttpStatusCode = HttpStatusCode.OK,
-                Message = "Deleted"
+                Message = "Reservation deleted successfully"
             };
         }
 
+
         public async Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO)
         {
-            Deposit deposit = new Deposit
-            {
-                Sum = reservationDTO.Sum,
-                IdDepositType = reservationDTO.IdDepositType
-            };
-            _context.Deposits.Add(deposit);
-
-
             var room = await _context.Rooms.SingleOrDefaultAsync(x => x.IdRoom == reservationDTO.IdRoom);
-            Reservation reservation = new Reservation
+            if (room == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Room not found"
+                };
+            } else if(room.IdRoomStatus != 3)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Room is occupied"
+                };
+            }
+
+            Deposit deposit = null;
+
+
+            if (reservationDTO.IdDepositType != 0)
+            {
+                deposit = new Deposit
+                {
+                    Sum = reservationDTO.Sum,
+                    IdDepositType = reservationDTO.IdDepositType
+                };
+                _context.Deposits.Add(deposit);
+            }
+
+            var reservation = new Reservation
             {
                 Capacity = reservationDTO.Capacity,
                 Price = reservationDTO.Price,
@@ -227,29 +260,35 @@ namespace hoteru_be.Services.Implementations
                 IdRoom = room.IdRoom,
                 IdUser = reservationDTO.IdUser,
                 Deposit = deposit
-                
             };
 
             _context.Reservations.Add(reservation);
 
-    
 
             var guest = await _context.Guests.SingleOrDefaultAsync(x => x.IdPerson == reservationDTO.IdPerson);
-            GuestReservation guestReservation = new GuestReservation
+            if (guest == null)
             {
-                 Reservation = reservation,
-                 Guest = guest
-            };
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Guest not found"
+                };
+            }
 
+            var guestReservation = new GuestReservation
+            {
+                Reservation = reservation,
+                Guest = guest
+            };
             _context.GuestReservations.Add(guestReservation);
 
 
-            if (reservationDTO.Services.Count > 0)
+            foreach (var serviceDTO in reservationDTO.Services)
             {
-                for (int i = 0; i < reservationDTO.Services.Count; i++)
+                var service = await _context.Services.SingleOrDefaultAsync(x => x.IdService == serviceDTO.IdService);
+                if (service != null)
                 {
-                    var service = await _context.Services.SingleOrDefaultAsync(x => x.IdService == reservationDTO.Services[i].IdService);
-                    Entities.ReservationService reservationService = new Entities.ReservationService
+                    var reservationService = new Entities.ReservationService
                     {
                         Reservation = reservation,
                         Service = service
@@ -257,9 +296,7 @@ namespace hoteru_be.Services.Implementations
                     _context.ReservationServices.Add(reservationService);
                 }
             }
-
-
-
+            room.IdRoomStatus = 2;
             await _context.SaveChangesAsync();
 
             return new MethodResultDTO
@@ -268,6 +305,7 @@ namespace hoteru_be.Services.Implementations
                 Message = "Created"
             };
         }
+
 
         public async Task<ArrivalDTO> GetSpecificArrival(int IdArrival)
         {
@@ -379,9 +417,13 @@ namespace hoteru_be.Services.Implementations
         public async Task<MethodResultDTO> ConfirmReservation(int IdReservation)
         {
             var reservation = await _context.Reservations.SingleOrDefaultAsync(r => r.IdReservation == IdReservation);
+
+            var room = await _context.Rooms.SingleOrDefaultAsync(r => r.IdRoom == reservation.IdRoom);
+
             if(reservation.Confirmed == false)
             {
                 reservation.Confirmed = true;
+                room.IdRoomStatus = 2;
 
             } else if(reservation.Confirmed == true)
             {
@@ -391,6 +433,7 @@ namespace hoteru_be.Services.Implementations
                     Sum = reservation.Price
                 };
                 reservation.Bill = bill;
+                room.IdRoomStatus = 1;
             }
 
             await _context.SaveChangesAsync();

@@ -72,10 +72,10 @@
           <label>Guest personal information</label>
           <div class="input-form">
             <label>Guest Selection: </label>
-            <select v-model="state.formData.IdPerson" @change="v$.formData.IdPerson.$touch()">
+            <select v-model="state.formData.idPerson" @change="v$.formData.idPerson.$touch()">
               <option disabled value="0">Select a guest</option>
-              <option v-for="guest in state.guests" :key="guest.IdPerson" :value="guest.IdPerson">
-                {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
+              <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
+               {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
               </option>
             </select>
             <router-link class="form-btn" to="/new-guest">Add new guest</router-link>
@@ -84,16 +84,12 @@
 
         <div class="guest">
           <label>Deposit option</label>
-          <div v-if="!state.hasDeposit">
-            <label>There is no deposit.</label>
-          </div>
-          <div v-else class="input-form">
+          <div class="input-form">
             <label>Deposit sum: </label>
             <input
                 v-model="state.formData.Sum"
                 class="input"
                 type="number"
-                placeholder="Enter room capacity"
             >
             <label>Choose type: </label>
             <select v-model="state.formData.IdDepositType">
@@ -128,11 +124,8 @@
           </div>
         </div>
 
-
-
-
         <div class="registration-class">
-          <router-link class="registration-btn" to="/rooms">Cancel</router-link>
+          <router-link class="registration-btn" to="/arrivals">Cancel</router-link>
           <button class="registration-btn" type="submit">Confirm</button>
         </div>
       </form>
@@ -165,14 +158,14 @@ export default {
     const state = reactive({
       formData: {
         In: todayString,
-        Out: Date,
+        Out: tomorrowString,
         Capacity: 0,
         Price: 0,
         IdRoom: 0,
         Confirmed: false,
         Sum: 0,
         IdDepositType: 0,
-        IdPerson: 0,
+        idPerson: 0,
         services: [],
         idUser: idUser
       },
@@ -355,6 +348,7 @@ export default {
     }
 
 
+
     return {
       state,
       v$,
@@ -506,7 +500,7 @@ h1 {
   font-weight: bold;
   color: white;
   cursor: pointer;
-  max-width: 110px;
+  max-width: 120px;
 }
 
 .element {

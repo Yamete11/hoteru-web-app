@@ -7,16 +7,28 @@
     <div class="navbar-links">
       <router-link class="navbar-btn" to="/new-reservation">New Reservation</router-link>
       <div class="right-links">
-        <router-link class="navbar-btn" to="/settings">Settings</router-link>
+        <div class="dropdown-wrapper" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
+          <button class="navbar-btn">Settings</button>
+          <div class="dropdown-content" v-show="showDropdown">
+            <router-link to="/my-account">My Account</router-link>
+            <router-link to="/employees">List of Employees</router-link>
+          </div>
+        </div>
         <button class="navbar-btn" @click="logout">Log out</button>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
 export default {
   name: "Navbar",
+  data() {
+    return {
+      showDropdown: false
+    };
+  },
   methods: {
     logout() {
       localStorage.removeItem('token');
@@ -26,13 +38,15 @@ export default {
       this.$router.push('/arrivals');
     }
   },
-  computed:{
-    companyName(){
-      return this.$store.getters.getUserData.companyTitle || 'No Company';
+  computed: {
+    companyName() {
+      const user = this.$store.getters.getUserData;
+      return user?.companyTitle || 'No Company';
     }
   }
 }
 </script>
+
 
 <style scoped>
 .navbar{
@@ -84,5 +98,43 @@ export default {
 .navbar h1 {
   cursor: pointer;
 }
+
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #715d47;
+  border: 1px solid white;
+  border-radius: 5px;
+  min-width: 160px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-content a {
+  color: white;
+  padding: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  border-bottom: 1px solid white;
+}
+
+.dropdown-content a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-content a:hover {
+  background-color: #8d745b;
+}
+
+
 
 </style>

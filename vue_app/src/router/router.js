@@ -14,10 +14,10 @@ import ServiceDetails from "../pages/details/ServiceDetails.vue";
 import GuestDetails from "../pages/details/GuestDetails.vue";
 import NewGuest from "../pages/new/NewGuest.vue";
 import HistoryDetails from "../pages/details/HistoryDetails.vue";
-import ReservationDetails from "../pages/details/ReservationDetails.vue";
+import ListOfEmployees from "../pages/ListOfEmployees.vue";
 import ArrivalDetails from "../pages/details/ArrivalDetails.vue";
 import NewReservation from "../pages/new/NewReservation.vue";
-import Settings from "../pages/Settings.vue";
+import MyAccount from "../pages/MyAccount.vue";
 
 
 const routes = [
@@ -108,8 +108,12 @@ const routes = [
         component: History
     },
     {
-        path: '/settings',
-        component: Settings
+        path: '/my-account',
+        component: MyAccount
+    },
+    {
+        path: '/employees',
+        component: ListOfEmployees
     }
 ]
 
@@ -120,4 +124,15 @@ const router = createRouter({
     history: createWebHistory("/")
 })
 
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = !!localStorage.getItem('token');
+
+    if ((to.path === '/' || to.path === '/registration') && isAuthenticated) {
+        next('/arrivals');
+    } else {
+        next();
+    }
+});
+
 export default router;
+

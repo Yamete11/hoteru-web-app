@@ -7,7 +7,7 @@
 
         <div class="main-top">
           <div class="left">
-            <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by number ..."/>
+            <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by its number ..."/>
           </div>
           <div class="right">
             <router-link to="/new-room" class="new-room-button">New Room</router-link>
@@ -146,7 +146,7 @@ export default {
 }
 
 .search-input {
-  width: 10%;
+  width: 13%;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;

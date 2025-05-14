@@ -26,20 +26,15 @@ export default createStore({
         },
     },
     actions: {
-        login({ commit }, token) {
-            commit('setToken', token);
-            localStorage.setItem('token', token);
-        },
-        logout({ commit }) {
-            commit('clearToken');
-            localStorage.removeItem('token');
-        },
         initializeStore({ commit }) {
             const token = localStorage.getItem('token');
             if (token) {
                 commit('setToken', token);
-            } else {
-                commit('clearToken');
+            }
+
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData) {
+                commit('setUserData', userData);
             }
         },
         async fetchUserData({ commit, getters }, userName) {
@@ -49,11 +44,16 @@ export default createStore({
                         'Authorization': `Bearer ${getters.getToken}`
                     },
                 });
-                commit('setUserData', response.data);
+                const userData = response.data;
+                commit('setUserData', userData);
+
+                localStorage.setItem('userData', JSON.stringify(userData));
             } catch (error) {
                 console.error(error);
                 commit('clearUserData');
+                localStorage.removeItem('userData');
             }
         }
     }
+
 });

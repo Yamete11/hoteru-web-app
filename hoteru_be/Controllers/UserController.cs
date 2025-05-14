@@ -44,9 +44,9 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateUser([FromBody] NewUserDTO newUserDTO)
+        public async Task<MethodResultDTO> UpdateUser([FromBody] UpdateUserDTO updateUserDTO)
         {
-            return await _service.UpdateUser(newUserDTO);
+            return await _service.UpdateUser(updateUserDTO);
         }
 
         [HttpDelete("{IdPerson}")]

@@ -6,22 +6,22 @@
 
 <script>
 export default {
-  components:{
-
-  },
-  name: "App"
+  components: {},
+  name: "App",
+  created() {
+    this.$store.dispatch('initializeStore');
+  }
 }
 </script>
 
 <style>
-
-body, html{
+body, html {
   background-color: #F1DEC9;
   margin: 0;
   padding: 0;
   height: 100%;
 }
-h1{
+h1 {
   color: #FFFFFF;
 }
 </style>

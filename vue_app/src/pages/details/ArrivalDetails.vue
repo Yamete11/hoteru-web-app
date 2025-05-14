@@ -176,7 +176,8 @@
 
       <div class="registration-class">
         <router-link class="registration-btn" to="/arrivals">Cancel</router-link>
-        <button v-if="!state.isEditing" class="registration-btn" type="button" @click="confirmReservation">Confirm</button>
+        <button v-if="!state.isEditing && state.formData.confirmed" class="registration-btn" type="button" @click="confirmReservation">Close</button>
+        <button v-else-if="!state.isEditing && !state.formData.confirmed" class="registration-btn" type="button" @click="confirmReservation">Confirm</button>
         <button class="registration-btn" type="button" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
       </div>
     </form>
@@ -284,7 +285,6 @@ export default {
     }
 
     async function fetchReservation(idReservation){
-      console.log(idReservation)
       try{
         const responseReservation = await axios.get('https://localhost:44384/api/Reservation/arrival/' + idReservation,{
           headers: {
@@ -296,6 +296,7 @@ export default {
         state.formData.services = state.formData.services || [];
         state.formData.in = isoToLocalDate(state.formData.in);
         state.formData.out = isoToLocalDate(state.formData.out);
+        console.log("Confirmed " + state.formData.confirmed)
 
 
         const responseRooms = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.formData.idRoom,{

@@ -12,7 +12,7 @@ namespace hoteru_be.Services.Interfaces
 
         public Task<MethodResultDTO> PostUser(NewUserDTO newUserDTO);
 
-        public Task<MethodResultDTO> UpdateUser(NewUserDTO newUserDTO);
+        public Task<MethodResultDTO> UpdateUser(UpdateUserDTO updateUserDTO);
 
         public Task<MethodResultDTO> DeleteUser(int IdPerson);
     }

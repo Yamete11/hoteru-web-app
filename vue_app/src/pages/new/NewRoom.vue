@@ -65,7 +65,7 @@
           <label>Type: </label>
           <select v-model="state.formData.Type" @change="v$.formData.Type.$touch()">
             <option disabled value="">Select type</option>
-            <option v-for="roomType in state.roomTypes" :key="roomType.idRoomType" :value="String(roomType.idRoomType)">{{ roomType.title }}</option>
+            <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.Type.$error">
             <span v-if="!v$.formData.Type.required.$response">Type is required*</span>
@@ -78,7 +78,7 @@
           <label>Status: </label>
           <select v-model="state.formData.Status" @change="v$.formData.Status.$touch()">
             <option disabled value="">Select status</option>
-            <option v-for="roomStatus in state.roomStatuses" :key="roomStatus.idRoomStatus" :value="String(roomStatus.idRoomStatus)">{{ roomStatus.title }}</option>
+            <option v-for="roomStatus in state.roomStatuses" :key="roomStatus.idStatus" :value="String(roomStatus.idStatus)">{{ roomStatus.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.Status.$error">
             <span v-if="!v$.formData.Status.required.$response">Status is required*</span>
@@ -155,6 +155,7 @@ export default {
 
     async function addRoom() {
       v$.value.$touch();
+      console.log(state.formData)
       if (!v$.value.$error) {
         try {
           const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
@@ -178,7 +179,7 @@ export default {
       }
     }
 
-    return { state, v$, addRoom, fetchRoomTypes };
+    return { state, v$, addRoom, fetchRoomTypes};
   },
   mounted() {
     this.fetchRoomTypes();
