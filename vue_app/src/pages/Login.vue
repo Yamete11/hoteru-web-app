@@ -1,26 +1,29 @@
 <template>
-  <div class="main-login">
+  <div class="main-login" data-testid="main-login">
     <div class="registration">
-      <router-link class="registration-btn" to="/registration">New Company</router-link>
+      <router-link class="registration-btn" to="/registration" data-testid="new-company-link">New Company</router-link>
     </div>
     <div class="login">
-      <h1>HOTERU ホテル</h1>
-      <form @submit.prevent="loginIn" class="login-form">
+      <h1 data-testid="login-title">HOTERU ホテル</h1>
+      <form @submit.prevent="loginIn" class="login-form" data-testid="login-form">
         <my-input
             class="login-input"
             v-model="login"
             type="text"
             placeholder="login"
+            data-testid="login-input"
         />
         <my-input
             class="login-input"
             v-model="password"
             type="password"
             placeholder="password"
+            data-testid="password-input"
         />
-        <p class="error-message" v-if="errors.validation">{{ errors.validation }}</p>
-        <button class="login-btn" type="submit">LOG IN</button>
-
+        <p class="error-message" v-if="errors.validation" data-testid="error-message">
+          {{ errors.validation }}
+        </p>
+        <button class="login-btn" type="submit" data-testid="login-button">LOG IN</button>
       </form>
     </div>
   </div>
@@ -142,4 +145,3 @@ export default {
   margin: 10px 0;
 }
 </style>
-

@@ -1,8 +1,8 @@
 <template>
   <div class="item-div">
-    <span class="item title">{{ service.title }}</span>
-    <span class="item sum">{{ service.sum }}</span>
-    <span class="item description">{{ service.description }}</span>
+    <span class="item title" data-testid="service-item-title">{{ service.title }}</span>
+    <span class="item sum" data-testid="service-item-price">{{ service.sum }}</span>
+    <span class="item description" data-testid="service-item-description">{{ service.description }}</span>
     <div class="item-btns">
       <button class="btn" type="button" @click="viewServiceDetails(service.idService)">
         Details

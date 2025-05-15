@@ -9,6 +9,7 @@
         <div class="input-form">
           <label>Title*: </label>
           <input
+              data-testid="service-title"
               v-model="state.formData.Title"
               class="input"
               type="text"
@@ -26,6 +27,7 @@
         <div class="input-form">
           <label>Price*: </label>
           <input
+              data-testid="service-price"
               v-model.number="state.formData.Sum"
               class="input"
               type="text"
@@ -46,6 +48,7 @@
         <div class="input-form">
           <label>Description: </label>
           <input
+              data-testid="service-description"
               v-model="state.formData.Description"
               class="input"
               type="text"
@@ -59,7 +62,7 @@
 
         <div class="registration-class">
           <router-link class="registration-btn" to="/services">Cancel</router-link>
-          <button class="registration-btn" type="submit">Confirm</button>
+          <button class="registration-btn" type="submit" data-testid="service-confirm-button">Confirm</button>
         </div>
       </form>
     </div>

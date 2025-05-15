@@ -1,11 +1,13 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar" data-testid="sidebar">
     <sidebar-button
         v-for="(button, index) in buttons"
         :key="index"
         :class="{ active: activeButton === button.path }"
         @click="setActive(button.path)"
-        :path="button.path">
+        :path="button.path"
+        :data-testid="`sidebar-button-${button.name.toLowerCase()}`"
+    >
       {{ button.name }}
     </sidebar-button>
   </div>

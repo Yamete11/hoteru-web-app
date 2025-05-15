@@ -5,15 +5,16 @@
       <div class="input-form">
         <label>First name: </label>
         <input
+            data-testid="registration-first-name"
             v-model="state.formData.Name"
             class="input"
             type="text"
-            placeholder="Enter your First name"
+            placeholder="Enter your first name"
             @input="v$.formData.Name.$touch()"
         >
-        <span v-if="v$.formData.Name.$error" class="error-message">
+        <span v-if="v$.formData.Name.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Name.required.$response">This field is required</span>
-          <span v-else-if="!v$.formData.Name.maxLength.$response">Name must be less than 50 characters</span>
+          <span v-else-if="!v$.formData.Name.maxLength.$response">Name must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Name.onlyLetters.$response">Name must contain only letters</span>
         </span>
         <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
@@ -21,13 +22,14 @@
       <div class="input-form">
         <label>Last name: </label>
         <input
+            data-testid="registration-last-name"
             v-model="state.formData.Surname"
             class="input"
             type="text"
             placeholder="Enter your last name"
             @input="v$.formData.Surname.$touch()"
         >
-        <span v-if="v$.formData.Surname.$error" class="error-message">
+        <span v-if="v$.formData.Surname.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Surname.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Surname.maxLength.$response">Name must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Surname.onlyLetters.$response">Name must contain only letters</span>
@@ -38,12 +40,13 @@
       <div class="input-form">
         <label>Email: </label>
         <input
+            data-testid="registration-email"
             v-model="state.formData.Email"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.Email.$error" class="error-message">
+        <span v-if="v$.formData.Email.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Email.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Email.email.$response">Email is not properly written</span>
         </span>
@@ -53,12 +56,13 @@
       <div class="input-form">
         <label>Login: </label>
         <input
+            data-testid="registration-login"
             v-model="state.formData.LoginName"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.LoginName.$error" class="error-message">
+        <span v-if="v$.formData.LoginName.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.LoginName.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.LoginName.maxLength.$response">Name must be less than 20 characters</span>
           <span v-else-if="!v$.formData.LoginName.onlyLetters.$response">Name must contain only letters</span>
@@ -70,12 +74,13 @@
       <div class="input-form">
         <label>Password: </label>
         <input
+            data-testid="registration-password"
             v-model="state.formData.Password"
             class="input"
             type="password"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.Password.$error" class="error-message">
+        <span v-if="v$.formData.Password.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Password.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Password.maxLength.$response">Name must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Password.onlyLetters.$response">Name must contain only letters</span>
@@ -87,12 +92,13 @@
       <div class="input-form">
         <label>Company name: </label>
         <input
+            data-testid="registration-company-name"
             v-model="state.formData.Title"
             class="input"
             type="text"
-            placeholder="Enter your last name"
+            placeholder="Enter your company name"
         >
-        <span v-if="v$.formData.Title.$error" class="error-message">
+        <span v-if="v$.formData.Title.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Title.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Title.maxLength.$response">Title must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Title.onlyLetters.$response">Title must contain only letters</span>
@@ -104,12 +110,13 @@
       <div class="input-form">
         <label>Country: </label>
         <input
+            data-testid="registration-country"
             v-model="state.formData.Country"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.Country.$error" class="error-message">
+        <span v-if="v$.formData.Country.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Country.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Country.maxLength.$response">Title must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Country.onlyLetters.$response">Title must contain only letters</span>
@@ -121,12 +128,13 @@
       <div class="input-form">
         <label>City: </label>
         <input
+            data-testid="registration-city"
             v-model="state.formData.City"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.City.$error" class="error-message">
+        <span v-if="v$.formData.City.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.City.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.City.maxLength.$response">Title must be less than 20 characters</span>
           <span v-else-if="!v$.formData.City.onlyLetters.$response">Title must contain only letters</span>
@@ -138,12 +146,13 @@
       <div class="input-form">
         <label>Street: </label>
         <input
+            data-testid="registration-street"
             v-model="state.formData.Street"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.Street.$error" class="error-message">
+        <span v-if="v$.formData.Street.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Street.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Street.maxLength.$response">Title must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Street.onlyLetters.$response">Title must contain only letters</span>
@@ -155,12 +164,13 @@
       <div class="input-form">
         <label>Postcode: </label>
         <input
+            data-testid="registration-postcode"
             v-model="state.formData.Postcode"
             class="input"
             type="text"
             placeholder="Enter your last name"
         >
-        <span v-if="v$.formData.Postcode.$error" class="error-message">
+        <span v-if="v$.formData.Postcode.$error" class="error-message" data-testid="error-message">
           <span v-if="!v$.formData.Postcode.required.$response">This field is required</span>
           <span v-else-if="!v$.formData.Postcode.maxLength.$response">Title must be less than 20 characters</span>
           <span v-else-if="!v$.formData.Postcode.onlyLetters.$response">Title must contain only letters</span>
@@ -168,8 +178,8 @@
         <span class="error-message" v-if="state.errors.Postcode">{{ state.errors.Postcode[0] }}</span>
       </div>
       <div class="registration-class">
-        <router-link class="registration-btn" to="/">Cancel</router-link>
-        <button class="registration-btn" type="submit">Confirm</button>
+        <router-link class="registration-btn" to="/" data-testid="registration-cancel">Cancel</router-link>
+        <button class="registration-btn" type="submit" data-testid="registration-submit">Confirm</button>
       </div>
     </form>
   </div>

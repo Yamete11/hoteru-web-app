@@ -1,5 +1,11 @@
 <template>
-  <router-link :to="path" class="button-link"><slot></slot></router-link>
+  <router-link
+      :to="path"
+      class="button-link"
+      :data-testid="dataTestid"
+  >
+    <slot></slot>
+  </router-link>
 </template>
 
 <script>
@@ -9,10 +15,15 @@ export default {
     path: {
       type: String,
       required: true
+    },
+    dataTestid: {
+      type: String,
+      required: false
     }
   }
 }
 </script>
+
 
 <style scoped>
 .button-link {

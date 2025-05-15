@@ -6,7 +6,7 @@
       <div class="main">
         <div class="main-top">
           <input type="text" class="search-input" v-model="searchQuery" placeholder="Search service by its title ..." />
-          <router-link to="/new-service" class="new-service-button">New Service</router-link>
+          <router-link to="/new-service" class="new-service-button" data-testid="new-service-button">New Service</router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">
