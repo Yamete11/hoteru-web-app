@@ -32,8 +32,12 @@ export default {
   methods: {
     logout() {
       localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      this.$store.commit('clearToken');
+      this.$store.commit('clearUserData');
       this.$router.push('/');
-    },
+    }
+    ,
     goToArrivals() {
       this.$router.push('/arrivals');
     }

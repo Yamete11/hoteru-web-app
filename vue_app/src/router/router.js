@@ -29,15 +29,18 @@ const routes = [
         path: '/reservations/:idReservation',
         component: ArrivalDetails,
         name: 'ReservationDetails',
+        meta: { requiresAuth: true },
         props: route => ({ idReservation: Number(route.params.idReservation), detailsType: 'Reservation' })
     },
     {
         path: '/reservations',
-        component: Reservation
+        component: Reservation,
+        meta: { requiresAuth: true }
     },
     {
         path: '/new-reservation',
-        component: NewReservation
+        component: NewReservation,
+        meta: { requiresAuth: true }
     },
     {
         path: '/registration',
@@ -47,73 +50,88 @@ const routes = [
         path: '/arrivals/:idReservation',
         component: ArrivalDetails,
         name: 'ArrivalDetails',
+        meta: { requiresAuth: true },
         props: route => ({ idReservation: Number(route.params.idReservation), detailsType: 'Arrival' })
     },
     {
         path: '/arrivals',
-        component: Arrival
+        component: Arrival,
+        meta: { requiresAuth: true }
     },
     {
         path: '/guests/:idPerson',
         component: GuestDetails,
         name: 'GuestDetails',
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/guests',
-        component: Guest
+        component: Guest,
+        meta: { requiresAuth: true }
     },
     {
         path: '/new-guest',
-        component: NewGuest
+        component: NewGuest,
+        meta: { requiresAuth: true }
     },
     {
         path: '/rooms/:idRoom',
         component: RoomDetails,
         name: 'RoomDetails',
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/rooms',
         component: Room,
-        name: 'Rooms'
+        name: 'Rooms',
+        meta: { requiresAuth: true }
     },
     {
         path: '/new-room',
-        component: NewRoom
+        component: NewRoom,
+        meta: { requiresAuth: true }
     },
     {
         path: '/services/:idService',
         component: ServiceDetails,
         name: 'ServiceDetails',
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/services',
         component: Service,
-        name: "Services"
+        name: "Services",
+        meta: { requiresAuth: true }
     },
     {
         path: '/new-service',
-        component: NewService
+        component: NewService,
+        meta: { requiresAuth: true }
     },
     {
         path: '/history/:idReservation',
         component: HistoryDetails,
         name: 'HistoryDetails',
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/history',
-        component: History
+        component: History,
+        meta: { requiresAuth: true }
     },
     {
         path: '/my-account',
-        component: MyAccount
+        component: MyAccount,
+        meta: { requiresAuth: true }
     },
     {
         path: '/employees',
-        component: ListOfEmployees
+        component: ListOfEmployees,
+        meta: { requiresAuth: true }
     }
 ]
 
@@ -127,12 +145,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const isAuthenticated = !!localStorage.getItem('token');
 
-    if ((to.path === '/' || to.path === '/registration') && isAuthenticated) {
+    if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+        next('/');
+    } else if ((to.path === '/' || to.path === '/registration') && isAuthenticated) {
         next('/arrivals');
     } else {
         next();
     }
 });
+
 
 export default router;
 
