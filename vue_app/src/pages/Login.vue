@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import { parseJwt } from "../utils/jwt";
 
 export default {
   name: "Login",
@@ -58,10 +59,17 @@ export default {
         }
 
         const data = await response.json();
-        console.log(data);
+        console.log("JWT Token:", data.token);
 
         localStorage.setItem('token', data.token);
         this.$store.commit('setToken', data.token);
+
+        const payload = parseJwt(data.token);
+        console.log("JWT payload:", payload);
+        console.log("User role:", payload?.role);
+
+        this.$store.commit('setUserRole', payload?.role);
+        console.log("Role from the Store: " + this.$store.getters.getUserRole)
 
         await this.$store.dispatch('fetchUserData', this.login);
 

@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace hoteru_be.Controllers
 {
@@ -30,7 +31,10 @@ namespace hoteru_be.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] LoginDTO loginDTO)
         {
-            var user = _context.Users.FirstOrDefault(u => u.LoginName == loginDTO.Login && u.Password == loginDTO.Password);
+            var user = _context.Users
+                .Include(u => u.UserType)
+                .FirstOrDefault(u => u.LoginName == loginDTO.Login && u.Password == loginDTO.Password);
+
             if (user == null)
             {
                 return Unauthorized(new { message = "Login failed. Please check the credentials." });
@@ -38,21 +42,26 @@ namespace hoteru_be.Controllers
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, user.LoginName),
+                new Claim(ClaimTypes.NameIdentifier, user.IdPerson.ToString()),
+
+                new Claim(ClaimTypes.Role, user.UserType.Title)
+            };
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.LoginName),
-
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(120),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-
 
             return Ok(new
             {

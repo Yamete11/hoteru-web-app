@@ -5,11 +5,13 @@ export default createStore({
     state: {
         token: null,
         userData: null,
+        userRole: null
     },
     getters: {
         isAuthenticated: state => !!state.token,
         getToken: state => state.token,
         getUserData: state => state.userData,
+        getUserRole: state => state.userRole
     },
     mutations: {
         setToken(state, token) {
@@ -24,6 +26,10 @@ export default createStore({
         clearUserData(state) {
             state.userData = null;
         },
+        setUserRole(state, role) {
+            state.userRole = role;
+            localStorage.setItem('userRole', role);
+        },
     },
     actions: {
         initializeStore({ commit }) {
@@ -35,6 +41,11 @@ export default createStore({
             const userData = JSON.parse(localStorage.getItem('userData'));
             if (userData) {
                 commit('setUserData', userData);
+            }
+
+            const userRole = localStorage.getItem('userRole');
+            if (userRole) {
+                commit('setUserRole', userRole);
             }
         },
         async fetchUserData({ commit, getters }, userName) {

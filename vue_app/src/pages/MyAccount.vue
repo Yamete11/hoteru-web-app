@@ -13,6 +13,7 @@
                placeholder="Enter room number"
                :readonly="!state.isEditing"
                @input="v$.formData.name.$touch()"
+               data-testid="input-name"
         >
         <span class="error-message" v-if="v$.formData.name.$error">
             <span v-if="!v$.formData.name.required.$response">Name is required*</span>
@@ -30,6 +31,7 @@
                placeholder="Enter room capacity"
                :readonly="!state.isEditing"
                @input="v$.formData.surname.$touch()"
+               data-testid="input-surname"
         >
         <span class="error-message" v-if="v$.formData.surname.$error">
             <span v-if="!v$.formData.surname.required.$response">Surname is required*</span>
@@ -47,6 +49,7 @@
                placeholder="Enter room price"
                :readonly="!state.isEditing"
                @input="v$.formData.email.$touch()"
+               data-testid="input-email"
         >
         <span class="error-message" v-if="v$.formData.email.$error">
             <span v-if="!v$.formData.email.required.$response">Email is required*</span>
@@ -63,6 +66,7 @@
                placeholder="Enter room price"
                :readonly="!state.isEditing"
                @input="v$.formData.loginName.$touch()"
+               data-testid="input-login"
         >
         <span class="error-message" v-if="v$.formData.loginName.$error">
             <span v-if="!v$.formData.loginName.required.$response">Name is required*</span>
@@ -74,9 +78,9 @@
 
       <div class="input-form">
         <label>Type: </label>
-        <input v-if="!state.isEditing" class="input" type="text" :value="state.typeTitle" readonly>
-        <select v-else v-model="state.formData.idUserType" class="input" @change="v$.formData.idUserType.$touch()">
-          <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
+        <input v-if="!state.isEditing" class="input" type="text" :value="state.typeTitle" data-testid="input-type-readonly" readonly>
+        <select v-else v-model="state.formData.idUserType" class="input" @change="v$.formData.idUserType.$touch()" data-testid="select-user-type">
+          <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType" :data-testid="'option-type-' + type.idType">{{ type.title }}</option>
         </select>
         <span class="error-message" v-if="v$.formData.idUserType.$error">
             <span v-if="!v$.formData.idUserType.required.$response">Type is required*</span>
@@ -86,8 +90,8 @@
 
 
       <div class="registration-class">
-        <router-link class="registration-btn" to="/arrivals">Back</router-link>
-        <button type="submit" class="registration-btn">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
+        <router-link class="registration-btn" to="/arrivals" data-testid="button-back">Back</router-link>
+        <button type="submit" class="registration-btn" data-testid="button-submit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
       </div>
     </form>
 

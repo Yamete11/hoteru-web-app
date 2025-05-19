@@ -5,16 +5,17 @@
       <h2>{{ companyName }}</h2>
     </div>
     <div class="navbar-links">
-      <router-link class="navbar-btn" to="/new-reservation">New Reservation</router-link>
+      <router-link class="navbar-btn" to="/new-reservation" data-testid="new-reservation-button">New Reservation</router-link>
       <div class="right-links">
         <div class="dropdown-wrapper" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-          <button class="navbar-btn">Settings</button>
+          <button class="navbar-btn" data-testid="settings-button">Settings</button>
           <div class="dropdown-content" v-show="showDropdown">
-            <router-link to="/my-account">My Account</router-link>
-            <router-link to="/employees">List of Employees</router-link>
+            <router-link to="/my-account" data-testid="my-account-link">My Account</router-link>
+            <router-link v-if="isAdminOrSuperAdmin()" to="/employees" data-testid="employees-link">List of Employees</router-link>
+
           </div>
         </div>
-        <button class="navbar-btn" @click="logout">Log out</button>
+        <button class="navbar-btn" @click="logout" data-testid="log-out">Log out</button>
       </div>
     </div>
   </div>
@@ -22,6 +23,8 @@
 
 
 <script>
+
+
 export default {
   name: "Navbar",
   data() {
@@ -40,12 +43,18 @@ export default {
     ,
     goToArrivals() {
       this.$router.push('/arrivals');
+    },
+    isAdminOrSuperAdmin() {
+      return ['Superadmin', 'Admin'].includes(this.userRole);
     }
   },
   computed: {
     companyName() {
       const user = this.$store.getters.getUserData;
       return user?.companyTitle || 'No Company';
+    },
+    userRole() {
+      return this.$store.getters.getUserRole;
     }
   }
 }

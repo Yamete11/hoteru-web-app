@@ -14,6 +14,7 @@
                    type="text"
                    placeholder="Enter name"
                    @input="v$.newUser.name.$touch()"
+                   data-testid="input-name"
             >
             <span class="error-message" v-if="v$.newUser.name.$error">
             <span v-if="!v$.newUser.name.required.$response">Name is required*</span>
@@ -30,6 +31,7 @@
                    type="text"
                    placeholder="Enter surname"
                    @input="v$.newUser.surname.$touch()"
+                   data-testid="input-surname"
             >
             <span class="error-message" v-if="v$.newUser.surname.$error">
             <span v-if="!v$.newUser.surname.required.$response">Surname is required*</span>
@@ -46,6 +48,7 @@
                    type="text"
                    placeholder="Enter email"
                    @input="v$.newUser.email.$touch()"
+                   data-testid="input-email"
             >
             <span class="error-message" v-if="v$.newUser.email.$error">
             <span v-if="!v$.newUser.email.required.$response">Email is required*</span>
@@ -61,6 +64,7 @@
                    type="text"
                    placeholder="Enter login"
                    @input="v$.newUser.loginName.$touch()"
+                   data-testid="input-login"
             >
             <span class="error-message" v-if="v$.newUser.loginName.$error">
             <span v-if="!v$.newUser.loginName.required.$response">Login is required*</span>
@@ -77,6 +81,7 @@
                    type="password"
                    placeholder="Enter password"
                    @input="v$.newUser.password.$touch()"
+                   data-testid="input-password"
             >
             <span class="error-message" v-if="v$.newUser.password.$error">
           <span v-if="!v$.newUser.password.required.$response">Password is required*</span>
@@ -86,9 +91,9 @@
 
           <div class="input-form">
             <label>Type: </label>
-            <select v-model="state.newUser.idUserType" class="input"  @change="v$.newUser.idUserType.$touch()">
-              <option disabled value="">Select type</option>
-              <option v-for="type in state.userTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
+            <select v-model="state.newUser.idUserType" class="input" @change="v$.newUser.idUserType.$touch()" data-testid="select-user-type">
+            <option disabled value="">Select type</option>
+              <option v-for="type in filteredUserTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
             </select>
             <span class="error-message" v-if="v$.newUser.idUserType.$error">
             <span v-if="!v$.newUser.idUserType.required.$response">Type is required*</span>
@@ -97,8 +102,8 @@
           </div>
 
           <div class="registration-class">
-            <button type="button" class="registration-btn" @click="clearNewUserForm">Clean</button>
-            <button type="submit" class="registration-btn">Add User</button>
+            <button type="button" class="registration-btn" @click="clearNewUserForm" data-testid="clean-button">Clean</button>
+            <button type="submit" class="registration-btn" data-testid="add-user-button">Add User</button>
           </div>
         </form>
 
@@ -106,10 +111,13 @@
           <h1>List of employees: </h1>
           <div class="service-list">
             <ul class="added-services-list">
-              <li class="element" v-for="user in state.users" :key="user.idPerson">
-                <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
-                <button class="btn" @click.prevent="deleteUser(user.idPerson)">Remove</button>
+              <li class="element" v-for="user in state.users" :key="user.idPerson" :data-testid="'user-item-' + user.loginName">
+              <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
+                <button v-if="user.userType !== 'Superadmin'" class="btn" @click.prevent="deleteUser(user.idPerson)" :data-testid="'delete-user-' + user.loginName">
+                Remove
+                </button>
               </li>
+
             </ul>
           </div>
         </div>
@@ -124,7 +132,7 @@ import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import {reactive} from "vue";
+import {computed, reactive} from "vue";
 import {email} from "@vuelidate/validators";
 
 export default {
@@ -162,6 +170,10 @@ export default {
         idUserType: { required }
       }
     }
+
+    const filteredUserTypes = computed(() => {
+      return state.userTypes.filter(type => type.title !== 'Superadmin');
+    });
 
     const v$ = useVuelidate(rules, state);
 
@@ -253,7 +265,7 @@ export default {
     }
 
 
-    return {state, fetchUser, addUser, v$, clearNewUserForm, fetchUsers, deleteUser}
+    return {state, fetchUser, addUser, v$, clearNewUserForm, fetchUsers, deleteUser, filteredUserTypes}
   },
   mounted(){
     this.fetchUser(this.$store.getters.getUserData.idUser);
