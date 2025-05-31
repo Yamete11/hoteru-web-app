@@ -5,8 +5,8 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search by name ..." />
-          <router-link to="/new-guest" class="new-guest-button">New Guest</router-link>
+          <input type="text" data-testid="guest-search-input" class="search-input" v-model="searchQuery" placeholder="Search by name ..." />
+          <router-link to="/new-guest" class="new-guest-button" data-testid="new-guest-button">New Guest</router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -58,8 +58,6 @@ export default {
     },
     async fetchGuests() {
       try {
-        const token = this.$store.getters.getToken;
-        console.log("Token " + token)
         this.isLoading = true;
         const response = await axios.get('https://localhost:44384/api/Guest', {
           headers: {

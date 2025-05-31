@@ -10,7 +10,7 @@
             <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by its number ..."/>
           </div>
           <div class="right">
-            <router-link to="/new-room" class="new-room-button">New Room</router-link>
+            <router-link to="/new-room" class="new-room-button" data-testid="new-room-button">New Room</router-link>
           </div>
         </div>
         <div class="main-bot">

@@ -1,9 +1,9 @@
 <template>
   <div class="item-div">
-    <span class="item name">{{ guest.name }}</span>
-    <span class="item surname">{{ guest.surname }}</span>
-    <span class="item telNumber">{{ guest.telNumber }}</span>
-    <span class="item email">{{ guest.email }}</span>
+    <span class="item name" data-testid="guest-name">{{ guest.name }}</span>
+    <span class="item surname" data-testid="guest-surname">{{ guest.surname }}</span>
+    <span class="item telNumber" data-testid="guest-telNumber">{{ guest.telNumber }}</span>
+    <span class="item email" data-testid="guest-email">{{ guest.email }}</span>
     <div class="item-btns">
       <button class="btn" type="button" @click="viewGuestDetails(guest.idPerson)">
         Details
@@ -31,7 +31,7 @@ export default {
       this.$router.push({ name: 'GuestDetails', params: { idPerson: idPerson } });
     },
     deleteGuest(idPerson) {
-      axios.delete(`https://localhost:44384/api/Room/${idPerson}`)
+      axios.delete(`https://localhost:44384/api/Guest/${idPerson}`)
           .then(() => {
             this.$emit('deleteGuest', idPerson);
           })

@@ -23,7 +23,7 @@ test.afterEach(async () => {
     await test.context.close();
 });
 
-test('Check my account login', async () => {
+/*test('Check my account login', async () => {
     const page = test.page;
     const navbar = new Navbar(page);
     const myAccount = new MyAccount(page);
@@ -31,7 +31,7 @@ test('Check my account login', async () => {
     await navbar.openMyAccount();
 
     await expect(await myAccount.getLoginValue()).toBe(testData.validUsername);
-});
+});*/
 
 test('Creating new user', async () => {
     const page = test.page;

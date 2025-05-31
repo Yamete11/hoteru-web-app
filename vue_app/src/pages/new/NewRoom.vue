@@ -1,12 +1,12 @@
 <template>
-  <div class="newRoom-component">
-    <navbar></navbar>
-    <sidebar></sidebar>
-    <div class="main">
-      <h1>New Room</h1>
-      <form @submit.prevent="addRoom" class="creating-form">
+  <div class="newRoom-component" data-testid="new-room-component">
+    <navbar data-testid="navbar"></navbar>
+    <sidebar data-testid="sidebar"></sidebar>
+    <div class="main" data-testid="main-content">
+      <h1 data-testid="form-title">New Room</h1>
+      <form @submit.prevent="addRoom" class="creating-form" data-testid="room-form">
 
-        <div class="input-form">
+        <div class="input-form" data-testid="input-number">
           <label>Number: </label>
           <input
               v-model="state.formData.Number"
@@ -14,16 +14,16 @@
               type="text"
               placeholder="Enter room number"
               @input="v$.formData.Number.$touch()"
+              data-testid="number-input"
           >
-          <span class="error-message" v-if="v$.formData.Number.$error">
+          <span class="error-message" v-if="v$.formData.Number.$error" data-testid="error-number-validation">
             <span v-if="!v$.formData.Number.required.$response">Number is required*</span>
             <span v-if="!v$.formData.Number.maxLength.$response">Number must be less than 20 characters*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Number">{{ state.errors.Number[0] }}</span>
+          <span class="error-message" v-if="state.errors.Number" data-testid="error-number-server">{{ state.errors.Number[0] }}</span>
         </div>
 
-
-        <div class="input-form">
+        <div class="input-form" data-testid="input-capacity">
           <label>Capacity: </label>
           <input
               v-model="state.formData.Capacity"
@@ -31,18 +31,18 @@
               type="number"
               placeholder="Enter room capacity"
               @input="v$.formData.Capacity.$touch()"
+              data-testid="capacity-input"
           >
-          <span class="error-message" v-if="v$.formData.Capacity.$error">
+          <span class="error-message" v-if="v$.formData.Capacity.$error" data-testid="error-capacity-validation">
             <span v-if="!v$.formData.Capacity.required.$response">Capacity is required*</span>
             <span v-else-if="!v$.formData.Capacity.numeric.$response">Capacity must be a number*</span>
             <span v-else-if="!v$.formData.Capacity.maxValue.$response">Capacity must be less than or equal to 10*</span>
             <span v-else-if="!v$.formData.Capacity.minValue.$response">Capacity must be more than 0*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
+          <span class="error-message" v-if="state.errors.Capacity" data-testid="error-capacity-server">{{ state.errors.Capacity[0] }}</span>
         </div>
 
-
-        <div class="input-form">
+        <div class="input-form" data-testid="input-price">
           <label>Price: </label>
           <input
               v-model="state.formData.Price"
@@ -50,51 +50,72 @@
               type="number"
               placeholder="Enter room price"
               @input="v$.formData.Price.$touch()"
+              data-testid="price-input"
           >
-          <span class="error-message" v-if="v$.formData.Price.$error">
+          <span class="error-message" v-if="v$.formData.Price.$error" data-testid="error-price-validation">
             <span v-if="!v$.formData.Price.required.$response">Price is required*</span>
             <span v-else-if="!v$.formData.Price.numeric.$response">Price must be a number*</span>
             <span v-else-if="!v$.formData.Price.maxValue.$response">Price must be less than or equal to 1,000,000*</span>
             <span v-else-if="!v$.formData.Price.minValue.$response">Price must be more than 0*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Price">{{ state.errors.Price[0] }}</span>
+          <span class="error-message" v-if="state.errors.Price" data-testid="error-price-server">{{ state.errors.Price[0] }}</span>
         </div>
 
-
-        <div class="input-form">
+        <div class="input-form" data-testid="input-type">
           <label>Type: </label>
-          <select v-model="state.formData.Type" @change="v$.formData.Type.$touch()">
+          <select
+              v-model="state.formData.Type"
+              @change="v$.formData.Type.$touch()"
+              data-testid="type-select"
+          >
             <option disabled value="">Select type</option>
-            <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
+            <option
+                v-for="roomType in state.roomTypes"
+                :key="roomType.idType"
+                :value="String(roomType.idType)"
+                data-testid="type-option"
+            >
+              {{ roomType.title }}
+            </option>
           </select>
-          <span class="error-message" v-if="v$.formData.Type.$error">
+          <span class="error-message" v-if="v$.formData.Type.$error" data-testid="error-type-validation">
             <span v-if="!v$.formData.Type.required.$response">Type is required*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Type">{{ state.errors.Type[0] }}</span>
+          <span class="error-message" v-if="state.errors.Type" data-testid="error-type-server">{{ state.errors.Type[0] }}</span>
         </div>
 
-
-        <div class="input-form">
+        <div class="input-form" data-testid="input-status">
           <label>Status: </label>
-          <select v-model="state.formData.Status" @change="v$.formData.Status.$touch()">
+          <select
+              v-model="state.formData.Status"
+              @change="v$.formData.Status.$touch()"
+              data-testid="status-select"
+          >
             <option disabled value="">Select status</option>
-            <option v-for="roomStatus in state.roomStatuses" :key="roomStatus.idStatus" :value="String(roomStatus.idStatus)">{{ roomStatus.title }}</option>
+            <option
+                v-for="roomStatus in state.roomStatuses"
+                :key="roomStatus.idStatus"
+                :value="String(roomStatus.idStatus)"
+                data-testid="status-option"
+            >
+              {{ roomStatus.title }}
+            </option>
           </select>
-          <span class="error-message" v-if="v$.formData.Status.$error">
+          <span class="error-message" v-if="v$.formData.Status.$error" data-testid="error-status-validation">
             <span v-if="!v$.formData.Status.required.$response">Status is required*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Status">{{ state.errors.Status[0] }}</span>
+          <span class="error-message" v-if="state.errors.Status" data-testid="error-status-server">{{ state.errors.Status[0] }}</span>
         </div>
 
-
-        <div class="registration-class">
-          <router-link class="registration-btn" to="/rooms">Cancel</router-link>
-          <button class="registration-btn" type="submit">Confirm</button>
+        <div class="registration-class" data-testid="form-actions">
+          <router-link class="registration-btn" to="/rooms" data-testid="cancel-button">Cancel</router-link>
+          <button class="registration-btn" type="submit" data-testid="submit-button">Confirm</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 
 <script>
 import { reactive } from 'vue';

@@ -1,121 +1,137 @@
 <template>
-  <div class="newRoom-component">
+  <div class="newRoom-component" data-testid="new-guest-page">
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
-      <h1>New Guest</h1>
-      <form @submit.prevent="addGuest" class="creating-form">
+      <h1 data-testid="new-guest-title">New Guest</h1>
+      <form @submit.prevent="addGuest" class="creating-form" data-testid="new-guest-form">
 
-        <div class="input-form">
-          <label>Name: </label>
+        <div class="input-form" data-testid="input-name">
+          <label for="name-input">Name: </label>
           <input
+              id="name-input"
               v-model="state.formData.Name"
               class="input"
               type="text"
               placeholder="Enter name"
               @input="v$.formData.Name.$touch()"
-          >
-          <span class="error-message" v-if="v$.formData.Name.$error">
+              data-testid="name-input"
+          />
+          <span class="error-message" v-if="v$.formData.Name.$error" data-testid="name-error">
             <span v-if="!v$.formData.Name.required.$response">Name is required*</span>
             <span v-else-if="!v$.formData.Name.maxLength.$response">Name must be less than 20 characters*</span>
             <span v-else-if="!v$.formData.Name.onlyLetters.$response">Name must contain only letters*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
+          <span class="error-message" v-if="state.errors.Name" data-testid="name-error-backend">{{ state.errors.Name[0] }}</span>
         </div>
 
-
-
-        <div class="input-form">
-          <label>Surname: </label>
+        <div class="input-form" data-testid="input-surname">
+          <label for="surname-input">Surname: </label>
           <input
+              id="surname-input"
               v-model="state.formData.Surname"
               class="input"
               type="text"
               placeholder="Enter surname"
               @input="v$.formData.Surname.$touch()"
-          >
-          <span class="error-message" v-if="v$.formData.Surname.$error">
+              data-testid="surname-input"
+          />
+          <span class="error-message" v-if="v$.formData.Surname.$error" data-testid="surname-error">
             <span v-if="!v$.formData.Surname.required.$response">Surname is required*</span>
             <span v-else-if="!v$.formData.Surname.maxLength.$response">Surname must be less than 20 characters*</span>
             <span v-else-if="!v$.formData.Surname.onlyLetters.$response">Name must contain only letters*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
+          <span class="error-message" v-if="state.errors.Surname" data-testid="surname-error-backend">{{ state.errors.Surname[0] }}</span>
         </div>
 
-
-        <div class="input-form">
-          <label>Email: </label>
+        <div class="input-form" data-testid="input-email">
+          <label for="email-input">Email: </label>
           <input
+              id="email-input"
               v-model="state.formData.Email"
               class="input"
               type="text"
               placeholder="Enter email"
               @input="v$.formData.Email.$touch()"
-          >
-          <span class="error-message" v-if="v$.formData.Email.$error">
+              data-testid="email-input"
+          />
+          <span class="error-message" v-if="v$.formData.Email.$error" data-testid="email-error">
             <span v-if="!v$.formData.Email.required.$response">Email is required*</span>
             <span v-if="!v$.formData.Email.email.$response">Invalid email format*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email[0] }}</span>
+          <span class="error-message" v-if="state.errors.Email" data-testid="email-error-backend">{{ state.errors.Email[0] }}</span>
         </div>
 
-
-        <div class="input-form">
-          <label>Tel. number: </label>
+        <div class="input-form" data-testid="input-tel">
+          <label for="tel-input">Tel. number: </label>
           <input
+              id="tel-input"
               v-model="state.formData.TelNumber"
               class="input"
               type="text"
               placeholder="Enter tel. number"
               @input="v$.formData.TelNumber.$touch()"
-          >
-          <span class="error-message" v-if="v$.formData.TelNumber.$error">
+              data-testid="tel-input"
+          />
+          <span class="error-message" v-if="v$.formData.TelNumber.$error" data-testid="tel-error">
             <span v-if="!v$.formData.TelNumber.required.$response">Telephone number is required*</span>
             <span v-if="!v$.formData.TelNumber.numeric.$response">Telephone number must be a number*</span>
             <span v-if="!v$.formData.TelNumber.maxLength.$response">Telephone number must be less than 15 characters*</span>
           </span>
-          <span class="error-message" v-if="state.errors.TelNumber">{{ state.errors.TelNumber[0] }}</span>
+          <span class="error-message" v-if="state.errors.TelNumber" data-testid="tel-error-backend">{{ state.errors.TelNumber[0] }}</span>
         </div>
 
-
-        <div class="input-form">
-          <label>Passport: </label>
+        <div class="input-form" data-testid="input-passport">
+          <label for="passport-input">Passport: </label>
           <input
+              id="passport-input"
               v-model="state.formData.Passport"
               class="input"
               type="text"
               placeholder="Enter passport number"
               @input="v$.formData.Passport.$touch()"
-          >
-          <span class="error-message" v-if="v$.formData.Passport.$error">
+              data-testid="passport-input"
+          />
+          <span class="error-message" v-if="v$.formData.Passport.$error" data-testid="passport-error">
             <span v-if="!v$.formData.Passport.required.$response">Passport number is required*</span>
             <span v-if="!v$.formData.Passport.maxLength.$response">Passport number must be less than 10 characters*</span>
           </span>
-          <span class="error-message" v-if="state.errors.Passport">{{ state.errors.Passport[0] }}</span>
+          <span class="error-message" v-if="state.errors.Passport" data-testid="passport-error-backend">{{ state.errors.Passport[0] }}</span>
         </div>
 
-
-        <div class="input-form">
-          <label>Status: </label>
-          <select v-model="state.formData.IdGuestStatus" @change="v$.formData.IdGuestStatus.$touch()">
+        <div class="input-form" data-testid="input-status">
+          <label for="status-select">Status: </label>
+          <select
+              id="status-select"
+              v-model="state.formData.IdGuestStatus"
+              @change="v$.formData.IdGuestStatus.$touch()"
+              data-testid="status-select"
+          >
             <option disabled value="">Select status</option>
-            <option v-for="guestStatus in state.guestStatuses" :key="guestStatus.idStatus" :value="String(guestStatus.idStatus)">{{ guestStatus.title }}</option>
+            <option
+                v-for="guestStatus in state.guestStatuses"
+                :key="guestStatus.idStatus"
+                :value="String(guestStatus.idStatus)"
+                :data-testid="`status-option-${guestStatus.idStatus}`"
+            >
+              {{ guestStatus.title }}
+            </option>
           </select>
-          <span class="error-message" v-if="v$.formData.IdGuestStatus.$error">
+          <span class="error-message" v-if="v$.formData.IdGuestStatus.$error" data-testid="status-error">
             <span v-if="!v$.formData.IdGuestStatus.required.$response">Status is required*</span>
           </span>
-          <span class="error-message" v-if="state.errors.IdGuestStatus">{{ state.errors.IdGuestStatus[0] }}</span>
+          <span class="error-message" v-if="state.errors.IdGuestStatus" data-testid="status-error-backend">{{ state.errors.IdGuestStatus[0] }}</span>
         </div>
 
-
-        <div class="registration-class">
-          <router-link class="registration-btn" to="/guests">Cancel</router-link>
-          <button class="registration-btn" type="submit">Confirm</button>
+        <div class="registration-class" data-testid="form-buttons">
+          <router-link class="registration-btn" to="/guests" data-testid="cancel-button">Cancel</router-link>
+          <button class="registration-btn" type="submit" data-testid="confirm-button">Confirm</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
