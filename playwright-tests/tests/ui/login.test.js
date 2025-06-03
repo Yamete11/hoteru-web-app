@@ -6,11 +6,8 @@ test('Login with valid credentials', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.goto();
-
     await loginPage.fillLoginForm(testData.validUsername, testData.validPassword);
-
     await loginPage.submitLoginForm();
-
     await loginPage.assertRedirectToArrivals();
 });
 

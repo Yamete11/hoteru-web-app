@@ -7,9 +7,9 @@
       <form @submit.prevent="addReservation" class="creating-form">
 
         <div class="tab-switcher">
-          <span :class="{ active: state.formData.Confirmed === false }" @click="state.formData.Confirmed = false">Arrival</span>
+          <span :class="{ active: state.formData.Confirmed === false }" @click="state.formData.Confirmed = false" data-testid="arrival-tab">Arrival</span>
           <span> - </span>
-          <span :class="{ active: state.formData.Confirmed === true }" @click="state.formData.Confirmed = true">Reservation</span>
+          <span :class="{ active: state.formData.Confirmed === true }" @click="state.formData.Confirmed = true" data-testid="reservation-tab">Reservation</span>
         </div>
 
 
@@ -23,6 +23,7 @@
                 :min="todayString"
                 :max="maxInDate"
                 @input="v$.formData.In.$touch()"
+                data-testid="date-in"
             >
           </div>
           <div class="input-form">
@@ -33,6 +34,7 @@
                 type="date"
                 :min="tomorrowString"
                 @input="v$.formData.Out.$touch()"
+                data-testid="date-out"
             >
           </div>
         </div>
@@ -47,6 +49,7 @@
                   type="number"
                   placeholder="Enter room capacity"
                   @input="v$.formData.Capacity.$touch()"
+                  data-testid="capacity"
               >
             </div>
             <div class="input-form">

@@ -8,6 +8,10 @@ module.exports = {
     servicePrice: 35,
     serviceDescription: 'test desk',
 
+    editServiceTitle: 'editServiceTitle',
+    editServicePrice: '1',
+    editServiceDescription: 'editDescription',
+
     roomNumber: '501',
     roomCapacity: '2',
     roomPrice: '100',

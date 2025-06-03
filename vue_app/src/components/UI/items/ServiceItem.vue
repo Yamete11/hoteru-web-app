@@ -4,10 +4,10 @@
     <span class="item sum" data-testid="service-item-price">{{ service.sum }}</span>
     <span class="item description" data-testid="service-item-description">{{ service.description }}</span>
     <div class="item-btns">
-      <button class="btn" type="button" @click="viewServiceDetails(service.idService)">
+      <button class="btn" type="button" @click="viewServiceDetails(service.idService)" data-testid="service-item-details-button">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteService(service.idService)">
+      <button class="btn" type="button" @click="deleteService(service.idService)" data-testid="service-item-delete-button">
         Delete
       </button>
     </div>

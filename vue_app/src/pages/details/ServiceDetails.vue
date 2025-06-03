@@ -14,6 +14,7 @@
               placeholder="Enter room number"
               :readonly="!state.isEditing"
               @input="v$.formData.title.$touch()"
+              data-testid="input-title"
           >
           <span class="error-message" v-if="v$.formData.title.$error">
             <span v-if="!v$.formData.title.required.$response">Title is required*</span>
@@ -31,6 +32,7 @@
               placeholder="Enter room capacity"
               :readonly="!state.isEditing"
               @input="v$.formData.sum.$touch()"
+              data-testid="input-price"
           >
           <span class="error-message" v-if="v$.formData.sum.$error">
           <span v-if="!v$.formData.sum.numeric.$response">Price must be a number*</span>
@@ -50,14 +52,15 @@
               placeholder="Enter room price"
               :readonly="!state.isEditing"
               @input="v$.formData.description.$touch()"
+              data-testid="input-description"
           >
           <span class="error-message" v-if="v$.formData.description.$error">Description can have only 50 symbols*</span>
           <span class="error-message" v-if="state.errors.Description">{{ state.errors.Description[0] }}</span>
         </div>
 
         <div class="registration-class">
-          <router-link class="registration-btn" to="/services">Back</router-link>
-          <button type="button" class="registration-btn" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
+          <router-link class="registration-btn" to="/services" data-testid="button-back">Back</router-link>
+          <button type="button" class="registration-btn" @click="toggleEdit" data-testid="button-edit-save">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
         </div>
       </form>
     </div>

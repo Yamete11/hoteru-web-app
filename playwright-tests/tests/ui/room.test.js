@@ -5,14 +5,7 @@ const NewRoomPage = require('../../pages/new-room-page');
 const SideBar = require('../../components/sidebar');
 const testData = require('../test-data/user-data');
 
-
-let context;
-let page;
-
-test.beforeEach(async ({ browser }) => {
-    context = await browser.newContext();
-    page = await context.newPage();
-
+test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.fillLoginForm(testData.validUsername, testData.validPassword);
@@ -20,7 +13,7 @@ test.beforeEach(async ({ browser }) => {
 });
 
 
-test('Create new Room', async () => {
+test('Create new Room', async ({ page }) => {
     const sidebar = new SideBar(page);
     const roomPage = new RoomPage(page);
     const newRoomPage = new NewRoomPage(page);
@@ -35,5 +28,12 @@ test('Create new Room', async () => {
         testData.roomStatus
     );
     await newRoomPage.submitForm();
+
+    await roomPage.fillSearchInput(testData.roomNumber);
+
+    await roomPage.assertValues(
+        testData.roomNumber,
+        testData.roomCapacity,
+    );
 });
 

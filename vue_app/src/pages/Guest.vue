@@ -54,6 +54,7 @@ export default {
   },
   methods: {
     deleteGuest(idPerson) {
+      console.log(this.guests)
       this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
     },
     async fetchGuests() {

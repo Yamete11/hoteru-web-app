@@ -29,10 +29,10 @@ test('Create new Guest', async ({ page }) => {
     );
     await newGuestPage.submitForm();
 
-    /*await guestPage.assertValues(
+    await guestPage.assertValues(
         testData.guestName,
         testData.guestSurname,
-        testData.guestEmail,
         testData.guestTelNumber,
-    );*/
+        testData.guestEmail
+    );
 });

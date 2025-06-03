@@ -5,7 +5,7 @@
           v-for="guest in guests"
           :guest="guest"
           :key="guest.idPerson"
-          @deleteRoom="deleteGuest"
+          @deleteGuest="deleteGuest"
       />
     </transition-group>
   </div>

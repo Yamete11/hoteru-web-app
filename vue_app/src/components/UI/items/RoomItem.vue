@@ -1,15 +1,15 @@
 <template>
   <div class="item-div">
-    <span class="item number">{{ room.number }}</span>
-    <span class="item capacity">{{ room.capacity }}</span>
-    <span class="item type">{{ room.type }}</span>
-    <span class="item status">{{ room.status }}</span>
+    <span class="item number" data-testid="room-number">{{ room.number }}</span>
+    <span class="item capacity" data-testid="room-capacity">{{ room.capacity }}</span>
+    <span class="item type" data-testid="room-type">{{ room.type }}</span>
+    <span class="item status" data-testid="room-status">{{ room.status }}</span>
     <div class="item-btns">
       <button class="btn" type="button" @click="viewRoomDetails(room.idRoom)">
         Details
       </button>
 
-      <button class="btn" type="button" @click="deleteRoom(room.idRoom)">
+      <button class="btn" type="button" data-testid="delete-room-button" @click="deleteRoom(room.idRoom)">
         Delete
       </button>
     </div>

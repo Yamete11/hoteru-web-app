@@ -7,7 +7,7 @@
 
         <div class="main-top">
           <div class="left">
-            <input type="text" class="search-input" v-model="searchQuery" placeholder="Search room by its number ..."/>
+            <input type="text" class="search-input" v-model="searchQuery" data-testid="search-input" placeholder="Search room by its number ..."/>
           </div>
           <div class="right">
             <router-link to="/new-room" class="new-room-button" data-testid="new-room-button">New Room</router-link>
@@ -22,7 +22,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <room-list :rooms="sortedAndSearchedPosts" @deleteRoom="deleteRoom"/>
+            <room-list :rooms="rooms" @deleteRoom="deleteRoom"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -60,6 +60,13 @@ export default {
       return this.rooms.filter(room => room.number.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
     }
   },
+  watch: {
+    searchQuery() {
+      this.page = 1;
+      this.rooms = [];
+      this.fetchRooms();
+    }
+  },
   methods: {
     deleteRoom(idRoom) {
       this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
@@ -73,12 +80,12 @@ export default {
           },
           params: {
             page: this.page,
-            limit: this.limit
+            limit: this.limit,
+            searchQuery: this.searchQuery
           }
         });
         this.rooms = response.data.list;
         this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
-        console.log(this.rooms)
       } catch (error) {
         console.error(error);
       } finally {
@@ -88,23 +95,23 @@ export default {
     async loadMore() {
       try {
         this.page++;
-        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Room', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
           params: {
             page: this.page,
-            limit: this.limit
+            limit: this.limit,
+            searchQuery: this.searchQuery
           }
         });
-        console.log(response)
         this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
         this.rooms = [...this.rooms, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
-    },
+    }
+    ,
 
   }
 }

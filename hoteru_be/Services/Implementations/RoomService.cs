@@ -84,12 +84,18 @@ namespace hoteru_be.Services.Implementations
                 }).ToListAsync();
         }
 
-        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit)
+        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit, string searchQuery = "")
         {
-           
-            var totalRooms = await _context.Rooms.CountAsync();
+            var query = _context.Rooms.AsQueryable();
 
-            var rooms = await _context.Rooms
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query.Where(r => r.Number.ToLower().StartsWith(searchQuery.ToLower()));
+            }
+
+            var totalRooms = await query.CountAsync();
+
+            var rooms = await query
                 .OrderBy(r => r.IdRoom)
                 .Skip((page - 1) * limit)
                 .Take(limit)
@@ -110,8 +116,8 @@ namespace hoteru_be.Services.Implementations
                 Page = page,
                 Limit = limit
             };
-
         }
+
 
         public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)
         {
