@@ -35,7 +35,6 @@ namespace hoteru_be.Services.Implementations
             .Include(r => r.Room)
             .Include(r => r.User)
             .ThenInclude(u => u.Person)
-            .Include(r => r.GuestReservations)
             .ThenInclude(gr => gr.Guest)
             .ThenInclude(g => g.Person)
             .Select(r => new ReservationDTO
@@ -45,8 +44,8 @@ namespace hoteru_be.Services.Implementations
                 Out = r.Out.ToString("yyyy-MM-dd"),
                 RoomNumber = r.Room.Number,
                 BookedBy = r.User.LoginName,
-                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
-                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
+                Name = r.Guest.Person.Name,
+                Surname = r.Guest.Person.Surname
             }
             ).ToListAsync();
 
@@ -67,27 +66,25 @@ namespace hoteru_be.Services.Implementations
                 .CountAsync();
 
             var reservations = await _context.Reservations
-            .OrderBy(r => r.IdRoom)
-            .Skip((page - 1) * limit)
-            .Take(limit)
-            .Where(r => r.Bill != null)
-            .Include(r => r.Room)
-            .Include(r => r.User)
-            .ThenInclude(u => u.Person)
-            .Include(r => r.GuestReservations)
-            .ThenInclude(gr => gr.Guest)
-            .ThenInclude(g => g.Person)
-            .Select(r => new ReservationDTO
-            {
-                IdReservation = r.IdReservation,
-                In = r.In.ToString("yyyy-MM-dd"),
-                Out = r.Out.ToString("yyyy-MM-dd"),
-                RoomNumber = r.Room.Number,
-                BookedBy = r.User.LoginName,
-                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
-                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
-            }
-            ).ToListAsync();
+                .Where(r => r.Bill != null)
+                .OrderBy(r => r.IdRoom)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .Select(r => new ReservationDTO
+                {
+                    IdReservation = r.IdReservation,
+                    In = r.In.ToString("yyyy-MM-dd"),
+                    Out = r.Out.ToString("yyyy-MM-dd"),
+                    RoomNumber = r.Room.Number,
+                    BookedBy = r.User.LoginName,
+                    Name = r.Guest.Person.Name,
+                    Surname = r.Guest.Person.Surname
+                })
+                .ToListAsync();
 
             return new PaginatedResultDTO<ReservationDTO>
             {
@@ -97,6 +94,7 @@ namespace hoteru_be.Services.Implementations
                 Limit = limit
             };
         }
+
 
         public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals(int page, int limit)
         {
@@ -112,7 +110,6 @@ namespace hoteru_be.Services.Implementations
             .Include(r => r.Room)
             .Include(r => r.User)
             .ThenInclude(u => u.Person)
-            .Include(r => r.GuestReservations)
             .ThenInclude(gr => gr.Guest)
             .ThenInclude(g => g.Person)
             .Select(r => new ReservationDTO
@@ -122,8 +119,8 @@ namespace hoteru_be.Services.Implementations
                 Out = r.Out.ToString("yyyy-MM-dd"),
                 RoomNumber = r.Room.Number,
                 BookedBy = r.User.LoginName,
-                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
-                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname
+                Name = r.Guest.Person.Name,
+                Surname = r.Guest.Person.Surname
             }
             ).ToListAsync();
 
@@ -136,9 +133,8 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation)
+        public async Task<FullReservationDTO> GetSpecificHistory(int IdReservation)
         {
-
             var services = await _context.ReservationServices
                 .Where(r => r.IdReservation == IdReservation)
                 .Include(r => r.Service)
@@ -150,37 +146,39 @@ namespace hoteru_be.Services.Implementations
                     Date = r.Date.ToString("yyyy-MM-dd")
                 }).ToListAsync();
 
-            return await _context.Reservations
-            .Where(r => r.Bill != null && r.IdReservation == IdReservation)
-            .Include(r => r.Bill)
-            .Include(r => r.Room)
-            .ThenInclude(u => u.RoomType)
-            .Include(r => r.Deposit)
-            .ThenInclude(u => u.DepositType)
-            .Include(r => r.ReservationServices)
-            .ThenInclude(u => u.Service)
-            .Include(r => r.User)
-            .ThenInclude(u => u.Person)
-            .Include(r => r.GuestReservations)
-            .ThenInclude(gr => gr.Guest)
-            .ThenInclude(g => g.Person)
-            .Select(r => new FullReservationDTO
+            var reservation = await _context.Reservations
+                .Where(r => r.Bill != null && r.IdReservation == IdReservation)
+                .Include(r => r.Bill)
+                .Include(r => r.Room)
+                    .ThenInclude(rt => rt.RoomType)
+                .Include(r => r.Deposit)
+                    .ThenInclude(d => d.DepositType)
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .Include(r => r.User)
+                    .ThenInclude(u => u.Person)
+                .FirstOrDefaultAsync();
+
+            if (reservation == null)
+                return null;
+
+            return new FullReservationDTO
             {
-                IdReservation = r.IdReservation,
-                In = r.In.ToString("yyyy-MM-dd"),
-                Out = r.Out.ToString("yyyy-MM-dd"),
-                RoomNumber = r.Room.Number,
-                RoomType = r.Room.RoomType.Title,
-                BookedBy = r.User.LoginName,
-                Name = r.GuestReservations.FirstOrDefault().Guest.Person.Name,
-                Surname = r.GuestReservations.FirstOrDefault().Guest.Person.Surname,
-                DepositSum = r.IdDeposit.HasValue ? r.Deposit.Sum : 0,
-                DepositType = r.IdDeposit.HasValue ? r.Deposit.DepositType.Title : "",       
-                BillSum = r.Bill.Sum,
-                Created = r.Bill.Created.ToString("yyyy-MM-dd"),
-                Services = services
-            }).ToListAsync();
+                IdReservation = reservation.IdReservation,
+                In = reservation.In.ToString("yyyy-MM-dd"),
+                Out = reservation.Out.ToString("yyyy-MM-dd"),
+                RoomNumber = reservation.Room.Number,
+                RoomType = reservation.Room.RoomType.Title,
+                BookedBy = reservation.User.LoginName,
+                Name = reservation.Guest.Person.Name,
+                Surname = reservation.Guest.Person.Surname,
+                DepositSum = reservation.IdDeposit.HasValue ? reservation.Deposit.Sum : 0,
+                DepositType = reservation.IdDeposit.HasValue ? reservation.Deposit.DepositType.Title : "",
+                BillSum = reservation.Bill.Sum,
+                Created = reservation.Bill.Created.ToString("yyyy-MM-dd"),
+            };
         }
+
 
         public async Task<MethodResultDTO> DeleteSpecificReservation(int idReservation)
         {
@@ -196,15 +194,15 @@ namespace hoteru_be.Services.Implementations
                 };
             }
 
-            var guestReservations = await _context.GuestReservations
-                .Where(x => x.IdReservation == idReservation)
-                .ToListAsync();
 
             var reservationServices = await _context.ReservationServices
                 .Where(x => x.IdReservation == idReservation)
                 .ToListAsync();
 
-            _context.GuestReservations.RemoveRange(guestReservations);
+            var room = await _context.Rooms.SingleOrDefaultAsync(x => x.IdRoom == reservation.IdRoom);
+            room.IdRoomStatus = 1; 
+
+           
             _context.ReservationServices.RemoveRange(reservationServices);
             _context.Reservations.Remove(reservation);
 
@@ -259,6 +257,7 @@ namespace hoteru_be.Services.Implementations
                 Confirmed = reservationDTO.Confirmed,
                 IdRoom = room.IdRoom,
                 IdUser = reservationDTO.IdUser,
+                IdGuest = reservationDTO.IdPerson,
                 Deposit = deposit
             };
 
@@ -274,13 +273,6 @@ namespace hoteru_be.Services.Implementations
                     Message = "Guest not found"
                 };
             }
-
-            var guestReservation = new GuestReservation
-            {
-                Reservation = reservation,
-                Guest = guest
-            };
-            _context.GuestReservations.Add(guestReservation);
 
 
             foreach (var serviceDTO in reservationDTO.Services)
@@ -321,7 +313,6 @@ namespace hoteru_be.Services.Implementations
                     Date = r.Date.ToString("yyyy-MM-dd")
                 }).ToListAsync();
 
-            var guest = await _context.GuestReservations.SingleOrDefaultAsync(r => r.IdReservation == IdArrival);
 
             return await _context.Reservations
                 .Where(r => r.IdReservation == IdArrival)
@@ -335,7 +326,7 @@ namespace hoteru_be.Services.Implementations
                    Capacity = r.Capacity,
                    IdRoom = r.IdRoom,
                    IdDepositType = r.IdDeposit.HasValue ? r.Deposit.IdDepositType : 0,
-                   IdGuest = guest.IdGuest,
+                   IdGuest = r.IdGuest,
                    IdRoomType = r.Room.IdRoomType,
                    Services = services,
                    Confirmed = r.Confirmed,
@@ -370,13 +361,9 @@ namespace hoteru_be.Services.Implementations
                 deposit.IdDepositType = arrivalDTO.IdDepositType;
                 deposit.Sum = arrivalDTO.DepositSum;
             }
-            
            
-            
 
-            var guest = await _context.GuestReservations.SingleOrDefaultAsync(r => r.IdReservation == arrivalDTO.IdReservation);
-
-            guest.IdGuest = arrivalDTO.IdGuest;
+            reservation.IdGuest = arrivalDTO.IdGuest;
             
 
             reservation.In = arrivalDTO.In;
@@ -416,32 +403,58 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> ConfirmReservation(int IdReservation)
         {
-            var reservation = await _context.Reservations.SingleOrDefaultAsync(r => r.IdReservation == IdReservation);
+            var reservation = await _context.Reservations
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                .SingleOrDefaultAsync(r => r.IdReservation == IdReservation);
 
-            var room = await _context.Rooms.SingleOrDefaultAsync(r => r.IdRoom == reservation.IdRoom);
+            if (reservation == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Reservation not found"
+                };
+            }
 
-            if(reservation.Confirmed == false)
+            var room = reservation.Room;
+
+            if (reservation.Confirmed == false)
             {
                 reservation.Confirmed = true;
                 room.IdRoomStatus = 2;
-
-            } else if(reservation.Confirmed == true)
+            }
+            else if (reservation.Confirmed == true)
             {
                 var bill = new Bill
                 {
                     Created = DateTime.Now,
-                    Sum = reservation.Price
+                    Sum = reservation.Price,
+
+                    InDate = reservation.In,
+                    OutDate = reservation.Out,
+
+                    GuestName = reservation.Guest?.Person?.Name ?? "Unknown",
+                    GuestSurname = reservation.Guest?.Person?.Surname ?? "Unknown",
+
+                    RoomNumber = room.Number,
+                    BookedBy = reservation.User?.LoginName ?? "Unknown"
                 };
+
                 reservation.Bill = bill;
                 room.IdRoomStatus = 1;
             }
 
             await _context.SaveChangesAsync();
+
             return new MethodResultDTO
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Confirmed"
             };
         }
+
     }
 }

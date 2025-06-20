@@ -5,8 +5,21 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" v-model="searchQuery" placeholder="Search service by its title ..." />
-          <router-link to="/new-service" class="new-service-button" data-testid="new-service-button">New Service</router-link>
+          <select v-model="searchField" class="search-select" data-testid="service-search-select">
+            <option value="title">Title</option>
+            <option value="sum">Sum</option>
+            <option value="description">Description</option>
+          </select>
+          <input
+              type="text"
+              class="search-input"
+              v-model="searchQuery"
+              :placeholder="`Search by ${searchField}...`"
+              data-testid="search-input"
+          />
+          <router-link to="/new-service" class="new-service-button" data-testid="new-service-button">
+            New Service
+          </router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -33,24 +46,27 @@ import axios from "axios";
 
 export default {
   name: "Service",
-
   data() {
     return {
       isLoading: false,
       services: [],
       searchQuery: '',
+      searchField: 'title',
       totalServices: 0,
       page: 1,
       limit: 15,
     };
   },
   mounted() {
-    console.log(this.$refs.observer);
     this.fetchServices();
   },
-  computed:{
-    sortedAndSearchedPosts(){
-      return this.services.filter(service => service.title.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
+  computed: {
+    sortedAndSearchedPosts() {
+      return this.services.filter(service => {
+        const rawValue = service[this.searchField];
+        const fieldValue = String(rawValue ?? '').toLowerCase();
+        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+      });
     }
   },
   methods: {
@@ -71,7 +87,6 @@ export default {
         });
         this.services = response.data.list;
         this.totalServices = Math.ceil(response.data.totalCount / this.limit);
-        console.log(this.services)
       } catch (error) {
         console.error(error);
       } finally {
@@ -81,7 +96,6 @@ export default {
     async loadMore() {
       try {
         this.page++;
-        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Service', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
@@ -91,15 +105,13 @@ export default {
             limit: this.limit
           }
         });
-        console.log(response)
         this.totalServices = Math.ceil(response.data.totalCount / this.limit);
         this.services = [...this.services, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
-    },
-
-  },
+    }
+  }
 }
 </script>
 
@@ -125,27 +137,35 @@ export default {
 
 .main-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1rem;
   padding: 1rem;
 }
 
+.search-select {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .search-input {
-  width: 12%;
+  width: 200px;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
-  margin-right: 1rem;
 }
 
 .search-input:focus {
   outline: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 
 .new-service-button {
   font-weight: bold;
@@ -171,28 +191,16 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.title {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-
-}
-.header.sum {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-.header.description {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
+.header.title,
+.header.sum,
+.header.description,
 .header.action {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
 
-.observer{
+.observer {
   height: 10px;
   margin-bottom: 20px;
 }

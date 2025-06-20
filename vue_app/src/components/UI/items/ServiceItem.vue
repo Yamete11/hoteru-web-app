@@ -16,6 +16,8 @@
 
 <script>
 import axios from "axios";
+import store from "@/store";
+
 
 export default {
   name: "ServiceItem",
@@ -30,7 +32,11 @@ export default {
       this.$router.push({ name: 'ServiceDetails', params: { idService: idService } });
     },
     deleteService(idService) {
-      axios.delete(`https://localhost:44384/api/Service/${idService}`)
+      axios.delete(`https://localhost:44384/api/Service/${idService}`, {
+        headers: {
+          'Authorization': `Bearer ${store.getters.getToken}`
+        },
+      })
           .then(() => {
             this.$emit('deleteService', idService);
           })

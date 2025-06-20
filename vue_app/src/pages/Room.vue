@@ -4,14 +4,21 @@
     <div class="content">
       <sidebar></sidebar>
       <div class="main">
-
         <div class="main-top">
-          <div class="left">
-            <input type="text" class="search-input" v-model="searchQuery" data-testid="search-input" placeholder="Search room by its number ..."/>
-          </div>
-          <div class="right">
-            <router-link to="/new-room" class="new-room-button" data-testid="new-room-button">New Room</router-link>
-          </div>
+          <select v-model="searchField" class="search-select" data-testid="room-search-select">
+            <option value="number">Number</option>
+            <option value="capacity">Capacity</option>
+            <option value="type">Type</option>
+            <option value="status">Status</option>
+          </select>
+          <input
+              type="text"
+              class="search-input"
+              v-model="searchQuery"
+              :placeholder="`Search by ${searchField}...`"
+              data-testid="search-input"
+          />
+          <router-link to="/new-room" class="new-room-button" data-testid="new-room-button">New Room</router-link>
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -22,7 +29,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <room-list :rooms="rooms" @deleteRoom="deleteRoom"/>
+            <room-list :rooms="filteredRooms" @deleteRoom="deleteRoom" />
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -39,33 +46,30 @@ import axios from 'axios';
 
 export default {
   name: "Room",
-  components: {},
   data() {
     return {
       isLoading: false,
       rooms: [],
       searchQuery: '',
+      searchField: 'number',
       page: 1,
       limit: 15,
       roomTypes: [],
       roomStatuses: [],
-      totalRooms: 0
+      totalRooms: 0,
     };
+  },
+  computed: {
+    filteredRooms() {
+      return this.rooms.filter(room => {
+        const rawValue = room[this.searchField];
+        const fieldValue = String(rawValue ?? '').toLowerCase();
+        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+      });
+    }
   },
   mounted() {
     this.fetchRooms();
-  },
-  computed: {
-    sortedAndSearchedPosts() {
-      return this.rooms.filter(room => room.number.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
-    }
-  },
-  watch: {
-    searchQuery() {
-      this.page = 1;
-      this.rooms = [];
-      this.fetchRooms();
-    }
   },
   methods: {
     deleteRoom(idRoom) {
@@ -80,8 +84,7 @@ export default {
           },
           params: {
             page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery
+            limit: this.limit
           }
         });
         this.rooms = response.data.list;
@@ -101,8 +104,7 @@ export default {
           },
           params: {
             page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery
+            limit: this.limit
           }
         });
         this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
@@ -111,16 +113,11 @@ export default {
         console.error(error);
       }
     }
-    ,
-
   }
-}
+};
 </script>
 
-
 <style scoped>
-
-
 .room-component {
   display: flex;
   flex-direction: column;
@@ -143,31 +140,35 @@ export default {
 
 .main-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1rem;
   padding: 1rem;
 }
 
-.left {
-  width: 100%;
+.search-select {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .search-input {
-  width: 13%;
+  width: 200px;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
-  margin-right: 1rem;
 }
 
 .search-input:focus {
   outline: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 
 .new-room-button {
   font-weight: bold;
@@ -178,18 +179,6 @@ export default {
   text-decoration: none;
   border-radius: 4px;
   white-space: nowrap;
-}
-
-.filters-button{
-  text-decoration: none;
-  border: none;
-  font-weight: bold;
-  font-size: 20px;
-  padding: 0.5rem 3rem;
-  background-color: #A4907C;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 .table-headers {
@@ -206,38 +195,17 @@ export default {
   font-size: 20px;
 }
 
-.header.number {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-
-}
-
-.header.capacity {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-
-.header.type {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-
-.header.status {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-}
-
+.header.number,
+.header.capacity,
+.header.type,
+.header.status,
 .header.action {
   display: flex;
   justify-content: center;
   flex-basis: 10%;
 }
 
-.observer{
+.observer {
   height: 10px;
   margin-bottom: 20px;
 }

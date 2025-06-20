@@ -5,7 +5,18 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" placeholder="Search ..." />
+          <select v-model="searchField" class="search-select" data-testid="reservation-search-select">
+            <option value="name">Name</option>
+            <option value="roomNumber">Room</option>
+            <option value="bookedBy">Booked By</option>
+          </select>
+          <input
+              type="text"
+              class="search-input"
+              v-model="searchQuery"
+              :placeholder="`Search by ${searchField}...`"
+              data-testid="reservation-search-input"
+          />
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -17,7 +28,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <reservation-list :reservations="reservations" @deleteReservation="deleteReservation"/>
+            <reservation-list :reservations="filteredReservations" @deleteReservation="deleteReservation"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -34,24 +45,32 @@ import axios from "axios";
 
 export default {
   name: "Reservation",
-  components: {},
   data() {
     return {
       isLoading: false,
       reservations: [],
+      searchQuery: '',
+      searchField: 'name',
       page: 1,
       limit: 15,
       totalReservations: 0
     };
   },
+  computed: {
+    filteredReservations() {
+      return this.reservations.filter(res => {
+        const value = res[this.searchField];
+        const fieldValue = String(value ?? '').toLowerCase();
+        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+      });
+    }
+  },
   mounted() {
-    console.log(this.$refs.observer);
     this.fetchReservations();
-  }
-  ,
+  },
   methods: {
     deleteReservation(idReservation) {
-      this.reservations = this.reservations.filter(reservation => reservation.idReservation !== idReservation);
+      this.reservations = this.reservations.filter(res => res.idReservation !== idReservation);
     },
     async fetchReservations() {
       try {
@@ -67,7 +86,6 @@ export default {
         });
         this.reservations = response.data.list;
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
-        console.log(this.reservations)
       } catch (error) {
         console.error(error);
       } finally {
@@ -77,7 +95,6 @@ export default {
     async loadMore() {
       try {
         this.page++;
-        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Reservation', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
@@ -87,7 +104,6 @@ export default {
             limit: this.limit
           }
         });
-        console.log(response)
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
         this.reservations = [...this.reservations, ...response.data.list];
       } catch (error) {
@@ -95,7 +111,6 @@ export default {
       }
     }
   }
-
 }
 </script>
 
@@ -121,20 +136,29 @@ export default {
 
 .main-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1rem;
   padding: 1rem;
 }
 
+.search-select {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .search-input {
-  width: 10%;
+  width: 200px;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
-  margin-right: 1rem;
 }
 
 .search-input:focus {
@@ -155,34 +179,18 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.in {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-
-}
-.header.out {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.name {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.room {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.bookedBy {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
+.header.in,
+.header.out,
+.header.name,
+.header.room,
+.header.bookedBy,
 .header.action {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
 
-.observer{
+.observer {
   height: 10px;
   margin-bottom: 20px;
 }

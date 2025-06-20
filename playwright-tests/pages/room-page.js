@@ -11,7 +11,9 @@ class RoomPage {
         this.roomCapacity = page.getByTestId('room-capacity');
         this.roomType = page.getByTestId('room-type');
         this.roomStatus = page.getByTestId('room-status');
-        this.serviceItemDetailsButton = page.getByTestId('service-item-details-button');
+        this.deleteRoomButton = page.getByTestId('delete-room-button');
+        this.roomItemDetailsButton = page.getByTestId('room-item-details-button');
+
     }
 
     async openNewRoom() {
@@ -25,6 +27,14 @@ class RoomPage {
     async assertValues(number, capacity){
         await expect(this.roomNumber.last()).toHaveText(number);
         await expect(this.roomCapacity.last()).toHaveText(String(capacity));
+    }
+
+    async deleteRoom(){
+        await this.deleteRoomButton.click();
+    }
+
+    async openDetails(){
+        await this.roomItemDetailsButton.last().click()
     }
 }
 

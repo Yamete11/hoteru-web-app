@@ -4,7 +4,7 @@ module.exports = defineConfig({
     workers: 1,
     testDir: './tests',
     timeout: 30000,
-    retries: 1,
+    retries: 0,
     reporter: 'html',
     use: {
         headless: false,

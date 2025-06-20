@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationController : ControllerBase
@@ -38,7 +39,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet("history/{IdReservation}")]
-        public async Task<IEnumerable<FullReservationDTO>> GetSpecificHistory(int IdReservation)
+        public async Task<FullReservationDTO> GetSpecificHistory(int IdReservation)
         {
             return await _service.GetSpecificHistory(IdReservation);
         }

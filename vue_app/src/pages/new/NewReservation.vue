@@ -54,18 +54,18 @@
             </div>
             <div class="input-form">
               <label>Type: </label>
-              <select v-model="state.roomType" @change="v$.state.roomType.$touch()">
+              <select v-model="state.roomType" @change="v$.state.roomType.$touch()" data-testid="room-type-select">
                 <option disabled value="0" selected>Select type</option>
-                <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)">{{ roomType.title }}</option>
+                <option v-for="roomType in state.roomTypes" :key="roomType.idType" :value="String(roomType.idType)" data-testid="room-type-option">{{ roomType.title }}</option>
               </select>
             </div>
           </div>
 
           <div class="input-form">
             <label>Room Selection: </label>
-            <select v-model="state.formData.IdRoom" @change="v$.formData.IdRoom.$touch()">
+            <select v-model="state.formData.IdRoom" @change="v$.formData.IdRoom.$touch()" data-testid="room-select">
               <option disabled value="0" selected>Select a room</option>
-              <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom">{{ room.number }} - Capacity: {{ room.capacity }}</option>
+              <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom" data-testid="room-option">{{ room.number }} - Capacity: {{ room.capacity }}</option>
             </select>
             <label>Price: {{state.formData.Price}}</label>
           </div>
@@ -75,9 +75,9 @@
           <label>Guest personal information</label>
           <div class="input-form">
             <label>Guest Selection: </label>
-            <select v-model="state.formData.idPerson" @change="v$.formData.idPerson.$touch()">
+            <select v-model="state.formData.idPerson" @change="v$.formData.idPerson.$touch()" data-testid="guest-select">
               <option disabled value="0">Select a guest</option>
-              <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson">
+              <option v-for="guest in state.guests" :key="guest.idPerson" :value="guest.idPerson" data-testid="guest-option">
                {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
               </option>
             </select>
@@ -86,32 +86,36 @@
         </div>
 
         <div class="guest">
-          <label>Deposit option</label>
-          <div class="input-form">
+          <label>Deposit</label>
+          <template v-if="!state.isEditing && !state.hasDeposit">
+            <label>There is no deposit.</label>
+          </template>
+          <div v-else-if="state.hasDeposit" class="input-form">
             <label>Deposit sum: </label>
             <input
                 v-model="state.formData.Sum"
                 class="input"
                 type="number"
+                data-testid="deposit-input"
             >
             <label>Choose type: </label>
-            <select v-model="state.formData.IdDepositType">
+            <select v-model="state.formData.IdDepositType" data-testid="deposit-select">
               <option disabled value="0">Select type</option>
-              <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType">
+              <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType" data-testid="deposit-option">
                 {{ type.title }}
               </option>
             </select>
           </div>
-          <button @click.prevent="switchDeposit" class="form-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
+          <button @click.prevent="switchDeposit" class="form-btn" data-testid="add-deposit-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
         </div>
 
         <div class="guest">
           <label>Service option</label>
           <div class="input-form">
             <label>Choose a service</label>
-            <select v-model="state.selectedService" class="input">
+            <select v-model="state.selectedService" class="input" data-testid="service-select">
               <option value="" disabled selected>Select a service</option>
-              <option v-for="service in state.services" :key="service.idService" :value="service">
+              <option v-for="service in state.services" :key="service.idService" :value="service" data-testid="service-option">
                 {{ service.title }}: {{ service.sum }}
               </option>
             </select>
@@ -128,8 +132,8 @@
         </div>
 
         <div class="registration-class">
-          <router-link class="registration-btn" to="/arrivals">Cancel</router-link>
-          <button class="registration-btn" type="submit">Confirm</button>
+          <router-link class="registration-btn" to="/arrivals" data-testid="cancel-button">Cancel</router-link>
+          <button class="registration-btn" type="submit" data-testid="submit-button">Confirm</button>
         </div>
       </form>
     </div>

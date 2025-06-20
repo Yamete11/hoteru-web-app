@@ -5,7 +5,19 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" data-testid="guest-search-input" class="search-input" v-model="searchQuery" placeholder="Search by name ..." />
+          <select v-model="searchField" class="search-select" data-testid="guest-search-select">
+            <option value="name">Name</option>
+            <option value="surname">Surname</option>
+            <option value="telNumber">Phone</option>
+            <option value="email">Email</option>
+          </select>
+          <input
+              type="text"
+              class="search-input"
+              v-model="searchQuery"
+              :placeholder="`Search by ${searchField}...`"
+              data-testid="guest-search-input"
+          />
           <router-link to="/new-guest" class="new-guest-button" data-testid="new-guest-button">New Guest</router-link>
         </div>
         <div class="main-bot">
@@ -40,21 +52,26 @@ export default {
       isLoading: false,
       guests: [],
       searchQuery: '',
+      searchField: 'name',
       page: 1,
       limit: 15,
     };
   },
   computed: {
     sortedAndSearchedPosts() {
-      return this.guests.filter(guest => guest.name.toLowerCase().startsWith(this.searchQuery.toLowerCase()));
+      return this.guests.filter(guest => {
+        const rawValue = guest[this.searchField];
+        const fieldValue = String(rawValue ?? '').toLowerCase();
+        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+      });
     }
-  },
+  }
+  ,
   mounted() {
     this.fetchGuests();
   },
   methods: {
     deleteGuest(idPerson) {
-      console.log(this.guests)
       this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
     },
     async fetchGuests() {
@@ -71,7 +88,6 @@ export default {
         });
         this.guests = response.data.list;
         this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
-        console.log(this.guests)
       } catch (error) {
         console.error(error);
       } finally {
@@ -81,7 +97,6 @@ export default {
     async loadMore() {
       try {
         this.page++;
-        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Guest', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
@@ -91,7 +106,6 @@ export default {
             limit: this.limit
           }
         });
-        console.log(response)
         this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
         this.guests = [...this.guests, ...response.data.list];
       } catch (error) {
@@ -124,27 +138,35 @@ export default {
 
 .main-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1rem;
   padding: 1rem;
 }
 
+.search-select {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .search-input {
-  width: 10%;
+  width: 200px;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
-  margin-right: 1rem;
 }
 
 .search-input:focus {
   outline: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 
 .new-guest-button {
   font-weight: bold;
@@ -170,30 +192,17 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.name {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-
-}
-.header.surname {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.telNumber {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.email {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
+.header.name,
+.header.surname,
+.header.telNumber,
+.header.email,
 .header.action {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
 
-.observer{
+.observer {
   height: 10px;
   margin-bottom: 20px;
 }

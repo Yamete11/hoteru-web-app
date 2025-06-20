@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace hoteru_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -32,12 +33,14 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Superadmin")]
         public Task<List<ListUserDTO>> GetUsers()
         {
             return _service.GetUsers();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Superadmin")]
         public async Task<MethodResultDTO> PostUser([FromBody] NewUserDTO newUserDTO)
         {
             return await _service.PostUser(newUserDTO);
@@ -50,6 +53,7 @@ namespace hoteru_be.Controllers
         }
 
         [HttpDelete("{IdPerson}")]
+        [Authorize(Roles = "Admin,Superadmin")]
         public async Task<MethodResultDTO> DeleteUser(int IdPerson)
         {
             return await _service.DeleteUser(IdPerson);

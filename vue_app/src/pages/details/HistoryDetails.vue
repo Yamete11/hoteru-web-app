@@ -43,19 +43,6 @@
           <label>{{ reservation.created }}</label>
         </div>
 
-        <div v-if="reservation.services && reservation.services.length > 0">
-          <label class="service-label">Services: </label>
-          <div class="service-list">
-            <ul>
-              <li class="element" v-for="service in reservation.services" :key="service.idService">
-                Title: {{ service.title }}, Price: {{ service.sum }}, Date: {{ service.date }}
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div v-else>
-          <label class="service-label">No services</label>
-        </div>
         <div class="registration-class">
           <router-link class="registration-btn" to="/history">Back</router-link>
         </div>
@@ -89,7 +76,7 @@ export default {
           },
         });
 
-        this.reservation = response.data[0];
+        this.reservation = response.data;
         console.log(this.reservation)
       } catch(error){
         console.log(error);

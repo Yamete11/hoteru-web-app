@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GuestStatusController : ControllerBase

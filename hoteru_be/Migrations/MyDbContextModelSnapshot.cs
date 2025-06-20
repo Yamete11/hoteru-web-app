@@ -60,8 +60,33 @@ namespace hoteru_be.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("BookedBy")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("GuestName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("GuestSurname")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("InDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OutDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RoomNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Sum")
                         .HasColumnType("real");
@@ -74,8 +99,14 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdBill = 1,
-                            Created = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Sum = 300f
+                            BookedBy = "zxc",
+                            Created = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestName = "Noah",
+                            GuestSurname = "Wilson",
+                            InDate = new DateTime(2025, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OutDate = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RoomNumber = "108",
+                            Sum = 140f
                         });
                 });
 
@@ -110,6 +141,18 @@ namespace hoteru_be.Migrations
                             IdDeposit = 2,
                             IdDepositType = 1,
                             Sum = 300f
+                        },
+                        new
+                        {
+                            IdDeposit = 3,
+                            IdDepositType = 2,
+                            Sum = 500f
+                        },
+                        new
+                        {
+                            IdDeposit = 4,
+                            IdDepositType = 2,
+                            Sum = 1000f
                         });
                 });
 
@@ -163,59 +206,73 @@ namespace hoteru_be.Migrations
                     b.HasData(
                         new
                         {
-                            IdPerson = 1,
+                            IdPerson = 5,
                             IdGuestStatus = 1,
-                            Passport = "FV124124",
-                            TelNumber = "123123123"
+                            Passport = "PL111111",
+                            TelNumber = "500100100"
                         },
                         new
                         {
-                            IdPerson = 2,
+                            IdPerson = 6,
                             IdGuestStatus = 1,
-                            Passport = "BG121231",
-                            TelNumber = "567567567"
-                        });
-                });
-
-            modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
-                {
-                    b.Property<int>("IdGuestReservation")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("IdGuest")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdReservation")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdGuestReservation");
-
-                    b.HasIndex("IdGuest");
-
-                    b.HasIndex("IdReservation");
-
-                    b.ToTable("GuestReservations");
-
-                    b.HasData(
-                        new
-                        {
-                            IdGuestReservation = 1,
-                            IdGuest = 1,
-                            IdReservation = 1
+                            Passport = "PL222222",
+                            TelNumber = "500200200"
                         },
                         new
                         {
-                            IdGuestReservation = 2,
-                            IdGuest = 2,
-                            IdReservation = 2
+                            IdPerson = 7,
+                            IdGuestStatus = 1,
+                            Passport = "PL333333",
+                            TelNumber = "500300300"
                         },
                         new
                         {
-                            IdGuestReservation = 3,
-                            IdGuest = 1,
-                            IdReservation = 3
+                            IdPerson = 8,
+                            IdGuestStatus = 1,
+                            Passport = "PL444444",
+                            TelNumber = "500400400"
+                        },
+                        new
+                        {
+                            IdPerson = 9,
+                            IdGuestStatus = 1,
+                            Passport = "PL555555",
+                            TelNumber = "500500500"
+                        },
+                        new
+                        {
+                            IdPerson = 10,
+                            IdGuestStatus = 1,
+                            Passport = "PL666666",
+                            TelNumber = "500600600"
+                        },
+                        new
+                        {
+                            IdPerson = 11,
+                            IdGuestStatus = 1,
+                            Passport = "PL777777",
+                            TelNumber = "500700700"
+                        },
+                        new
+                        {
+                            IdPerson = 12,
+                            IdGuestStatus = 1,
+                            Passport = "PL888888",
+                            TelNumber = "500800800"
+                        },
+                        new
+                        {
+                            IdPerson = 13,
+                            IdGuestStatus = 1,
+                            Passport = "PL999999",
+                            TelNumber = "500900900"
+                        },
+                        new
+                        {
+                            IdPerson = 14,
+                            IdGuestStatus = 1,
+                            Passport = "PL000000",
+                            TelNumber = "501000000"
                         });
                 });
 
@@ -332,6 +389,86 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             Name = "Jack",
                             Surname = "Marston"
+                        },
+                        new
+                        {
+                            IdPerson = 5,
+                            Email = "anna.nowak@gmail.com",
+                            IdHotel = 1,
+                            Name = "Anna",
+                            Surname = "Nowak"
+                        },
+                        new
+                        {
+                            IdPerson = 6,
+                            Email = "john.doe@gmail.com",
+                            IdHotel = 1,
+                            Name = "John",
+                            Surname = "Doe"
+                        },
+                        new
+                        {
+                            IdPerson = 7,
+                            Email = "emma.smith@gmail.com",
+                            IdHotel = 1,
+                            Name = "Emma",
+                            Surname = "Smith"
+                        },
+                        new
+                        {
+                            IdPerson = 8,
+                            Email = "liam.brown@gmail.com",
+                            IdHotel = 1,
+                            Name = "Liam",
+                            Surname = "Brown"
+                        },
+                        new
+                        {
+                            IdPerson = 9,
+                            Email = "olivia.taylor@gmail.com",
+                            IdHotel = 1,
+                            Name = "Olivia",
+                            Surname = "Taylor"
+                        },
+                        new
+                        {
+                            IdPerson = 10,
+                            Email = "noah.wilson@gmail.com",
+                            IdHotel = 1,
+                            Name = "Noah",
+                            Surname = "Wilson"
+                        },
+                        new
+                        {
+                            IdPerson = 11,
+                            Email = "sophia.martinez@gmail.com",
+                            IdHotel = 1,
+                            Name = "Sophia",
+                            Surname = "Martinez"
+                        },
+                        new
+                        {
+                            IdPerson = 12,
+                            Email = "james.anderson@gmail.com",
+                            IdHotel = 1,
+                            Name = "James",
+                            Surname = "Anderson"
+                        },
+                        new
+                        {
+                            IdPerson = 13,
+                            Email = "isabella.thomas@gmail.com",
+                            IdHotel = 1,
+                            Name = "Isabella",
+                            Surname = "Thomas"
+                        },
+                        new
+                        {
+                            IdPerson = 14,
+                            Email = "william.lee@gmail.com",
+                            IdHotel = 1,
+                            Name = "William",
+                            Surname = "Lee"
                         });
                 });
 
@@ -352,6 +489,9 @@ namespace hoteru_be.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("IdDeposit")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdGuest")
                         .HasColumnType("int");
 
                     b.Property<int>("IdRoom")
@@ -379,6 +519,8 @@ namespace hoteru_be.Migrations
                         .IsUnique()
                         .HasFilter("[IdDeposit] IS NOT NULL");
 
+                    b.HasIndex("IdGuest");
+
                     b.HasIndex("IdRoom");
 
                     b.HasIndex("IdUser");
@@ -389,38 +531,103 @@ namespace hoteru_be.Migrations
                         new
                         {
                             IdReservation = 1,
-                            Capacity = 2,
+                            Capacity = 1,
                             Confirmed = true,
                             IdDeposit = 1,
-                            IdRoom = 1,
-                            IdUser = 3,
-                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Out = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 1f
+                            IdGuest = 5,
+                            IdRoom = 2,
+                            IdUser = 1,
+                            In = new DateTime(2025, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 150f
                         },
                         new
                         {
                             IdReservation = 2,
-                            Capacity = 3,
+                            Capacity = 2,
                             Confirmed = true,
-                            IdBill = 1,
                             IdDeposit = 2,
-                            IdRoom = 2,
-                            IdUser = 4,
-                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Out = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 2f
+                            IdGuest = 6,
+                            IdRoom = 3,
+                            IdUser = 2,
+                            In = new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 180f
                         },
                         new
                         {
                             IdReservation = 3,
-                            Capacity = 2,
-                            Confirmed = false,
-                            IdRoom = 3,
+                            Capacity = 3,
+                            Confirmed = true,
+                            IdDeposit = 3,
+                            IdGuest = 7,
+                            IdRoom = 5,
                             IdUser = 3,
-                            In = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Out = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 1f
+                            In = new DateTime(2025, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 340f
+                        },
+                        new
+                        {
+                            IdReservation = 4,
+                            Capacity = 4,
+                            Confirmed = true,
+                            IdDeposit = 4,
+                            IdGuest = 8,
+                            IdRoom = 6,
+                            IdUser = 3,
+                            In = new DateTime(2025, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 325f
+                        },
+                        new
+                        {
+                            IdReservation = 5,
+                            Capacity = 1,
+                            Confirmed = true,
+                            IdGuest = 9,
+                            IdRoom = 7,
+                            IdUser = 3,
+                            In = new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 330f
+                        },
+                        new
+                        {
+                            IdReservation = 6,
+                            Capacity = 2,
+                            Confirmed = true,
+                            IdBill = 1,
+                            IdGuest = 10,
+                            IdRoom = 8,
+                            IdUser = 3,
+                            In = new DateTime(2025, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 140f
+                        },
+                        new
+                        {
+                            IdReservation = 7,
+                            Capacity = 3,
+                            Confirmed = false,
+                            IdGuest = 6,
+                            IdRoom = 9,
+                            IdUser = 3,
+                            In = new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 330f
+                        },
+                        new
+                        {
+                            IdReservation = 8,
+                            Capacity = 4,
+                            Confirmed = false,
+                            IdGuest = 11,
+                            IdRoom = 10,
+                            IdUser = 3,
+                            In = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Out = new DateTime(2025, 6, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Price = 380f
                         });
                 });
 
@@ -515,19 +722,19 @@ namespace hoteru_be.Migrations
                         {
                             IdRoom = 1,
                             Capacity = 1,
-                            IdRoomStatus = 2,
+                            IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "101",
-                            Price = 3.5f
+                            Price = 45f
                         },
                         new
                         {
                             IdRoom = 2,
                             Capacity = 2,
-                            IdRoomStatus = 1,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "102",
-                            Price = 3.5f
+                            Price = 75f
                         },
                         new
                         {
@@ -536,7 +743,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "103",
-                            Price = 3.5f
+                            Price = 60f
                         },
                         new
                         {
@@ -545,61 +752,61 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "104",
-                            Price = 3.5f
+                            Price = 90f
                         },
                         new
                         {
                             IdRoom = 5,
                             Capacity = 5,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "105",
-                            Price = 3.5f
+                            Price = 85f
                         },
                         new
                         {
                             IdRoom = 6,
                             Capacity = 6,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "106",
-                            Price = 3.5f
+                            Price = 65f
                         },
                         new
                         {
                             IdRoom = 7,
                             Capacity = 7,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "107",
-                            Price = 3.5f
+                            Price = 55f
                         },
                         new
                         {
                             IdRoom = 8,
                             Capacity = 8,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "108",
-                            Price = 3.5f
+                            Price = 70f
                         },
                         new
                         {
                             IdRoom = 9,
                             Capacity = 9,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "109",
-                            Price = 3.5f
+                            Price = 110f
                         },
                         new
                         {
                             IdRoom = 10,
                             Capacity = 10,
-                            IdRoomStatus = 3,
+                            IdRoomStatus = 2,
                             IdRoomType = 1,
                             Number = "201",
-                            Price = 3.5f
+                            Price = 95f
                         },
                         new
                         {
@@ -608,7 +815,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "202",
-                            Price = 3.5f
+                            Price = 100f
                         },
                         new
                         {
@@ -617,7 +824,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "203",
-                            Price = 3.5f
+                            Price = 120f
                         },
                         new
                         {
@@ -626,7 +833,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "204",
-                            Price = 3.5f
+                            Price = 130f
                         },
                         new
                         {
@@ -635,7 +842,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "205",
-                            Price = 3.5f
+                            Price = 75f
                         },
                         new
                         {
@@ -644,7 +851,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "206",
-                            Price = 3.5f
+                            Price = 85f
                         },
                         new
                         {
@@ -653,7 +860,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "207",
-                            Price = 3.5f
+                            Price = 105f
                         },
                         new
                         {
@@ -662,7 +869,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "208",
-                            Price = 3.5f
+                            Price = 140f
                         },
                         new
                         {
@@ -671,7 +878,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 1,
                             Number = "209",
-                            Price = 3.5f
+                            Price = 135f
                         },
                         new
                         {
@@ -680,7 +887,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "301",
-                            Price = 3.5f
+                            Price = 100f
                         },
                         new
                         {
@@ -689,7 +896,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "302",
-                            Price = 3.5f
+                            Price = 110f
                         },
                         new
                         {
@@ -698,7 +905,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "303",
-                            Price = 3.5f
+                            Price = 115f
                         },
                         new
                         {
@@ -707,7 +914,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "304",
-                            Price = 3.5f
+                            Price = 125f
                         },
                         new
                         {
@@ -716,7 +923,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "305",
-                            Price = 3.5f
+                            Price = 135f
                         },
                         new
                         {
@@ -725,7 +932,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "306",
-                            Price = 3.5f
+                            Price = 95f
                         },
                         new
                         {
@@ -734,7 +941,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "307",
-                            Price = 3.5f
+                            Price = 85f
                         },
                         new
                         {
@@ -743,7 +950,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "308",
-                            Price = 3.5f
+                            Price = 125f
                         },
                         new
                         {
@@ -752,7 +959,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "309",
-                            Price = 3.5f
+                            Price = 140f
                         },
                         new
                         {
@@ -761,7 +968,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "401",
-                            Price = 3.5f
+                            Price = 145f
                         },
                         new
                         {
@@ -770,7 +977,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "402",
-                            Price = 3.5f
+                            Price = 150f
                         },
                         new
                         {
@@ -779,7 +986,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "403",
-                            Price = 3.5f
+                            Price = 125f
                         },
                         new
                         {
@@ -788,7 +995,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "404",
-                            Price = 3.5f
+                            Price = 135f
                         },
                         new
                         {
@@ -797,7 +1004,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "405",
-                            Price = 3.5f
+                            Price = 100f
                         },
                         new
                         {
@@ -806,7 +1013,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "406",
-                            Price = 3.5f
+                            Price = 110f
                         },
                         new
                         {
@@ -815,7 +1022,7 @@ namespace hoteru_be.Migrations
                             IdRoomStatus = 3,
                             IdRoomType = 2,
                             Number = "407",
-                            Price = 3.5f
+                            Price = 95f
                         });
                 });
 
@@ -945,17 +1152,31 @@ namespace hoteru_be.Migrations
                     b.HasData(
                         new
                         {
-                            IdPerson = 3,
+                            IdPerson = 1,
                             IdUserType = 3,
                             LoginName = "asd",
                             Password = "asd"
                         },
                         new
                         {
-                            IdPerson = 4,
+                            IdPerson = 2,
                             IdUserType = 1,
                             LoginName = "qwe",
                             Password = "qwe"
+                        },
+                        new
+                        {
+                            IdPerson = 3,
+                            IdUserType = 2,
+                            LoginName = "zxc",
+                            Password = "zxc"
+                        },
+                        new
+                        {
+                            IdPerson = 4,
+                            IdUserType = 3,
+                            LoginName = "qaz",
+                            Password = "qaz"
                         });
                 });
 
@@ -1021,25 +1242,6 @@ namespace hoteru_be.Migrations
                     b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("hoteru_be.Entities.GuestReservation", b =>
-                {
-                    b.HasOne("hoteru_be.Entities.Guest", "Guest")
-                        .WithMany("GuestReservations")
-                        .HasForeignKey("IdGuest")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("hoteru_be.Entities.Reservation", "Reservation")
-                        .WithMany("GuestReservations")
-                        .HasForeignKey("IdReservation")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Guest");
-
-                    b.Navigation("Reservation");
-                });
-
             modelBuilder.Entity("hoteru_be.Entities.Hotel", b =>
                 {
                     b.HasOne("hoteru_be.Entities.Address", "Address")
@@ -1072,6 +1274,12 @@ namespace hoteru_be.Migrations
                         .WithOne("Reservation")
                         .HasForeignKey("hoteru_be.Entities.Reservation", "IdDeposit");
 
+                    b.HasOne("hoteru_be.Entities.Guest", "Guest")
+                        .WithMany("Reservations")
+                        .HasForeignKey("IdGuest")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("hoteru_be.Entities.Room", "Room")
                         .WithMany("Reservations")
                         .HasForeignKey("IdRoom")
@@ -1087,6 +1295,8 @@ namespace hoteru_be.Migrations
                     b.Navigation("Bill");
 
                     b.Navigation("Deposit");
+
+                    b.Navigation("Guest");
 
                     b.Navigation("Room");
 
@@ -1172,7 +1382,7 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Guest", b =>
                 {
-                    b.Navigation("GuestReservations");
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.GuestStatus", b =>
@@ -1189,8 +1399,6 @@ namespace hoteru_be.Migrations
 
             modelBuilder.Entity("hoteru_be.Entities.Reservation", b =>
                 {
-                    b.Navigation("GuestReservations");
-
                     b.Navigation("ReservationServices");
                 });
 

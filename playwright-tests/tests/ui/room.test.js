@@ -35,5 +35,7 @@ test('Create new Room', async ({ page }) => {
         testData.roomNumber,
         testData.roomCapacity,
     );
+
+    await roomPage.deleteRoom();
 });
 

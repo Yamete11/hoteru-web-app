@@ -18,6 +18,7 @@
 
 <script>
 import axios from "axios";
+import store from "@/store";
 
 export default {
   name: "ReservationItem",
@@ -32,7 +33,11 @@ export default {
       this.$router.push({ name: 'ReservationDetails', params: { idReservation: idReservation } });
     },
     deleteReservation(idReservation) {
-      axios.delete(`https://localhost:44384/api/Reservation/${idReservation}`)
+      axios.delete(`https://localhost:44384/api/Reservation/${idReservation}`, {
+        headers: {
+          'Authorization': `Bearer ${store.getters.getToken}`
+        }
+      })
           .then(() => {
             this.$emit('deleteReservation', idReservation);
           })

@@ -208,12 +208,17 @@ export default {
 
     async function fetchUsers() {
       try {
-        const response = await axios.get('https://localhost:44384/api/User');
+        const response = await axios.get('https://localhost:44384/api/User', {
+          headers: {
+            'Authorization': `Bearer ${store.getters.getToken}`
+          }
+        });
         state.users = response.data;
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     }
+
 
 
     async function addUser(){

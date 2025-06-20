@@ -9,7 +9,7 @@
       <button class="btn" type="button" @click="viewReservationDetails(reservation.idReservation)">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteReservation(reservation.idReservation)">
+      <button class="btn" type="button" data-testid="delete-reservation-button" @click="deleteReservation(reservation.idReservation)">
         Delete
       </button>
     </div>
@@ -18,6 +18,7 @@
 
 <script>
 import axios from "axios";
+import store from "@/store";
 
 export default {
   name: "ArrivalItem",
@@ -32,7 +33,11 @@ export default {
       this.$router.push({ name: 'ArrivalDetails', params: { idReservation: idReservation } });
     },
     deleteReservation(idReservation) {
-      axios.delete(`https://localhost:44384/api/Reservation/${idReservation}`)
+      axios.delete(`https://localhost:44384/api/Reservation/${idReservation}`, {
+        headers: {
+          'Authorization': `Bearer ${store.getters.getToken}`
+        }
+      })
           .then(() => {
             this.$emit('deleteReservation', idReservation);
           })

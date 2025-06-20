@@ -33,6 +33,7 @@ test('Create new Service', async ({ page }) => {
         testData.servicePrice,
         testData.serviceDescription
     );
+    await servicePage.deleteService()
 });
 
 test('Edit a service', async ({ page }) => {
@@ -54,4 +55,8 @@ test('Edit a service', async ({ page }) => {
         testData.editServicePrice,
         testData.editServiceDescription
     );
+
+    await servicePage.enterSearch(testData.editServiceTitle)
+    await servicePage.deleteService()
 });
+

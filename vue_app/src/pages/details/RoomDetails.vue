@@ -14,6 +14,7 @@
                  placeholder="Enter room number"
                  :readonly="!state.isEditing"
                  @input="v$.formData.number.$touch()"
+                 data-testid="input-number"
           >
           <span class="error-message" v-if="v$.formData.number.$error">
             <span v-if="!v$.formData.number.required.$response">Number is required*</span>
@@ -30,6 +31,7 @@
                  placeholder="Enter room capacity"
                  :readonly="!state.isEditing"
                  @input="v$.formData.capacity.$touch()"
+                 data-testid="input-capacity"
           >
           <span class="error-message" v-if="v$.formData.capacity.$error">
             <span v-if="!v$.formData.capacity.required.$response">Capacity is required*</span>
@@ -48,6 +50,7 @@
                  placeholder="Enter room price"
                  :readonly="!state.isEditing"
                  @input="v$.formData.price.$touch()"
+                 data-testid="input-price"
           >
           <span class="error-message" v-if="v$.formData.price.$error">
             <span v-if="!v$.formData.price.required.$response">Price is required*</span>
@@ -61,8 +64,8 @@
         <div class="input-form">
           <label>Type: </label>
           <input v-if="!state.isEditing" class="input" type="text" :value="state.typeTitle" readonly>
-          <select v-else v-model="state.formData.type" class="input" @change="v$.formData.type.$touch()">
-            <option v-for="type in state.roomTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
+          <select v-else v-model="state.formData.type" class="input" @change="v$.formData.type.$touch()" data-testid="room-type-select">
+            <option v-for="type in state.roomTypes" :value="type.idType" :key="type.idType" data-testid="room-type-option">{{ type.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.type.$error">
             <span v-if="!v$.formData.type.required.$response">Type is required*</span>
@@ -73,8 +76,8 @@
         <div class="input-form">
           <label>Status: </label>
           <input v-if="!state.isEditing" class="input" type="text" :value="state.statusTitle" readonly>
-          <select v-else v-model="state.formData.status" class="input" @change="v$.formData.status.$touch()">
-            <option v-for="status in state.roomStatuses" :value="status.idStatus" :key="status.idStatus">{{ status.title }}</option>
+          <select v-else v-model="state.formData.status" class="input" @change="v$.formData.status.$touch()" data-testid="room-status-select">
+            <option v-for="status in state.roomStatuses" :value="status.idStatus" :key="status.idStatus" data-testid="room-status-option">{{ status.title }}</option>
           </select>
           <span class="error-message" v-if="v$.formData.status.$error">
             <span v-if="!v$.formData.status.required.$response">Status is required*</span>
@@ -83,8 +86,8 @@
         </div>
 
         <div class="registration-class">
-          <router-link class="registration-btn" to="/rooms">Back</router-link>
-          <button type="submit" class="registration-btn">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
+          <router-link class="registration-btn" to="/rooms" data-testid="btn-back">Back</router-link>
+          <button type="submit" class="registration-btn" data-testid="btn-submit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
         </div>
       </form>
     </div>

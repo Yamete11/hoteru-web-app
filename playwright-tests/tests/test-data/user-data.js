@@ -24,4 +24,14 @@ module.exports = {
     guestTelNumber: '1234567890',
     guestPassport: 'AB1234567',
     guestStatus: '2',
+
+    reservationInDate: '2025-06-20',
+    reservationOutDate: '2025-06-25',
+    reservationCapacity: 2,
+    reservationRoomType: "Regular",
+    reservationRoom: '104 - Capacity: 4',
+    reservationGuest: '14',
+    reservationDepositSum: 100,
+    reservationDepositType: '2',
+    reservationService: 'Spa: 120.5',
 };

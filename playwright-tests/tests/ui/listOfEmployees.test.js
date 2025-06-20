@@ -21,7 +21,7 @@ test('Check my account login', async ({ page }) => {
     await expect(await myAccount.getLoginValue()).toBe(testData.validUsername);
 });
 
-/*test('Creating new user', async ({ page }) => {
+test('Creating new user', async ({ page }) => {
     const navbar = new Navbar(page);
     const listOfEmployees = new ListOfEmployees(page);
 
@@ -43,5 +43,5 @@ test('Check my account login', async ({ page }) => {
     expect(isUserPresent).toBe(true);
 
     await listOfEmployees.deleteUserByLogin(newUser.login)
-});*/
+});
 

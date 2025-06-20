@@ -22,6 +22,6 @@ namespace hoteru_be.Entities
         [ForeignKey(nameof(IdGuestStatus))]
         public GuestStatus GuestStatus { get; set; }
 
-        public virtual ICollection<GuestReservation> GuestReservations { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }
