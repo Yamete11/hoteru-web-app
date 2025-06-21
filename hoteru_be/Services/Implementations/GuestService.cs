@@ -46,13 +46,34 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests(int page, int limit)
+        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests(int page, int limit, string searchQuery = null, string searchField = null)
         {
+            IQueryable<Guest> query = _context.Guests.Include(g => g.Person).Include(g => g.GuestStatus);
 
-            var totalGuests = await _context.Guests.CountAsync();
+            if (!string.IsNullOrWhiteSpace(searchQuery) && !string.IsNullOrWhiteSpace(searchField))
+            {
+                searchQuery = searchQuery.ToLower();
+                switch (searchField.ToLower())
+                {
+                    case "name":
+                        query = query.Where(g => g.Person.Name.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "surname":
+                        query = query.Where(g => g.Person.Surname.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "telnumber":
+                        query = query.Where(g => g.TelNumber.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "email":
+                        query = query.Where(g => g.Person.Email.ToLower().StartsWith(searchQuery));
+                        break;
+                }
+            }
 
-            var guests = await _context.Guests
-                .OrderBy(r => r.IdPerson)
+            var totalGuests = await query.CountAsync();
+
+            var guests = await query
+                .OrderBy(g => g.IdPerson)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .Select(x => new GuestDTO
@@ -76,12 +97,18 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
+
         public async Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson)
         {
             var guest = await _context.Guests
             .Include(r => r.GuestStatus)
             .Include(r => r.Person)
             .FirstOrDefaultAsync(x => x.IdPerson == IdPerson);
+
+            if (guest == null)
+            {
+                return null; // или выбросить NotFoundException, или вернуть пустой объект
+            }
 
             return new SpecificGuestDTO
             {

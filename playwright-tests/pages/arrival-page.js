@@ -22,7 +22,6 @@ class ArrivalPage {
 
     async deleteReservation() {
         await this.deleteReservationButton.first().waitFor({ state: 'visible' });
-
         await this.deleteReservationButton.first().click();
     }
 

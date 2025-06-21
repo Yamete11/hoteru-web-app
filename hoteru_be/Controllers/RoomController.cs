@@ -22,11 +22,12 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedResultDTO<RoomDTO>>> GetRooms([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "")
+        public async Task<ActionResult<PaginatedResultDTO<RoomDTO>>> GetRooms([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "", [FromQuery] string searchField = "number")
         {
-            var result = await _service.GetRooms(page, limit, searchQuery);
+            var result = await _service.GetRooms(page, limit, searchQuery, searchField);
             return Ok(result);
         }
+
 
 
         [HttpGet("freeRooms")]

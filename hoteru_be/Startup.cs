@@ -50,6 +50,7 @@ namespace hoteru_be
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserTypeService, UserTypeService>();
             services.AddScoped<IDepositService, DepositService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

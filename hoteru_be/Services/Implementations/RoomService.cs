@@ -84,13 +84,33 @@ namespace hoteru_be.Services.Implementations
                 }).ToListAsync();
         }
 
-        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit, string searchQuery = "")
+        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit, string searchQuery = "", string searchField = "number")
         {
-            var query = _context.Rooms.AsQueryable();
+            var query = _context.Rooms
+                .Include(r => r.RoomStatus)
+                .Include(r => r.RoomType)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
-                query = query.Where(r => r.Number.ToLower().StartsWith(searchQuery.ToLower()));
+                searchQuery = searchQuery.ToLower();
+
+                switch (searchField.ToLower())
+                {
+                    case "number":
+                        query = query.Where(r => r.Number.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "capacity":
+                        if (int.TryParse(searchQuery, out int cap))
+                            query = query.Where(r => r.Capacity == cap);
+                        break;
+                    case "type":
+                        query = query.Where(r => r.RoomType.Title.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "status":
+                        query = query.Where(r => r.RoomStatus.Title.ToLower().StartsWith(searchQuery));
+                        break;
+                }
             }
 
             var totalRooms = await query.CountAsync();
@@ -117,6 +137,7 @@ namespace hoteru_be.Services.Implementations
                 Limit = limit
             };
         }
+
 
 
         public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)

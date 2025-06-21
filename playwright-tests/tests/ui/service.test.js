@@ -1,7 +1,7 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/login-page');
 const ServicePage = require('../../pages/service-page');
-const NewServicePage = require('../../pages/new-service-page');
+const NewServicePage = require('../../pages/new/new-service-page');
 const SideBar = require('../../components/sidebar');
 const testData = require('../test-data/user-data');
 const ServiceDetailsPage = require("../../pages/details/service-details-page");
@@ -33,7 +33,6 @@ test('Create new Service', async ({ page }) => {
         testData.servicePrice,
         testData.serviceDescription
     );
-    await servicePage.deleteService()
 });
 
 test('Edit a service', async ({ page }) => {
@@ -55,7 +54,6 @@ test('Edit a service', async ({ page }) => {
         testData.editServicePrice,
         testData.editServiceDescription
     );
-
     await servicePage.enterSearch(testData.editServiceTitle)
     await servicePage.deleteService()
 });

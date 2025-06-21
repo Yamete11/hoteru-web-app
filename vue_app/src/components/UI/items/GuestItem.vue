@@ -8,7 +8,7 @@
       <button class="btn" type="button" @click="viewGuestDetails(guest.idPerson)">
         Details
       </button>
-      <button class="btn" type="button" @click="deleteGuest(guest.idPerson)">
+      <button class="btn" type="button" data-testid="delete-guest-button" @click="deleteGuest(guest.idPerson)">
         Delete
       </button>
     </div>

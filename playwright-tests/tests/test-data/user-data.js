@@ -18,11 +18,11 @@ module.exports = {
     roomType: '1',
     roomStatus: '3',
 
-    guestName: 'John',
-    guestSurname: 'Doe',
-    guestEmail: 'john.doe@example.com',
+    guestName: 'TEST',
+    guestSurname: 'TEST',
+    guestEmail: 'test@example.com',
     guestTelNumber: '1234567890',
-    guestPassport: 'AB1234567',
+    guestPassport: 'test123',
     guestStatus: '2',
 
     reservationInDate: '2025-06-20',

@@ -21,16 +21,23 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests([FromQuery] int page = 1, [FromQuery] int limit = 15)
+        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = null, [FromQuery] string searchField = null)
         {
-            return await _service.GetGuests(page, limit);
+            return await _service.GetGuests(page, limit, searchQuery, searchField);
         }
 
+
         [HttpGet("{IdPerson}")]
-        public async Task<SpecificGuestDTO> GetSpecificGuest(int IdPerson)
+        public async Task<ActionResult<SpecificGuestDTO>> GetSpecificGuest(int IdPerson)
         {
-            return await _service.GetSpecificGuest(IdPerson);
+            var guest = await _service.GetSpecificGuest(IdPerson);
+            if (guest == null)
+            {
+                return NotFound(new { Message = $"Guest with IdPerson {IdPerson} not found." });
+            }
+            return Ok(guest);
         }
+
 
         [HttpDelete("{IdPerson}")]
         public async Task<MethodResultDTO> DeleteGuest(int IdPerson)

@@ -9,14 +9,32 @@
             <option value="name">Name</option>
             <option value="roomNumber">Room</option>
             <option value="bookedBy">Booked By</option>
+            <option value="date">Date Range</option>
           </select>
-          <input
-              type="text"
-              class="search-input"
-              v-model="searchQuery"
-              :placeholder="`Search by ${searchField}...`"
-              data-testid="arrival-search-input"
-          />
+          <div v-if="searchField !== 'date'">
+            <input
+                type="text"
+                class="search-input"
+                v-model="searchQuery"
+                :placeholder="`Search by ${searchField}...`"
+                data-testid="arrival-search-input"
+            />
+          </div>
+          <div v-else class="date-range-container">
+            <input
+                type="date"
+                class="search-input"
+                v-model="dateFrom"
+                data-testid="arrival-date-from"
+            />
+            <input
+                type="date"
+                class="search-input"
+                v-model="dateTo"
+                data-testid="arrival-date-to"
+            />
+          </div>
+
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -51,20 +69,38 @@ export default {
       reservations: [],
       searchQuery: '',
       searchField: 'name',
+      dateFrom: '',
+      dateTo: '',
       page: 1,
       limit: 15,
       totalReservations: 0
     };
-  },
+  }
+  ,
   computed: {
     filteredReservations() {
+      if (this.searchField === 'date') {
+        return this.reservations.filter(res => {
+          const dateIn = new Date(res.in);
+          const dateOut = new Date(res.out);
+          const from = this.dateFrom ? new Date(this.dateFrom) : null;
+          const to = this.dateTo ? new Date(this.dateTo) : null;
+
+          const isInRange = (!from || dateIn >= from);
+          const isOutRange = (!to || dateOut <= to);
+
+          return isInRange && isOutRange;
+        });
+      }
+
       return this.reservations.filter(res => {
         const rawValue = res[this.searchField];
         const fieldValue = String(rawValue ?? '').toLowerCase();
         return fieldValue.startsWith(this.searchQuery.toLowerCase());
       });
     }
-  },
+  }
+  ,
   mounted() {
     this.fetchReservations();
   },
@@ -121,51 +157,6 @@ export default {
   background-color: #F1DEC9;
 }
 
-.content {
-  display: flex;
-  flex-grow: 1;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding-top: 8vh;
-  padding-left: 8%;
-}
-
-.main-top {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.search-select {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.search-input {
-  width: 200px;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #FFFFFF;
-}
-
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
 .table-headers {
   display: flex;
   justify-content: space-between;
@@ -194,4 +185,10 @@ export default {
   height: 10px;
   margin-bottom: 20px;
 }
+
+.date-range-container {
+  display: flex;
+  gap: 1rem;
+}
+
 </style>

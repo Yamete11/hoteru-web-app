@@ -34,12 +34,38 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit)
+        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit, string searchField, string searchQuery)
         {
-            
-            var totalServices = await _context.Services.CountAsync();
+            IQueryable<Service> query = _context.Services;
 
-            var services = await _context.Services
+            if (!string.IsNullOrWhiteSpace(searchField) && !string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.ToLower();
+
+                switch (searchField.ToLower())
+                {
+                    case "title":
+                        query = query.Where(s => s.Title.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "description":
+                        query = query.Where(s => s.Description.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "sum":
+                        if (decimal.TryParse(searchQuery, out var sumValue))
+                        {
+                            query = query.Where(s => s.Sum.ToString().StartsWith(searchQuery));
+                        }
+                        else
+                        {
+                            query = query.Where(s => false);
+                        }
+                        break;
+                }
+            }
+
+            var totalServices = await query.CountAsync();
+
+            var services = await query
                 .OrderBy(r => r.IdService)
                 .Skip((page - 1) * limit)
                 .Take(limit)
@@ -61,7 +87,8 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-     
+
+
 
         public async Task<ServiceDTO> GetSpecificService(int idService)
         {

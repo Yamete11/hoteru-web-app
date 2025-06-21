@@ -1,7 +1,7 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/login-page');
 const GuestPage = require('../../pages/guest-page');
-const NewGuestPage = require('../../pages/new-guest-page');
+const NewGuestPage = require('../../pages/new/new-guest-page');
 const SideBar = require('../../components/sidebar');
 const testData = require('../test-data/user-data');
 
@@ -35,4 +35,10 @@ test('Create new Guest', async ({ page }) => {
         testData.guestTelNumber,
         testData.guestEmail
     );
+});
+
+test.afterEach(async ({ page }) => {
+    const guestPage = new GuestPage(page);
+    await guestPage.enterSearchQuery(testData.guestName)
+    await guestPage.deleteGuest()
 });

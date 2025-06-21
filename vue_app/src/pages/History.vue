@@ -5,7 +5,35 @@
       <sidebar></sidebar>
       <div class="main">
         <div class="main-top">
-          <input type="text" class="search-input" placeholder="Search ..." />
+          <select v-model="searchField" class="search-select" data-testid="reservation-search-select">
+            <option value="name">Name</option>
+            <option value="room">Room</option>
+            <option value="bookedBy">Booked By</option>
+            <option value="date">Date Range</option>
+          </select>
+          <div v-if="searchField !== 'date'">
+            <input
+                type="text"
+                class="search-input"
+                v-model="searchQuery"
+                :placeholder="`Search by ${searchField}...`"
+                data-testid="reservation-search-input"
+            />
+          </div>
+          <div v-else class="date-range-container">
+            <input
+                type="date"
+                class="search-input"
+                v-model="dateFrom"
+                data-testid="reservation-date-from"
+            />
+            <input
+                type="date"
+                class="search-input"
+                v-model="dateTo"
+                data-testid="reservation-date-to"
+            />
+          </div>
         </div>
         <div class="main-bot">
           <div class="table-headers">
@@ -17,7 +45,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <history-list :reservations="reservations" @deleteReservation="deleteReservation"/>
+            <history-list :reservations="filteredReservations" @deleteReservation="deleteReservation"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -40,11 +68,31 @@ export default {
       reservations: [],
       page: 1,
       limit: 15,
-      totalReservations: 0
+      totalReservations: 0,
+      searchQuery: '',
+      searchField: 'name',
+      dateFrom: '',
+      dateTo: ''
     };
   },
+  computed: {
+    filteredReservations() {
+      if (this.searchField === 'date') {
+        return this.reservations.filter(res => {
+          const dateIn = new Date(res.dateIn);
+          const from = this.dateFrom ? new Date(this.dateFrom) : null;
+          const to = this.dateTo ? new Date(this.dateTo) : null;
+          return (!from || dateIn >= from) && (!to || dateIn <= to);
+        });
+      }
+      return this.reservations.filter(res => {
+        const rawValue = res[this.searchField];
+        const fieldValue = String(rawValue ?? '').toLowerCase();
+        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+      });
+    }
+  },
   mounted() {
-    console.log(this.reservations)
     this.fetchReservations();
   },
   methods: {
@@ -65,7 +113,6 @@ export default {
         });
         this.reservations = response.data.list;
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
-        console.log(this.reservations)
       } catch (error) {
         console.error(error);
       } finally {
@@ -73,9 +120,9 @@ export default {
       }
     },
     async loadMore() {
+      if (this.page >= this.totalReservations) return;
       try {
         this.page++;
-        console.log(this.page)
         const response = await axios.get('https://localhost:44384/api/Reservation/history', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
@@ -85,7 +132,6 @@ export default {
             limit: this.limit
           }
         });
-        console.log(response)
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
         this.reservations = [...this.reservations, ...response.data.list];
       } catch (error) {
@@ -93,7 +139,7 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -101,42 +147,6 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #F1DEC9;
-}
-
-.content {
-  display: flex;
-  flex-grow: 1;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding-top: 8vh;
-  padding-left: 8%;
-}
-
-.main-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-}
-
-.search-input {
-  width: 10%;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #FFFFFF;
-  margin-right: 1rem;
-}
-
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .table-headers {
@@ -152,30 +162,24 @@ export default {
   font-weight: bold;
   font-size: 20px;
 }
-.header.in {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
-
-}
-.header.out {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.name {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.room {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
-.header.bookedBy {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%; }
+.header.in,
+.header.out,
+.header.name,
+.header.room,
+.header.bookedBy,
 .header.action {
   display: flex;
   justify-content: center;
-  flex-basis: 10%; }
+  flex-basis: 10%;
+}
+
+.observer {
+  height: 10px;
+  margin-bottom: 20px;
+}
+
+.date-range-container {
+  display: flex;
+  gap: 1rem;
+}
 </style>

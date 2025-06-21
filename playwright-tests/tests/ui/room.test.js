@@ -1,7 +1,7 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/login-page');
 const RoomPage = require('../../pages/room-page');
-const NewRoomPage = require('../../pages/new-room-page');
+const NewRoomPage = require('../../pages/new/new-room-page');
 const SideBar = require('../../components/sidebar');
 const testData = require('../test-data/user-data');
 
@@ -35,7 +35,11 @@ test('Create new Room', async ({ page }) => {
         testData.roomNumber,
         testData.roomCapacity,
     );
+});
 
+test.afterEach(async ({ page }) => {
+    const roomPage = new RoomPage(page);
     await roomPage.deleteRoom();
 });
+
 

@@ -4,6 +4,8 @@ import components from './components/UI';
 import router from './router/router.js'
 import VIntersection from "./components/directives/VIntersection.js";
 import store from './store/index.js';
+import './assests/global.css';
+
 
 const app = createApp(App);
 

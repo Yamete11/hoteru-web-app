@@ -29,7 +29,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <guest-list :guests="sortedAndSearchedPosts" @deleteGuest="deleteGuest"/>
+            <guest-list :guests="guests" @deleteGuest="deleteGuest"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -57,18 +57,12 @@ export default {
       limit: 15,
     };
   },
-  computed: {
-    sortedAndSearchedPosts() {
-      return this.guests.filter(guest => {
-        const rawValue = guest[this.searchField];
-        const fieldValue = String(rawValue ?? '').toLowerCase();
-        return fieldValue.startsWith(this.searchQuery.toLowerCase());
-      });
-    }
-  }
-  ,
   mounted() {
     this.fetchGuests();
+  },
+  watch: {
+    searchQuery: 'fetchGuests',
+    searchField: 'fetchGuests',
   },
   methods: {
     deleteGuest(idPerson) {
@@ -77,13 +71,16 @@ export default {
     async fetchGuests() {
       try {
         this.isLoading = true;
+        this.page = 1;
         const response = await axios.get('https://localhost:44384/api/Guest', {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
           params: {
             page: this.page,
-            limit: this.limit
+            limit: this.limit,
+            searchQuery: this.searchQuery,
+            searchField: this.searchField
           }
         });
         this.guests = response.data.list;
@@ -95,6 +92,7 @@ export default {
       }
     },
     async loadMore() {
+      if (this.page >= this.totalGuests) return;
       try {
         this.page++;
         const response = await axios.get('https://localhost:44384/api/Guest', {
@@ -103,69 +101,26 @@ export default {
           },
           params: {
             page: this.page,
-            limit: this.limit
+            limit: this.limit,
+            searchQuery: this.searchQuery,
+            searchField: this.searchField
           }
         });
-        this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
         this.guests = [...this.guests, ...response.data.list];
       } catch (error) {
         console.error(error);
       }
     },
   },
-}
+};
 </script>
+
 
 <style scoped>
 .guest-component {
   display: flex;
   flex-direction: column;
   background-color: #F1DEC9;
-}
-
-.content {
-  display: flex;
-  flex-grow: 1;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding-top: 8vh;
-  padding-left: 8%;
-}
-
-.main-top {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.search-select {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.search-input {
-  width: 200px;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #FFFFFF;
-}
-
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .new-guest-button {

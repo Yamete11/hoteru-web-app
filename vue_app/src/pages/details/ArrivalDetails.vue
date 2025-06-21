@@ -357,11 +357,13 @@ export default {
     }
 
     async function confirmReservation() {
+      console.log("Token:", store.getters.getToken);
+
       try {
         const confirmResponse = await axios.put('https://localhost:44384/confirm/' + state.formData.idReservation,
             {
               headers: {
-                'Authorization': `Bearer ${store.getters.getToken}`
+                'Authorization': `Bearer ${this.store.getters.getToken}`
               },
             }
         );

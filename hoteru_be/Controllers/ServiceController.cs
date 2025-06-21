@@ -21,10 +21,11 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices([FromQuery] int page = 1, [FromQuery] int limit = 15)
+        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchField = null, [FromQuery] string searchQuery = null)
         {
-            return await _service.GetServices(page, limit);
+            return await _service.GetServices(page, limit, searchField, searchQuery);
         }
+
 
         [HttpGet("{idService}")]
         public async Task<ServiceDTO> GetSpecificService(int idService)
