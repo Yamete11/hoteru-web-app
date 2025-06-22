@@ -1,0 +1,5 @@
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be.UnitTests\obj\Debug\net5.0\hoteru_be.UnitTests.csproj.AssemblyReference.cache
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be.UnitTests\obj\Debug\net5.0\hoteru_be.UnitTests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be.UnitTests\obj\Debug\net5.0\hoteru_be.UnitTests.AssemblyInfoInputs.cache
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be.UnitTests\obj\Debug\net5.0\hoteru_be.UnitTests.AssemblyInfo.cs
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be.UnitTests\obj\Debug\net5.0\hoteru_be.UnitTests.csproj.CoreCompileInputs.cache

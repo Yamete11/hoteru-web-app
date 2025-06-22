@@ -21,22 +21,23 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations([FromQuery] int page = 1, [FromQuery] int limit = 15)
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "", [FromQuery] string searchField = "")
         {
             return await _service.GetReservations(page, limit);
         }
 
         [HttpGet("history")]
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory([FromQuery] int page = 1, [FromQuery] int limit = 15)
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "", [FromQuery] string searchField = "")
         {
             return await _service.GetHistory(page, limit);
         }
 
         [HttpGet("arrivals")]
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals([FromQuery] int page = 1, [FromQuery] int limit = 15)
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals( [FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "", [FromQuery] string searchField = "")
         {
-            return await _service.GetArrivals(page, limit);
+            return await _service.GetArrivals(page, limit, searchQuery, searchField);
         }
+
 
         [HttpGet("history/{IdReservation}")]
         public async Task<FullReservationDTO> GetSpecificHistory(int IdReservation)

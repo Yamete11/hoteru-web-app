@@ -20,34 +20,51 @@ namespace hoteru_be.Services.Implementations
             _context = context;
         }
 
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations(int page, int limit)
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetReservations(int page, int limit, string searchQuery = "", string searchField = "")
         {
-
-            var totalReservations = await _context.Reservations
+            var query = _context.Reservations
                 .Where(r => r.Bill == null && r.Confirmed == true)
-                .CountAsync();
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                    .ThenInclude(u => u.Person)
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .AsQueryable();
 
-            var reservations = await _context.Reservations
-            .OrderBy(r => r.IdRoom)
-            .Skip((page - 1) * limit)
-            .Take(limit)
-            .Where(r => r.Bill == null && r.Confirmed == true)
-            .Include(r => r.Room)
-            .Include(r => r.User)
-            .ThenInclude(u => u.Person)
-            .ThenInclude(gr => gr.Guest)
-            .ThenInclude(g => g.Person)
-            .Select(r => new ReservationDTO
+            if (!string.IsNullOrEmpty(searchQuery))
             {
-                IdReservation = r.IdReservation,
-                In = r.In.ToString("yyyy-MM-dd"),
-                Out = r.Out.ToString("yyyy-MM-dd"),
-                RoomNumber = r.Room.Number,
-                BookedBy = r.User.LoginName,
-                Name = r.Guest.Person.Name,
-                Surname = r.Guest.Person.Surname
+                searchQuery = searchQuery.ToLower();
+                switch (searchField.ToLower())
+                {
+                    case "name":
+                        query = query.Where(r => r.Guest.Person.Name.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "roomnumber":
+                        query = query.Where(r => r.Room.Number.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "bookedby":
+                        query = query.Where(r => r.User.LoginName.ToLower().StartsWith(searchQuery));
+                        break;
+                }
             }
-            ).ToListAsync();
+
+            var totalReservations = await query.CountAsync();
+
+            var reservations = await query
+                .OrderBy(r => r.IdRoom)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .Select(r => new ReservationDTO
+                {
+                    IdReservation = r.IdReservation,
+                    In = r.In.ToString("yyyy-MM-dd"),
+                    Out = r.Out.ToString("yyyy-MM-dd"),
+                    RoomNumber = r.Room.Number,
+                    BookedBy = r.User.LoginName,
+                    Name = r.Guest.Person.Name,
+                    Surname = r.Guest.Person.Surname
+                })
+                .ToListAsync();
 
             return new PaginatedResultDTO<ReservationDTO>
             {
@@ -56,24 +73,42 @@ namespace hoteru_be.Services.Implementations
                 Page = page,
                 Limit = limit
             };
-
         }
 
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory(int page, int limit)
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetHistory(int page, int limit, string searchQuery = "", string searchField = "")
         {
-            var totalReservations = await _context.Reservations
+            var query = _context.Reservations
                 .Where(r => r.Bill != null)
-                .CountAsync();
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                    .ThenInclude(u => u.Person)
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .AsQueryable();
 
-            var reservations = await _context.Reservations
-                .Where(r => r.Bill != null)
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                searchQuery = searchQuery.ToLower();
+                switch (searchField.ToLower())
+                {
+                    case "name":
+                        query = query.Where(r => r.Guest.Person.Name.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "roomnumber":
+                        query = query.Where(r => r.Room.Number.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "bookedby":
+                        query = query.Where(r => r.User.LoginName.ToLower().StartsWith(searchQuery));
+                        break;
+                }
+            }
+
+            var totalReservations = await query.CountAsync();
+
+            var reservations = await query
                 .OrderBy(r => r.IdRoom)
                 .Skip((page - 1) * limit)
                 .Take(limit)
-                .Include(r => r.Room)
-                .Include(r => r.User)
-                .Include(r => r.Guest)
-                    .ThenInclude(g => g.Person)
                 .Select(r => new ReservationDTO
                 {
                     IdReservation = r.IdReservation,
@@ -96,33 +131,53 @@ namespace hoteru_be.Services.Implementations
         }
 
 
-        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals(int page, int limit)
-        {
-            var totalReservations = await _context.Reservations
-                .Where(r => r.Confirmed == false)
-                .CountAsync();
 
-            var reservations = await _context.Reservations
-            .OrderBy(r => r.IdRoom)
-            .Skip((page - 1) * limit)
-            .Take(limit)
-            .Where(r => r.Confirmed == false)
-            .Include(r => r.Room)
-            .Include(r => r.User)
-            .ThenInclude(u => u.Person)
-            .ThenInclude(gr => gr.Guest)
-            .ThenInclude(g => g.Person)
-            .Select(r => new ReservationDTO
+        public async Task<PaginatedResultDTO<ReservationDTO>> GetArrivals(int page, int limit, string searchQuery = "", string searchField = "")
+        {
+            var query = _context.Reservations
+                .Where(r => r.Confirmed == false)
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                .ThenInclude(u => u.Person)
+                .Include(r => r.Guest)
+                    .ThenInclude(g => g.Person)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
             {
-                IdReservation = r.IdReservation,
-                In = r.In.ToString("yyyy-MM-dd"),
-                Out = r.Out.ToString("yyyy-MM-dd"),
-                RoomNumber = r.Room.Number,
-                BookedBy = r.User.LoginName,
-                Name = r.Guest.Person.Name,
-                Surname = r.Guest.Person.Surname
+                searchQuery = searchQuery.ToLower();
+
+                switch (searchField.ToLower())
+                {
+                    case "name":
+                        query = query.Where(r => r.Guest.Person.Name.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "roomnumber":
+                        query = query.Where(r => r.Room.Number.ToLower().StartsWith(searchQuery));
+                        break;
+                    case "bookedby":
+                        query = query.Where(r => r.User.LoginName.ToLower().StartsWith(searchQuery));
+                        break;
+                }
             }
-            ).ToListAsync();
+
+            var totalReservations = await query.CountAsync();
+
+            var reservations = await query
+                .OrderBy(r => r.IdRoom)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .Select(r => new ReservationDTO
+                {
+                    IdReservation = r.IdReservation,
+                    In = r.In.ToString("yyyy-MM-dd"),
+                    Out = r.Out.ToString("yyyy-MM-dd"),
+                    RoomNumber = r.Room.Number,
+                    BookedBy = r.User.LoginName,
+                    Name = r.Guest.Person.Name,
+                    Surname = r.Guest.Person.Surname
+                })
+                .ToListAsync();
 
             return new PaginatedResultDTO<ReservationDTO>
             {
@@ -132,6 +187,7 @@ namespace hoteru_be.Services.Implementations
                 Limit = limit
             };
         }
+
 
         public async Task<FullReservationDTO> GetSpecificHistory(int IdReservation)
         {
@@ -346,7 +402,7 @@ namespace hoteru_be.Services.Implementations
             {
                 var depo = new Deposit
                 {
-                    Sum = arrivalDTO.Price,
+                    Sum = arrivalDTO.DepositSum,
                     IdDepositType = arrivalDTO.IdDepositType
                 };
                 _context.Deposits.Add(depo);

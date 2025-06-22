@@ -30,7 +30,7 @@ class RoomPage {
     }
 
     async deleteRoom(){
-        await this.deleteRoomButton.click();
+        await this.deleteRoomButton.last().click();
     }
 
     async openDetails(){

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {}
+    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be.UnitTests\\hoteru_be.UnitTests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {
+    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be.UnitTests\\hoteru_be.UnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
-        "projectName": "hoteru_be",
-        "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+        "projectUniqueName": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be.UnitTests\\hoteru_be.UnitTests.csproj",
+        "projectName": "hoteru_be.UnitTests",
+        "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be.UnitTests\\hoteru_be.UnitTests.csproj",
         "packagesPath": "C:\\Users\\Glebasher\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\obj\\",
+        "outputPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be.UnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Glebasher\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,43 +40,25 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "MailKit": {
+            "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[4.3.0, )"
+              "version": "[16.11.0, )"
             },
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
-            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
-            "Microsoft.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
-            "Microsoft.EntityFrameworkCore.InMemory": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
-            "Microsoft.EntityFrameworkCore.Tools": {
+            "coverlet.collector": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[5.0.17, )"
+              "version": "[3.1.0, )"
             },
-            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+            "xunit": {
               "target": "Package",
-              "version": "[1.14.0, )"
+              "version": "[2.4.1, )"
             },
-            "Swashbuckle.AspNetCore": {
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[5.6.3, )"
+              "version": "[2.4.3, )"
             }
           },
           "imports": [
@@ -89,16 +71,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[5.0.17, 5.0.17]"
-            }
-          ],
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

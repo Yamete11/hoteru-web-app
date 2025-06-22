@@ -25,8 +25,8 @@ module.exports = {
     guestPassport: 'test123',
     guestStatus: '2',
 
-    reservationInDate: '2025-06-20',
-    reservationOutDate: '2025-06-25',
+    reservationInDate: '2025-07-01',
+    reservationOutDate: '2025-07-25',
     reservationCapacity: 2,
     reservationRoomType: "Regular",
     reservationRoom: '104 - Capacity: 4',

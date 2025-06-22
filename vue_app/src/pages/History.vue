@@ -92,6 +92,10 @@ export default {
       });
     }
   },
+  watch: {
+    searchQuery: 'fetchReservations',
+    searchField: 'fetchReservations',
+  },
   mounted() {
     this.fetchReservations();
   },
@@ -107,10 +111,13 @@ export default {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
           params: {
-            page: this.page,
-            limit: this.limit
+            page: 1,
+            limit: this.limit,
+            searchQuery: this.searchQuery,
+            searchField: this.searchField
           }
         });
+        this.page = 1;
         this.reservations = response.data.list;
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
       } catch (error) {
@@ -129,7 +136,9 @@ export default {
           },
           params: {
             page: this.page,
-            limit: this.limit
+            limit: this.limit,
+            searchQuery: this.searchQuery,
+            searchField: this.searchField
           }
         });
         this.totalReservations = Math.ceil(response.data.totalCount / this.limit);

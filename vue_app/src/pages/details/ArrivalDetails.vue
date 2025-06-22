@@ -122,7 +122,7 @@
                 type="number"
                 placeholder="Enter deposit sum"
                 :readonly="!state.isEditing"
-                @change="v$.formData.depositSum.$touch()"
+                @input="v$.formData.depositSum.$touch()"
             >
             <span class="error-message" v-if="v$.formData.depositSum.$error">
               <span v-if="!v$.formData.depositSum.required.$response">The field is required*</span>
@@ -187,7 +187,7 @@
 <script>
 import {computed, reactive, watch} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
+import { required, numeric, maxLength, maxValue, minValue, helpers } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -237,13 +237,13 @@ export default {
         idRoom: { required },
         idRoomType: { required },
         idGuest: { required },
-        idDepositType: {
-          required: () => !state.hasDeposit
-        },
         depositSum: {
-          required: () => !state.hasDeposit,
-          numeric: () => !state.hasDeposit,
+          required: () => state.hasDeposit ? required.$validator : true,
+          numeric: () => state.hasDeposit ? numeric.$validator : true,
         },
+        idDepositType: {
+          required: () => state.hasDeposit ? required.$validator : true,
+        }
       },
     };
 
@@ -252,7 +252,7 @@ export default {
     async function toggleEdit() {
       if (state.isEditing) {
         v$.value.$touch();
-        console.log(v$)
+        console.log(v$.value.formData.depositSum.$error)
         if (!v$.value.$error) {
           console.log(state.formData)
           try {
@@ -417,16 +417,23 @@ export default {
 
     function switchDeposit() {
       state.hasDeposit = !state.hasDeposit;
-      state.formData.depositSum = 0;
-      state.formData.idDepositType = 0;
 
-      if (state.errors.depositSum) {
-        delete state.errors.depositSum;
+      if (!state.hasDeposit) {
+        delete state.formData.depositSum;
+        delete state.formData.idDepositType;
+      } else {
+        state.formData.depositSum = '';
+        state.formData.idDepositType = '';
       }
-      if (state.errors.idDepositType) {
-        delete state.errors.idDepositType;
-      }
+
+      delete state.errors.DepositSum;
+      delete state.errors.IdDepositType;
+
+      v$.value.$reset();
+      v$.value.$validate();
     }
+
+
 
     function isoToLocalDate(isoStr) {
       let date = new Date(isoStr);
