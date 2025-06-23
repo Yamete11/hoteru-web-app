@@ -32,14 +32,11 @@ namespace hoteru_be.UnitTests
         [Fact]
         public async Task GetDepositTypes_ReturnsAllDepositTypes()
         {
-            // Arrange
             var context = GetInMemoryDbContext();
             var service = new DepositTypeService(context);
 
-            // Act
             IEnumerable<TypeDTO> result = await service.GetDepositTypes();
 
-            // Assert
             Assert.NotNull(result);
             Assert.Collection(result,
                 item => Assert.Equal("Cash", item.Title),
