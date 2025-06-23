@@ -69,3 +69,6 @@ C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Runt
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\System.Text.Encoding.CodePages.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.InMemory.dll
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\Castle.Core.dll
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\bin\Debug\net5.0\Moq.dll

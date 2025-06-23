@@ -22,19 +22,28 @@ namespace hoteru_be.Services.Implementations
 
         public async Task<MethodResultDTO> DeleteUser(int IdPerson)
         {
-            Person person = await _context.Persons.SingleOrDefaultAsync(x => x.IdPerson == IdPerson);
+            var person = await _context.Persons.SingleOrDefaultAsync(x => x.IdPerson == IdPerson);
             var user = await _context.Users.Include(u => u.Reservations).SingleOrDefaultAsync(x => x.IdPerson == IdPerson);
 
-            if (user == null)
+            if (user == null || person == null)
             {
                 return new MethodResultDTO
                 {
                     HttpStatusCode = HttpStatusCode.NotFound,
-                    Message = "Not Found"
+                    Message = "User or Person not found"
                 };
-            };
+            }
 
             var superAdminUser = await _context.Users.FirstOrDefaultAsync(u => u.UserType.IdUserType == 1);
+
+            if (superAdminUser == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.InternalServerError,
+                    Message = "Super admin user not found"
+                };
+            }
 
             foreach (var reservation in user.Reservations)
             {
@@ -42,8 +51,6 @@ namespace hoteru_be.Services.Implementations
             }
 
             await _context.SaveChangesAsync();
-
-
 
             _context.Users.Remove(user);
             _context.Persons.Remove(person);
@@ -56,6 +63,7 @@ namespace hoteru_be.Services.Implementations
                 Message = "Deleted"
             };
         }
+
 
         public async Task<FullUserDTO> GetFullUser(int idUser)
         {

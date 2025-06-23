@@ -1,5 +1,6 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
+using hoteru_be.Entities;
 using hoteru_be.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -18,8 +19,8 @@ public class RoomTypeServiceTests
 
 
         context.RoomTypes.AddRange(
-            new Entities.RoomType { IdRoomType = 1, Title = "Regular" },
-            new Entities.RoomType { IdRoomType = 2, Title = "Luxury" }
+            new RoomType { IdRoomType = 1, Title = "Regular" },
+            new RoomType { IdRoomType = 2, Title = "Luxury" }
         );
         context.SaveChanges();
 
