@@ -12,7 +12,6 @@
           <span :class="{ active: state.formData.Confirmed === true }" @click="state.formData.Confirmed = true" data-testid="reservation-tab">Reservation</span>
         </div>
 
-
         <div class="date-inputs">
           <div class="input-form">
             <label>In: </label>
@@ -20,11 +19,13 @@
                 v-model="state.formData.In"
                 class="input"
                 type="date"
-                :min="todayString"
-                :max="maxInDate"
                 @input="v$.formData.In.$touch()"
                 data-testid="date-in"
             >
+            <span class="error-message" v-if="v$.formData.In.$error">
+              <span v-if="v$.formData.In.required?.$invalid">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.In">{{ state.errors.In[0] }}</span>
           </div>
           <div class="input-form">
             <label>Out: </label>
@@ -32,12 +33,18 @@
                 v-model="state.formData.Out"
                 class="input"
                 type="date"
-                :min="tomorrowString"
+                :min="minOutDate"
                 @input="v$.formData.Out.$touch()"
                 data-testid="date-out"
             >
+            <span class="error-message" v-if="v$.formData.Out.$error">
+              <span v-if="v$.formData.Out.required?.$invalid">The field is required*</span>
+              <span v-else-if="v$.formData.Out.minValue?.$invalid">The out date must be after the in date*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Out">{{ state.errors.Out[0] }}</span>
           </div>
         </div>
+
         <div class="guest">
           <label>Room information</label>
           <div class="date-inputs">
@@ -51,6 +58,13 @@
                   @input="v$.formData.Capacity.$touch()"
                   data-testid="capacity"
               >
+              <span class="error-message" v-if="v$.formData.Capacity.$error">
+                <span v-if="!v$.formData.Capacity.required.$response">The field is required*</span>
+                <span v-else-if="!v$.formData.Capacity.numeric.$response">The filed must contain only numeric*</span>
+                <span v-else-if="!v$.formData.Capacity.minValue.$response">The capacity must be greater than 0*</span>
+                <span v-else-if="!v$.formData.Capacity.maxValue.$response">The capacity must be equal or less than 40*</span>
+              </span>
+              <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
             </div>
             <div class="input-form">
               <label>Type: </label>
@@ -67,6 +81,10 @@
               <option disabled value="0" selected>Select a room</option>
               <option v-for="room in filteredRooms" :key="room.idRoom" :value="room.idRoom" data-testid="room-option">{{ room.number }} - Capacity: {{ room.capacity }}</option>
             </select>
+            <span class="error-message" v-if="v$.formData.IdRoom.$error">
+              <span v-if="!v$.formData.IdRoom.required.$response">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.IdRoom">{{ state.errors.IdRoom[0] }}</span>
             <label>Price: {{state.formData.Price}}</label>
           </div>
         </div>
@@ -81,6 +99,10 @@
                {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
               </option>
             </select>
+            <span class="error-message" v-if="v$.formData.idPerson.$error">
+              <span v-if="!v$.formData.idPerson.required.$response">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.IdPerson">{{ state.errors.IdPerson[0] }}</span>
             <router-link class="form-btn" to="/new-guest">Add new guest</router-link>
           </div>
         </div>
@@ -98,6 +120,13 @@
                 type="number"
                 data-testid="deposit-input"
             >
+            <span class="error-message" v-if="v$.formData.Sum.$error">
+              <span v-if="v$.formData.Sum.required?.$invalid">The field is required*</span>
+              <span v-else-if="v$.formData.Sum.numeric?.$invalid">The field can contain only digits*</span>
+              <span v-else-if="v$.formData.Sum.minValue?.$invalid">The value must be greater than 0*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Sum">{{ state.errors.Sum[0] }}</span>
+
             <label>Choose type: </label>
             <select v-model="state.formData.IdDepositType" data-testid="deposit-select">
               <option disabled value="0">Select type</option>
@@ -105,6 +134,10 @@
                 {{ type.title }}
               </option>
             </select>
+            <span class="error-message" v-if="v$.formData.IdDepositType.$error">
+              <span v-if="!v$.formData.IdDepositType.required.$response">The field is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.idDepositType">{{ state.errors.idDepositType[0] }}</span>
           </div>
           <button @click.prevent="switchDeposit" class="form-btn" data-testid="add-deposit-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
         </div>
@@ -141,9 +174,9 @@
 </template>
 
 <script>
-import {computed, reactive, ref, watch} from 'vue';
+import {computed, reactive, watch} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
+import { required, numeric, helpers } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -187,26 +220,48 @@ export default {
       guests: [],
       services: [],
       errors: {},
+      minOutDate: '',
       guestSearchQuery: '',
       filteredGuests: [],
       isGuestSelected: false,
       hasDeposit: false
     });
 
+    const requiredIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || required.$validator(value);
+    });
+
+    const numericIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || numeric.$validator(value);
+    });
+
+    const requiredNonZero = helpers.withAsync((value) => {
+      return (value !== null && value !== undefined && value !== 0);
+    });
+
+    const requiredNonZeroDepo = helpers.withAsync((value) => {
+      return !state.hasDeposit || (value !== null && value !== undefined && value !== 0);
+    });
+
+    const minValueIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || value > 0;
+    });
+
 
     const rules = {
       formData: {
-        In: { required, minValue: val => new Date(val) >= new Date(today) },
+        In: { required },
         Out: { required, minValue: val => new Date(val) > new Date(state.formData.In) },
         Capacity: { required, numeric, minValue: value => value > 0, maxValue: value => value <= 40 },
-        IdRoom: { required },
-        IdPerson: { required },
+        IdRoom: { required : requiredNonZero},
+        idPerson: { required : requiredNonZero },
         IdDepositType: {
-          required: () => !state.hasDeposit
+          required: requiredNonZeroDepo
         },
         Sum: {
-          required: () => !state.hasDeposit,
-          numeric: () => !state.hasDeposit,
+          required: requiredIfHasDeposit,
+          numeric: numericIfHasDeposit,
+          minValue: minValueIfHasDeposit,
         }
       }
     };
@@ -263,21 +318,28 @@ export default {
     }
 
     async function addReservation(){
-      console.log(this.state.formData)
-      try {
-        const response = await axios.post('https://localhost:44384/api/Reservation', state.formData, {
-          headers: {
-            'Authorization': `Bearer ${store.getters.getToken}`
+      v$.value.$touch();
+      if (!v$.value.$error) {
+        try {
+          const response = await axios.post('https://localhost:44384/api/Reservation', state.formData, {
+            headers: {
+              'Authorization': `Bearer ${store.getters.getToken}`
+            }
+          });
+          console.log('Response:', response.data);
+          if (response.data && response.data.httpStatusCode === 200) {
+            await router.push('/arrivals');
           }
-        });
-        console.log('Response:', response.data);
-        if (response.data && response.data.httpStatusCode === 200) {
-          await router.push('/arrivals');
+        } catch (error) {
+          if (error.response && error.response.data && error.response.data.errors) {
+            state.errors = error.response.data.errors;
+          } else {
+            console.error(error);
+          }
         }
-      } catch (error) {
-        console.error(error);
       }
     }
+
 
     const filteredRooms = computed(() => {
       const selectedRoomType = state.roomTypes.find(rt => rt.idType.toString() === state.roomType)?.title;
@@ -290,15 +352,25 @@ export default {
     });
 
 
-    const minOutDate = ref('');
-    watch(() => state.formData.In, (newValue) => {
-      if (newValue) {
-        const inDate = new Date(newValue);
+    const minOutDate = computed(() => {
+      if (state.formData.In) {
+        const inDate = new Date(state.formData.In);
         inDate.setDate(inDate.getDate() + 1);
-        minOutDate.value = inDate.toISOString().split('T')[0];
-      } else {
-        minOutDate.value = null;
+        return inDate.toISOString().split('T')[0];
       }
+      return '';
+    });
+
+    watch(() => state.formData.In, (newIn) => {
+      const newInDate = new Date(newIn);
+      const outDate = new Date(state.formData.Out);
+
+      if (newInDate >= outDate) {
+        const newOutDate = new Date(newInDate);
+        newOutDate.setDate(newOutDate.getDate() + 1);
+        state.formData.Out = newOutDate.toISOString().split('T')[0];
+      }
+      state.minOutDate = minOutDate.value;
     });
 
 
@@ -350,11 +422,19 @@ export default {
 
     function switchDeposit() {
       state.hasDeposit = !state.hasDeposit;
-      state.formData.Sum = 0;
-      state.formData.IdDepositType = 0;
+      if (!state.hasDeposit) {
+        delete state.formData.Sum;
+        delete state.formData.IdDepositType;
+      } else {
+        state.formData.depositSum = '';
+        state.formData.idDepositType = 0;
+      }
+
+      delete state.errors.Sum;
+      delete state.errors.IdDepositType;
+
+      v$.value.$reset();
     }
-
-
 
     return {
       state,
@@ -375,8 +455,6 @@ export default {
   mounted() {
     this.fetchRooms();
   }
-
-
 }
 </script>
 

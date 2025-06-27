@@ -5,6 +5,8 @@ import router from './router/router.js'
 import VIntersection from "./components/directives/VIntersection.js";
 import store from './store/index.js';
 import './assests/global.css';
+import Notifications from '@kyvg/vue3-notification';
+
 
 
 const app = createApp(App);
@@ -31,4 +33,5 @@ app.directive('intersection', VIntersection);
     app
         .use(router)
         .use(store)
+        .use(Notifications)
         .mount('#app');

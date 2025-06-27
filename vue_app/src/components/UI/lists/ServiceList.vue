@@ -1,6 +1,6 @@
 <template>
-  <div v-if="services.length > 0" class="room-list">
-    <transition-group name="room-list">
+  <div v-if="services.length > 0" class="list">
+    <transition-group name="list">
       <service-item
           v-for="service in services"
           :service="service"
@@ -35,5 +35,23 @@ export default {
 h2 {
   display: flex;
   justify-content: center;
+}
+
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(130px);
+}
+
+.list-move {
+  transition: transform 0.4s ease;
 }
 </style>

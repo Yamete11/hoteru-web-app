@@ -1,6 +1,6 @@
 <template>
-  <div v-if="reservations.length > 0" class="room-list">
-    <transition-group name="room-list">
+  <div v-if="reservations.length > 0" class="list">
+    <transition-group name="list">
       <history-item
           v-for="reservation in reservations"
           :reservation="reservation"
@@ -37,21 +37,21 @@ h2 {
   justify-content: center;
 }
 
-.room-list-item {
+.list-item {
   display: inline-block;
   margin-right: 10px;
 }
-.room-list-enter-active,
-.room-list-leave-active {
+.list-enter-active,
+.list-leave-active {
   transition: all 0.4s ease;
 }
-.room-list-enter-from,
-.room-list-leave-to {
+.list-enter-from,
+.list-leave-to {
   opacity: 0;
   transform: translateX(130px);
 }
 
-.room-list-move {
+.list-move {
   transition: transform 0.4s ease;
 }
 </style>

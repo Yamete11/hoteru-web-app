@@ -158,19 +158,6 @@ export default {
   background-color: #F1DEC9;
 }
 
-.table-headers {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0.5rem 0.5rem 3rem;
-  background-color: #A4907C;
-  margin: 1rem;
-  border-radius: 4px;
-}
-
-.header {
-  font-weight: bold;
-  font-size: 20px;
-}
 .header.in,
 .header.out,
 .header.name,

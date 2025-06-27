@@ -107,7 +107,7 @@ namespace hoteru_be.Services.Implementations
 
             if (guest == null)
             {
-                return null; // или выбросить NotFoundException, или вернуть пустой объект
+                return null;
             }
 
             return new SpecificGuestDTO

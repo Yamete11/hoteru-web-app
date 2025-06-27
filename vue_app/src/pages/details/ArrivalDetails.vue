@@ -12,12 +12,10 @@
               class="input"
               type="date"
               :readonly="!state.isEditing"
-              :min="state.minInDate"
               @input="v$.formData.in.$touch()"
-          >
+          />
           <span class="error-message" v-if="v$.formData.in.$error">
-            <span v-if="!v$.formData.in.required.$response">The field is required*</span>
-            <span v-else-if="!v$.formData.in.minValue.$response">You can't use date before today's date*</span>
+            <span v-if="v$.formData.in.required?.$invalid">The field is required*</span>
           </span>
           <span class="error-message" v-if="state.errors.In">{{ state.errors.In[0] }}</span>
         </div>
@@ -34,12 +32,13 @@
               @input="v$.formData.out.$touch()"
           >
           <span class="error-message" v-if="v$.formData.out.$error">
-            <span v-if="!v$.formData.out.required.$response">The field is required*</span>
-            <span v-else-if="!v$.formData.out.minValue.$response">You can't use date before today's date*</span>
+            <span v-if="v$.formData.out.required?.$invalid">The field is required*</span>
+            <span v-else-if="v$.formData.out.minValue?.$invalid">The out date must be after the in date*</span>
           </span>
           <span class="error-message" v-if="state.errors.Out">{{ state.errors.Out[0] }}</span>
         </div>
       </div>
+
       <div class="guest">
         <label>Room information</label>
         <div class="date-inputs">
@@ -125,8 +124,9 @@
                 @input="v$.formData.depositSum.$touch()"
             >
             <span class="error-message" v-if="v$.formData.depositSum.$error">
-              <span v-if="!v$.formData.depositSum.required.$response">The field is required*</span>
-              <span v-else-if="!v$.formData.depositSum.numeric.$response">The field can contain only digits*</span>
+              <span v-if="v$.formData.depositSum.required?.$invalid">The field is required*</span>
+              <span v-else-if="v$.formData.depositSum.numeric?.$invalid">The field can contain only digits*</span>
+              <span v-else-if="v$.formData.depositSum.minValue?.$invalid">The value must be greater than 0*</span>
             </span>
             <span class="error-message" v-if="state.errors.DepositSum">{{ state.errors.DepositSum[0] }}</span>
 
@@ -141,10 +141,10 @@
             <span class="error-message" v-if="v$.formData.idDepositType.$error">
               <span v-if="!v$.formData.idDepositType.required.$response">The field is required*</span>
             </span>
-            <span class="error-message" v-if="state.errors.IdDepositType">{{ state.errors.IdDepositType[0] }}</span>
+            <span class="error-message" v-if="state.errors.idDepositType">{{ state.errors.idDepositType[0] }}</span>
           </template>
           <template v-else>
-            <label>There is no deposit.</label>
+            <label>There is no deposit</label>
           </template>
           <button v-if="state.isEditing" @click.prevent="switchDeposit" class="form-btn">{{ state.hasDeposit ? 'Delete deposit' : 'Add deposit'}}</button>
         </div>
@@ -187,7 +187,7 @@
 <script>
 import {computed, reactive, watch} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue, minValue, helpers } from '@vuelidate/validators';
+import { required, numeric, helpers } from '@vuelidate/validators';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -208,9 +208,8 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-    const today = new Date().toISOString().split('T')[0];
     const state = reactive({
-      formData: '',
+      formData: {},
       selectedRoom: '',
       selectedGuest: '',
       selectedService: '',
@@ -223,27 +222,46 @@ export default {
       depositTypes: [],
       isEditing: false,
       roomPrice: 0,
-      minInDate: new Date().toISOString().split('T')[0],
       minOutDate: '',
       errors: {},
       hasDeposit: false
     });
 
+    const requiredIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || required.$validator(value);
+    });
+
+    const numericIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || numeric.$validator(value);
+    });
+
+    const requiredNonZero = helpers.withAsync((value) => {
+      return !state.hasDeposit || (value !== null && value !== undefined && value !== 0);
+    });
+
+    const minValueIfHasDeposit = helpers.withAsync((value) => {
+      return !state.hasDeposit || value > 0;
+    });
+
+
+
     const rules = {
       formData: {
-        in: { required, minValue: val => new Date(val) >= new Date(today) },
+        in: { required },
         out: { required, minValue: val => new Date(val) > new Date(state.formData.in) },
         capacity: { required, numeric, minValue: value => value > 0, maxValue: value => value <= 40 },
         idRoom: { required },
         idRoomType: { required },
         idGuest: { required },
         depositSum: {
-          required: () => state.hasDeposit ? required.$validator : true,
-          numeric: () => state.hasDeposit ? numeric.$validator : true,
-        },
-        idDepositType: {
-          required: () => state.hasDeposit ? required.$validator : true,
+          required: requiredIfHasDeposit,
+          numeric: numericIfHasDeposit,
+          minValue: minValueIfHasDeposit,
         }
+        ,
+        idDepositType: {
+          required: requiredNonZero,
+        },
       },
     };
 
@@ -284,86 +302,68 @@ export default {
       }
     }
 
-    async function fetchReservation(idReservation){
-      try{
-        const responseReservation = await axios.get('https://localhost:44384/api/Reservation/arrival/' + idReservation,{
+    async function fetchReservation(idReservation) {
+      try {
+        const headers = {
           headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
+            'Authorization': `Bearer ${store.getters.getToken}`
           },
-        });
+        };
 
+        const responseReservation = await axios.get(`https://localhost:44384/api/Reservation/arrival/${idReservation}`, headers);
         state.formData = responseReservation.data;
         state.formData.services = state.formData.services || [];
         state.formData.in = isoToLocalDate(state.formData.in);
         state.formData.out = isoToLocalDate(state.formData.out);
-        console.log("Confirmed " + state.formData.confirmed)
 
-
-        const responseRooms = await axios.get('https://localhost:44384/api/Room/freeRooms?idRoom=' + state.formData.idRoom,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
+        const responseRooms = await axios.get(`https://localhost:44384/api/Room/freeRooms?idRoom=${state.formData.idRoom}`, headers);
         state.rooms = responseRooms.data;
 
-        const responseRoomTypes = await axios.get('https://localhost:44384/api/RoomType',{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
+        const responseRoomTypes = await axios.get(`https://localhost:44384/api/RoomType`, headers);
         state.roomTypes = responseRoomTypes.data;
 
-        const foundRoom = state.rooms.find(status => status.idRoom === state.formData.idRoom);
-        state.selectedRoom =  foundRoom.number + " - Capacity: " + foundRoom.capacity;
-        state.roomType = foundRoom.type;
+        const foundRoom = state.rooms.find(room => room.idRoom === state.formData.idRoom);
+        if (foundRoom) {
+          state.selectedRoom = `${foundRoom.number} - Capacity: ${foundRoom.capacity}`;
+          state.roomType = foundRoom.type;
 
-        const responseGuests = await axios.get('https://localhost:44384/api/Guest',{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.guests = responseGuests.data.list;
-
-        const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest)
-        state.selectedGuest = foundGuest.name + " " + foundGuest.surname + ", " + foundGuest.passport
-
-        const responseDepositType = await axios.get('https://localhost:44384/api/DepositType',{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.depositTypes = responseDepositType.data;
-
-        const foundDeposit = state.depositTypes.find(guest => guest.idType === state.formData.idDepositType)
-        if(foundDeposit !== undefined){
-          state.selectedDepositType = foundDeposit.title
+          const nights = differenceInCalendarDays(new Date(state.formData.out), new Date(state.formData.in));
+          state.formData.price = foundRoom.price * nights;
         }
 
-        const responseServices = await axios.get('https://localhost:44384/api/Service',{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
+        const responseGuests = await axios.get(`https://localhost:44384/api/Guest`, headers);
+        state.guests = responseGuests.data.list;
+
+        const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest);
+        if (foundGuest) {
+          state.selectedGuest = `${foundGuest.name} ${foundGuest.surname}, ${foundGuest.passport}`;
+        }
+
+        const responseDepositType = await axios.get(`https://localhost:44384/api/DepositType`, headers);
+        state.depositTypes = responseDepositType.data;
+
+        const foundDeposit = state.depositTypes.find(type => type.idType === state.formData.idDepositType);
+        if (foundDeposit) {
+          state.selectedDepositType = foundDeposit.title;
+        }
+
+        const responseServices = await axios.get(`https://localhost:44384/api/Service`, headers);
         state.services = responseServices.data.list;
 
-
-        const nights = differenceInCalendarDays(new Date(state.formData.out), new Date(state.formData.in));
-        state.roomPrice = foundRoom.price * nights;
         state.hasDeposit = state.formData.idDepositType !== 0;
-        console.log(state.formData)
+
       } catch (error) {
-        console.log(error);
+        console.error('Error loading reservation data:', error);
       }
     }
 
+
     async function confirmReservation() {
       console.log("Token:", store.getters.getToken);
-
       try {
-        const confirmResponse = await axios.put('https://localhost:44384/confirm/' + state.formData.idReservation,
-            {
+        const confirmResponse = await axios.put('https://localhost:44384/confirm/' + state.formData.idReservation, {}, {
               headers: {
-                'Authorization': `Bearer ${this.store.getters.getToken}`
+                'Authorization': `Bearer ${store.getters.getToken}`
               },
             }
         );
@@ -423,17 +423,14 @@ export default {
         delete state.formData.idDepositType;
       } else {
         state.formData.depositSum = '';
-        state.formData.idDepositType = '';
+        state.formData.idDepositType = 0;
       }
 
       delete state.errors.DepositSum;
       delete state.errors.IdDepositType;
 
       v$.value.$reset();
-      v$.value.$validate();
     }
-
-
 
     function isoToLocalDate(isoStr) {
       let date = new Date(isoStr);
@@ -479,7 +476,6 @@ export default {
 
     return {
       state,
-      today,
       fetchReservation,
       removeService,
       addService,
@@ -494,9 +490,6 @@ export default {
   ,
   mounted() {
     this.fetchReservation(this.idReservation);
-  },
-  computed(){
-
   }
 }
 </script>

@@ -20,8 +20,6 @@ namespace hoteru_be.UnitTests
 
             var context = new MyDbContext(options);
 
-            // Удалять и создавать БД можно пропустить, т.к. имя уникально
-
             var superAdminUserType = new UserType { Title = "SuperAdmin" };
             var normalUserType = new UserType { Title = "User" };
             context.UserTypes.AddRange(superAdminUserType, normalUserType);

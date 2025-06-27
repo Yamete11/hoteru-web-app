@@ -56,26 +56,21 @@ namespace hoteru_be.UnitTests
         [Fact]
         public async Task AuthenticateAsync_ValidCredentials_ReturnsSuccessAndToken()
         {
-            // Arrange
             var context = GetInMemoryDbContext();
             var config = GetConfiguration();
             var service = new AuthService(context, config);
 
             var loginDto = new LoginDTO { Login = "testuser", Password = "password" };
 
-            // Act
             var result = await service.AuthenticateAsync(loginDto);
 
-            // Assert
             Assert.True(result.Success);
             Assert.NotNull(result.Token);
 
-            // Разбор токена
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(result.Token);
             var claims = token.Claims;
 
-            // Проверяем наличие обязательных claims
             Assert.Contains(claims, c => c.Type == "unique_name" && c.Value == "testuser");
             Assert.Contains(claims, c => c.Type == "nameid" && c.Value == "1");
             Assert.Contains(claims, c => c.Type == "role" && c.Value == "User");
