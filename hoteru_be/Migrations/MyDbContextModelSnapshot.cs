@@ -50,6 +50,14 @@ namespace hoteru_be.Migrations
                             Country = "Poland",
                             Postcode = "02-913",
                             Street = "Koszykowa 86"
+                        },
+                        new
+                        {
+                            IdAddress = 2,
+                            City = "Krakow",
+                            Country = "Poland",
+                            Postcode = "31-042",
+                            Street = "Main Square 1"
                         });
                 });
 
@@ -329,6 +337,12 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             IdAddress = 1,
                             Title = "Nobu"
+                        },
+                        new
+                        {
+                            IdHotel = 2,
+                            IdAddress = 2,
+                            Title = "Grand Krakow"
                         });
                 });
 
@@ -469,6 +483,14 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             Name = "William",
                             Surname = "Lee"
+                        },
+                        new
+                        {
+                            IdPerson = 15,
+                            Email = "jan.kowalski@grandkrakow.pl",
+                            IdHotel = 2,
+                            Name = "Jan",
+                            Surname = "Kowalski"
                         });
                 });
 
@@ -1344,28 +1366,35 @@ namespace hoteru_be.Migrations
                             IdPerson = 1,
                             IdUserType = 3,
                             LoginName = "asd",
-                            Password = "asd"
+                            Password = "AQAAAAEAACcQAAAAEJunn01F8InkwA3s5UmJeDNm+7oc9bBue4HftYt26KB5wusHnnCHpRLynWhQeBsldA=="
                         },
                         new
                         {
                             IdPerson = 2,
                             IdUserType = 1,
                             LoginName = "qwe",
-                            Password = "qwe"
+                            Password = "AQAAAAEAACcQAAAAEICoXzMwe+5LQpNMHJ9xEsMYZiyVq4kyrIabFuBt2/BsE6XIdwdsn7Ix3pYtLVZArQ=="
                         },
                         new
                         {
                             IdPerson = 3,
                             IdUserType = 2,
                             LoginName = "zxc",
-                            Password = "zxc"
+                            Password = "AQAAAAEAACcQAAAAEHlv7ELDN76gkuMFVbat1+yHM+NR013pVL1SXY4+aYORlcApNaEoX33ZXJhZU6CAVQ=="
                         },
                         new
                         {
                             IdPerson = 4,
                             IdUserType = 3,
                             LoginName = "qaz",
-                            Password = "qaz"
+                            Password = "AQAAAAEAACcQAAAAEE69t49gGUi3mfUZdq9NYEgY84I2oG9t9KLonzFLjeXimp3t+ZdPufmjFp/JuJP9bg=="
+                        },
+                        new
+                        {
+                            IdPerson = 15,
+                            IdUserType = 1,
+                            LoginName = "jan",
+                            Password = "AQAAAAEAACcQAAAAEOo/kz63BA27/UpNrJX44IQqU2KaOlNvYXmzbSBbwIAQ/Ark0EqXJM/rH3/HS99Gnw=="
                         });
                 });
 

@@ -181,11 +181,11 @@ namespace hoteru_be.Context
             modelBuilder.Entity<User>(t =>
             {
                 t.HasData(
-                    new User { IdPerson = 1, LoginName = "asd", Password = "asd", IdUserType = 3 },
-                    new User { IdPerson = 2, LoginName = "qwe", Password = "qwe", IdUserType = 1 },
-                    new User { IdPerson = 3, LoginName = "zxc", Password = "zxc", IdUserType = 2 },
-                    new User { IdPerson = 4, LoginName = "qaz", Password = "qaz", IdUserType = 3 },
-                    new User { IdPerson = 15, LoginName = "jan", Password = "jan", IdUserType = 1 });
+                    new User { IdPerson = 1, LoginName = "asd", Password = "AQAAAAEAACcQAAAAEJunn01F8InkwA3s5UmJeDNm+7oc9bBue4HftYt26KB5wusHnnCHpRLynWhQeBsldA==", IdUserType = 3 }, //pass = asd
+                    new User { IdPerson = 2, LoginName = "qwe", Password = "AQAAAAEAACcQAAAAEICoXzMwe+5LQpNMHJ9xEsMYZiyVq4kyrIabFuBt2/BsE6XIdwdsn7Ix3pYtLVZArQ==", IdUserType = 1 }, //pass = qwe
+                    new User { IdPerson = 3, LoginName = "zxc", Password = "AQAAAAEAACcQAAAAEHlv7ELDN76gkuMFVbat1+yHM+NR013pVL1SXY4+aYORlcApNaEoX33ZXJhZU6CAVQ==", IdUserType = 2 }, //pass = zxc
+                    new User { IdPerson = 4, LoginName = "qaz", Password = "AQAAAAEAACcQAAAAEE69t49gGUi3mfUZdq9NYEgY84I2oG9t9KLonzFLjeXimp3t+ZdPufmjFp/JuJP9bg==", IdUserType = 3 }, //pass = qaz
+                    new User { IdPerson = 15, LoginName = "jan", Password = "AQAAAAEAACcQAAAAEOo/kz63BA27/UpNrJX44IQqU2KaOlNvYXmzbSBbwIAQ/Ark0EqXJM/rH3/HS99Gnw==", IdUserType = 1 }); //pass = jan
             });
 
 

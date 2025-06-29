@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace hoteru_be.Services.Implementations
 {
@@ -14,11 +16,14 @@ namespace hoteru_be.Services.Implementations
     {
 
         private readonly MyDbContext _context;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(MyDbContext context)
+        public UserService(MyDbContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
+
 
         public async Task<MethodResultDTO> DeleteUser(int IdPerson)
         {
@@ -138,10 +143,11 @@ namespace hoteru_be.Services.Implementations
             User user = new User
             {
                 LoginName = newUserDTO.LoginName,
-                Password = newUserDTO.Password,
                 IdUserType = newUserDTO.IdUserType,
                 Person = person
             };
+            user.Password = _passwordHasher.HashPassword(user, newUserDTO.Password);
+
 
 
             _context.Persons.Add(person);

@@ -2,18 +2,26 @@
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Implementations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Linq;
 
 namespace hoteru_be.UnitTests
 {
     public class AuthServiceTests
     {
+        private readonly IPasswordHasher<User> _passwordHasher;
+
+        public AuthServiceTests()
+        {
+            _passwordHasher = new PasswordHasher<User>();
+        }
+
         private MyDbContext GetInMemoryDbContext()
         {
             var options = new DbContextOptionsBuilder<MyDbContext>()
@@ -28,10 +36,11 @@ namespace hoteru_be.UnitTests
             var user = new User
             {
                 LoginName = "testuser",
-                Password = "password",
                 UserType = userType,
                 IdPerson = 1
             };
+            user.Password = _passwordHasher.HashPassword(user, "password");
+
             context.Users.Add(user);
             context.SaveChanges();
 
@@ -58,7 +67,7 @@ namespace hoteru_be.UnitTests
         {
             var context = GetInMemoryDbContext();
             var config = GetConfiguration();
-            var service = new AuthService(context, config);
+            var service = new AuthService(context, config, _passwordHasher);
 
             var loginDto = new LoginDTO { Login = "testuser", Password = "password" };
 
@@ -69,12 +78,11 @@ namespace hoteru_be.UnitTests
 
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(result.Token);
-            var claims = token.Claims;
+            var claims = token.Claims.ToList();
 
             Assert.Contains(claims, c => c.Type == "unique_name" && c.Value == "testuser");
             Assert.Contains(claims, c => c.Type == "nameid" && c.Value == "1");
             Assert.Contains(claims, c => c.Type == "role" && c.Value == "User");
         }
-
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +52,7 @@ namespace hoteru_be
             services.AddScoped<IUserTypeService, UserTypeService>();
             services.AddScoped<IDepositService, DepositService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IPasswordHasher<Entities.User>, PasswordHasher<Entities.User>>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -80,7 +82,7 @@ namespace hoteru_be
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
                 };
             });
 

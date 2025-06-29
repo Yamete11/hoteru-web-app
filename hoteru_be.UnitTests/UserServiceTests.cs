@@ -2,6 +2,7 @@
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Implementations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Net;
@@ -12,6 +13,13 @@ namespace hoteru_be.UnitTests
 {
     public class UserServiceTests
     {
+        private readonly IPasswordHasher<User> _passwordHasher;
+
+        public UserServiceTests()
+        {
+            _passwordHasher = new PasswordHasher<User>();
+        }
+
         private MyDbContext GetInMemoryDbContext()
         {
             var options = new DbContextOptionsBuilder<MyDbContext>()
@@ -36,7 +44,7 @@ namespace hoteru_be.UnitTests
             var superAdminUser = new User
             {
                 LoginName = "superadmin",
-                Password = "pass",
+                Password = _passwordHasher.HashPassword(null, "pass"),
                 IdUserType = superAdminUserType.IdUserType,
                 Person = superAdminPerson,
                 Reservations = new List<Reservation>()
@@ -53,7 +61,7 @@ namespace hoteru_be.UnitTests
         public async Task DeleteUser_UserNotFound_ReturnsNotFound()
         {
             var context = GetInMemoryDbContext();
-            var service = new UserService(context);
+            var service = new UserService(context, _passwordHasher);
 
             var result = await service.DeleteUser(999);
 
@@ -79,7 +87,7 @@ namespace hoteru_be.UnitTests
             var user = new User
             {
                 LoginName = "testuser",
-                Password = "123",
+                Password = _passwordHasher.HashPassword(null, "123"),
                 IdUserType = (await context.UserTypes.FirstAsync(ut => ut.Title == "User")).IdUserType,
                 Person = person,
                 Reservations = new List<Reservation>()
@@ -87,7 +95,7 @@ namespace hoteru_be.UnitTests
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
-            var service = new UserService(context);
+            var service = new UserService(context, _passwordHasher);
 
             var result = await service.DeleteUser(user.IdPerson);
 
@@ -111,7 +119,7 @@ namespace hoteru_be.UnitTests
             var user = new User
             {
                 LoginName = "johndoe",
-                Password = "pwd",
+                Password = _passwordHasher.HashPassword(null, "pwd"),
                 IdUserType = userType.IdUserType,
                 Person = person,
                 Reservations = new List<Reservation>
@@ -124,7 +132,7 @@ namespace hoteru_be.UnitTests
 
             var reservation = await context.Reservations.FirstAsync();
 
-            var service = new UserService(context);
+            var service = new UserService(context, _passwordHasher);
 
             var result = await service.DeleteUser(user.IdPerson);
 
@@ -145,7 +153,7 @@ namespace hoteru_be.UnitTests
         {
             var context = GetInMemoryDbContext();
 
-            var service = new UserService(context);
+            var service = new UserService(context, _passwordHasher);
 
             var newUser = new NewUserDTO
             {
@@ -168,7 +176,7 @@ namespace hoteru_be.UnitTests
         {
             var context = GetInMemoryDbContext();
 
-            var service = new UserService(context);
+            var service = new UserService(context, _passwordHasher);
 
             var newUser = new NewUserDTO
             {
