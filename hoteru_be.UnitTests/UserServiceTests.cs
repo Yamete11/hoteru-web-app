@@ -2,8 +2,10 @@
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Implementations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,10 +16,24 @@ namespace hoteru_be.UnitTests
     public class UserServiceTests
     {
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserServiceTests()
         {
             _passwordHasher = new PasswordHasher<User>();
+
+            var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            var httpContext = new DefaultHttpContext();
+            httpContext.User = new System.Security.Claims.ClaimsPrincipal(
+                new System.Security.Claims.ClaimsIdentity(
+                    new[]
+                    {
+                        new System.Security.Claims.Claim("hotelId", "1")
+                    }
+                )
+            );
+            httpContextAccessorMock.Setup(_ => _.HttpContext).Returns(httpContext);
+            _httpContextAccessor = httpContextAccessorMock.Object;
         }
 
         private MyDbContext GetInMemoryDbContext()
@@ -32,9 +48,8 @@ namespace hoteru_be.UnitTests
             var normalUserType = new UserType { Title = "User" };
             context.UserTypes.AddRange(superAdminUserType, normalUserType);
 
-            var hotel = new Hotel { Title = "Test Hotel" };
+            var hotel = new Hotel { IdHotel = 1, Title = "Test Hotel" };
             context.Hotels.Add(hotel);
-
             context.SaveChanges();
 
             var superAdminPerson = new Person { Name = "Super", Surname = "Admin", Email = "super@hotel.com", Hotel = hotel };
@@ -50,18 +65,16 @@ namespace hoteru_be.UnitTests
                 Reservations = new List<Reservation>()
             };
             context.Users.Add(superAdminUser);
-
             context.SaveChanges();
 
             return context;
         }
 
-
         [Fact]
         public async Task DeleteUser_UserNotFound_ReturnsNotFound()
         {
             var context = GetInMemoryDbContext();
-            var service = new UserService(context, _passwordHasher);
+            var service = new UserService(context, _passwordHasher, _httpContextAccessor);
 
             var result = await service.DeleteUser(999);
 
@@ -73,13 +86,11 @@ namespace hoteru_be.UnitTests
         public async Task DeleteUser_SuperAdminNotFound_ReturnsInternalServerError()
         {
             var context = GetInMemoryDbContext();
-
             var superAdmin = await context.Users.Include(u => u.UserType).FirstAsync(u => u.UserType.Title == "SuperAdmin");
             context.Users.Remove(superAdmin);
             await context.SaveChangesAsync();
 
             var hotel = await context.Hotels.FirstAsync();
-
             var person = new Person { Name = "Test", Surname = "User", Email = "test@hotel.com", Hotel = hotel };
             context.Persons.Add(person);
             await context.SaveChangesAsync();
@@ -95,8 +106,7 @@ namespace hoteru_be.UnitTests
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
-            var service = new UserService(context, _passwordHasher);
-
+            var service = new UserService(context, _passwordHasher, _httpContextAccessor);
             var result = await service.DeleteUser(user.IdPerson);
 
             Assert.Equal(HttpStatusCode.InternalServerError, result.HttpStatusCode);
@@ -107,9 +117,7 @@ namespace hoteru_be.UnitTests
         public async Task DeleteUser_ValidUser_DeletesSuccessfully()
         {
             var context = GetInMemoryDbContext();
-
             var hotel = await context.Hotels.FirstAsync();
-
             var person = new Person { Name = "John", Surname = "Doe", Email = "john@hotel.com", Hotel = hotel };
             context.Persons.Add(person);
             await context.SaveChangesAsync();
@@ -122,23 +130,17 @@ namespace hoteru_be.UnitTests
                 Password = _passwordHasher.HashPassword(null, "pwd"),
                 IdUserType = userType.IdUserType,
                 Person = person,
-                Reservations = new List<Reservation>
-                {
-                    new Reservation()
-                }
+                Reservations = new List<Reservation> { new Reservation() }
             };
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
             var reservation = await context.Reservations.FirstAsync();
-
-            var service = new UserService(context, _passwordHasher);
-
+            var service = new UserService(context, _passwordHasher, _httpContextAccessor);
             var result = await service.DeleteUser(user.IdPerson);
 
             Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
             Assert.Equal("Deleted", result.Message);
-
             Assert.Null(await context.Users.FindAsync(user.IdPerson));
             Assert.Null(await context.Persons.FindAsync(person.IdPerson));
 
@@ -152,8 +154,7 @@ namespace hoteru_be.UnitTests
         public async Task PostUser_DuplicateLogin_ReturnsBadRequest()
         {
             var context = GetInMemoryDbContext();
-
-            var service = new UserService(context, _passwordHasher);
+            var service = new UserService(context, _passwordHasher, _httpContextAccessor);
 
             var newUser = new NewUserDTO
             {
@@ -175,8 +176,7 @@ namespace hoteru_be.UnitTests
         public async Task PostUser_ValidUser_CreatesSuccessfully()
         {
             var context = GetInMemoryDbContext();
-
-            var service = new UserService(context, _passwordHasher);
+            var service = new UserService(context, _passwordHasher, _httpContextAccessor);
 
             var newUser = new NewUserDTO
             {

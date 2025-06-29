@@ -24,6 +24,8 @@ namespace hoteru_be.Entities
         [ForeignKey(nameof(IdUserType))]
         public UserType UserType { get; set; }
 
+        public virtual ICollection<Service> Services { get; set; }
+
         public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }

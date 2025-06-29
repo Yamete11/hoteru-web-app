@@ -38,6 +38,7 @@ namespace hoteru_be
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddHttpContextAccessor();
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IServiceService, ServiceService>();
