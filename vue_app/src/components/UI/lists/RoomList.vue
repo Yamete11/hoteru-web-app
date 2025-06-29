@@ -6,7 +6,9 @@
           :room="room"
           :key="room.idRoom"
           @deleteRoom="deleteRoom"
+          @occupiedDeleteAttempt="occupiedDeleteAttempt"
       />
+
     </transition-group>
   </div>
   <h2 v-else>
@@ -28,8 +30,12 @@ export default {
   methods: {
     deleteRoom(idRoom) {
       this.$emit('deleteRoom', idRoom);
+    },
+    occupiedDeleteAttempt() {
+      this.$emit('occupiedDeleteAttempt');
     }
   }
+
 }
 </script>
 

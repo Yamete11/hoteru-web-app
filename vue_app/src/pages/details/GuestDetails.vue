@@ -1,5 +1,6 @@
 <template>
   <div class="newRoom-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
@@ -117,6 +118,8 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {email} from "@vuelidate/validators";
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "GuestDetails",
@@ -179,6 +182,15 @@ export default {
             } else {
               console.log('Success:', response.data);
               state.isEditing = false;
+
+              notify({
+                title: 'Guest Updated',
+                text: 'The guest has been successfully updated.',
+                type: 'success',
+                duration: 4000
+              });
+
+
               const foundStatus = state.guestStatuses.find(status => status.idStatus == state.formData.idGuestStatus);
               state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
             }

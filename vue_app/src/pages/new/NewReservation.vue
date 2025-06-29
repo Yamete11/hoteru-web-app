@@ -328,7 +328,10 @@ export default {
           });
           console.log('Response:', response.data);
           if (response.data && response.data.httpStatusCode === 200) {
-            await router.push('/arrivals');
+            await router.push({
+              path: '/arrivals',
+              query: { created: 'true' }
+            });
           }
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {

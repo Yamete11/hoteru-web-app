@@ -1,5 +1,6 @@
 <template>
   <div class="room-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -60,6 +61,8 @@
 
 <script>
 import axios from "axios";
+import { notify } from "@kyvg/vue3-notification";
+
 
 export default {
   name: "Arrival",
@@ -103,6 +106,17 @@ export default {
   ,
   mounted() {
     this.fetchReservations();
+
+    if (this.$route.query.created === 'true') {
+      notify({
+        title: 'Reservation Created',
+        text: 'Reservation has been successfully created.',
+        type: 'success',
+        duration: 3000
+      });
+
+      this.$router.replace({ query: {} });
+    }
   },
   watch: {
     searchQuery: 'fetchReservations',
@@ -111,6 +125,12 @@ export default {
   methods: {
     deleteReservation(idReservation) {
       this.reservations = this.reservations.filter(reservation => reservation.idReservation !== idReservation);
+      notify({
+        title: 'Reservation Deleted',
+        text: `Reservation has been deleted.`,
+        type: 'success',
+        duration: 3000
+      });
     },
     async fetchReservations() {
       try {

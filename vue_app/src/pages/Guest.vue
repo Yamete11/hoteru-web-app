@@ -1,5 +1,6 @@
 <template>
   <div class="guest-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -29,7 +30,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <guest-list :guests="guests" @deleteGuest="deleteGuest"/>
+            <guest-list :guests="guests" @deleteGuest="deleteGuest" @notificationDeleteAttempt="showGuestDeletedNotification"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -43,6 +44,8 @@
 
 <script>
 import axios from "axios";
+import { notify } from "@kyvg/vue3-notification";
+
 
 export default {
   name: "Guest",
@@ -55,16 +58,44 @@ export default {
       searchField: 'name',
       page: 1,
       limit: 15,
+      isGuestDeletedNotificationVisible: false
     };
   },
   mounted() {
     this.fetchGuests();
+
+    if (this.$route.query.created === 'true') {
+      notify({
+        title: "Guest Created",
+        text: "The new guest has been successfully created.",
+        type: "success",
+        duration: 3000,
+      });
+
+      this.$router.replace({ query: {} });
+    }
   },
   watch: {
     searchQuery: 'fetchGuests',
     searchField: 'fetchGuests',
   },
   methods: {
+    showGuestDeletedNotification() {
+      if (this.isGuestDeletedNotificationVisible) return;
+
+      this.isGuestDeletedNotificationVisible = true;
+
+      notify({
+        title: "Guest Deleted",
+        text: "Guest has been deleted. All associated reservations were also removed.",
+        type: "success",
+        duration: 3000,
+      });
+
+      setTimeout(() => {
+        this.isGuestDeletedNotificationVisible = false;
+      }, 3000);
+    },
     deleteGuest(idPerson) {
       this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
     },

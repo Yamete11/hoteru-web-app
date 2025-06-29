@@ -39,6 +39,7 @@ export default {
       })
           .then(() => {
             this.$emit('deleteService', idService);
+            this.$emit('notificationDeleteAttempt');
           })
           .catch(error => {
             console.error(error);

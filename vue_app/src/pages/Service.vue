@@ -1,5 +1,6 @@
 <template>
   <div class="service-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -29,7 +30,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <service-list :services="services" @deleteService="deleteService" />
+            <service-list :services="services" @deleteService="deleteService" @notificationDeleteAttempt="showServiceDeletedNotification"/>
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -43,6 +44,7 @@
 
 <script>
 import axios from "axios";
+import { notify } from "@kyvg/vue3-notification";
 
 export default {
   name: "Service",
@@ -55,16 +57,44 @@ export default {
       totalServices: 0,
       page: 1,
       limit: 15,
+      isServiceDeletedNotificationVisible: false
     };
   },
   mounted() {
     this.fetchServices();
+
+    if (this.$route.query.created === 'true') {
+      notify({
+        title: 'Service Created',
+        text: 'The service has been successfully created.',
+        type: 'success',
+        duration: 4000
+      });
+
+      this.$router.replace({ query: {} });
+    }
   },
   watch: {
     searchQuery: 'fetchServices',
     searchField: 'fetchServices'
   },
   methods: {
+    showServiceDeletedNotification() {
+      if (this.isServiceDeletedNotificationVisible) return;
+
+      this.isServiceDeletedNotificationVisible = true;
+
+      notify({
+        title: "Service Deleted",
+        text: "Service has been successfully deleted.",
+        type: "success",
+        duration: 4000,
+      });
+
+      setTimeout(() => {
+        this.isServiceDeletedNotificationVisible = false;
+      }, 4000);
+    },
     deleteService(idService) {
       this.services = this.services.filter(service => service.idService !== idService);
     },

@@ -1,5 +1,6 @@
 <template>
   <div class="newService-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
@@ -75,6 +76,8 @@ import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/val
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { notify } from '@kyvg/vue3-notification';
+
 export default {
   name: "ServiceDetails",
   props: {
@@ -118,13 +121,21 @@ export default {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
             });
+
             if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
               state.errors = response.data.errors || {};
               console.log('Error', response.data.message);
             } else {
               console.log('Success:', response.data);
+              notify({
+                title: 'Service Updated',
+                text: 'The service has been successfully updated.',
+                type: 'success',
+                duration: 4000
+              });
               state.isEditing = false;
             }
+
           } catch (error) {
             if (error.response && error.response.data && error.response.data.errors) {
               state.errors = error.response.data.errors;

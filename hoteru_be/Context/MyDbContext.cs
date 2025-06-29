@@ -116,14 +116,17 @@ namespace hoteru_be.Context
             modelBuilder.Entity<Address>(t =>
             {
                 t.HasData(
-                    new Address { IdAddress = 1, City = "Warsaw", Country = "Poland", Street = "Koszykowa 86", Postcode = "02-913" });
+                    new Address { IdAddress = 1, City = "Warsaw", Country = "Poland", Street = "Koszykowa 86", Postcode = "02-913" },
+                    new Address { IdAddress = 2, City = "Krakow", Country = "Poland", Street = "Main Square 1", Postcode = "31-042" });
+
 
             });
 
             modelBuilder.Entity<Hotel>(t =>
             {
                 t.HasData(
-                    new Hotel { IdHotel = 1, Title = "Nobu", IdAddress = 1 });
+                    new Hotel { IdHotel = 1, Title = "Nobu", IdAddress = 1 },
+                    new Hotel { IdHotel = 2, Title = "Grand Krakow", IdAddress = 2 });
 
             });
 
@@ -153,7 +156,8 @@ namespace hoteru_be.Context
                     new Person { IdPerson = 11, Name = "Sophia", Surname = "Martinez", Email = "sophia.martinez@gmail.com", IdHotel = 1 },
                     new Person { IdPerson = 12, Name = "James", Surname = "Anderson", Email = "james.anderson@gmail.com", IdHotel = 1 },
                     new Person { IdPerson = 13, Name = "Isabella", Surname = "Thomas", Email = "isabella.thomas@gmail.com", IdHotel = 1 },
-                    new Person { IdPerson = 14, Name = "William", Surname = "Lee", Email = "william.lee@gmail.com", IdHotel = 1 });
+                    new Person { IdPerson = 14, Name = "William", Surname = "Lee", Email = "william.lee@gmail.com", IdHotel = 1 },
+                    new Person { IdPerson = 15, Name = "Jan", Surname = "Kowalski", Email = "jan.kowalski@grandkrakow.pl", IdHotel = 2 });
 
             });
 
@@ -180,7 +184,8 @@ namespace hoteru_be.Context
                     new User { IdPerson = 1, LoginName = "asd", Password = "asd", IdUserType = 3 },
                     new User { IdPerson = 2, LoginName = "qwe", Password = "qwe", IdUserType = 1 },
                     new User { IdPerson = 3, LoginName = "zxc", Password = "zxc", IdUserType = 2 },
-                    new User { IdPerson = 4, LoginName = "qaz", Password = "qaz", IdUserType = 3 });
+                    new User { IdPerson = 4, LoginName = "qaz", Password = "qaz", IdUserType = 3 },
+                    new User { IdPerson = 15, LoginName = "jan", Password = "jan", IdUserType = 1 });
             });
 
 

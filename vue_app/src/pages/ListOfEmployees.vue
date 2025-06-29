@@ -1,5 +1,6 @@
 <template>
   <div class="newRoom-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
@@ -134,6 +135,8 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {computed, reactive} from "vue";
 import {email} from "@vuelidate/validators";
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "ListOfEmployees",
@@ -233,8 +236,17 @@ export default {
           });
           console.log('Response:', response.data);
           if (response.data && response.data.httpStatusCode === 200) {
-            await router.push('/arrivals');
+            notify({
+              title: 'User Created',
+              text: 'User has been successfully created.',
+              type: 'success',
+              duration: 4000
+            });
+            await fetchUsers();
+
+            clearNewUserForm();
           }
+
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
             state.errors = error.response.data.errors;
@@ -252,6 +264,14 @@ export default {
           }
         });
         state.users = state.users.filter(user => user.idPerson !== idPerson);
+
+        notify({
+          title: 'User Deleted',
+          text: 'User has been successfully deleted.',
+          type: 'success',
+          duration: 4000
+        });
+
       } catch (error) {
         console.error('Error deleting user:', error);
       }

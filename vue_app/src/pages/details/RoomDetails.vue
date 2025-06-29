@@ -1,5 +1,7 @@
 <template>
   <div class="newRoom-component">
+    <notifications position="top right" />
+
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
@@ -101,6 +103,8 @@ import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/val
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "RoomDetails",
@@ -154,25 +158,32 @@ export default {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
             });
+
             console.log('Success:', response.data);
             state.isEditing = false;
 
             const foundType = state.roomTypes.find(type => type.idType == state.formData.type);
-            console.log(foundType)
             state.typeTitle = foundType ? foundType.title : 'Type not found';
 
             const foundStatus = state.roomStatuses.find(status => status.idStatus == state.formData.status);
             state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
 
+            notify({
+              title: 'Room Updated',
+              text: 'Room has been successfully updated.',
+              type: 'success',
+              duration: 4000
+            });
+
           } catch (error) {
             console.log('Error:', error);
-
           }
         }
       } else {
         state.isEditing = true;
       }
     }
+
 
     async function fetchSpecificRoom(idRoom) {
       try {

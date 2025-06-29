@@ -6,6 +6,7 @@
           :service="service"
           :key="service.idService"
           @deleteService="deleteService"
+          @notificationDeleteAttempt="notificationDeleteAttempt"
       />
     </transition-group>
   </div>
@@ -26,8 +27,12 @@ export default {
   methods: {
     deleteService(idService) {
       this.$emit('deleteService', idService);
+    },
+    notificationDeleteAttempt() {
+      this.$emit('notificationDeleteAttempt');
     }
   }
+
 }
 </script>
 

@@ -1,6 +1,7 @@
 <template>
   <div class="newRoom-component">
-  <navbar></navbar>
+    <notifications position="top right" />
+    <navbar></navbar>
   <sidebar></sidebar>
   <div class="main">
     <form @submit.prevent="toggleEdit" class="creating-form">
@@ -109,6 +110,8 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {reactive} from "vue";
 import {email} from "@vuelidate/validators";
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "Settings",
@@ -170,6 +173,14 @@ export default {
               state.errors = '';
               const foundStatus = state.userTypes.find(status => status.idType == state.formData.idUserType);
               state.typeTitle = foundStatus ? foundStatus.title : 'Status not found';
+
+              notify({
+                title: "User Updated",
+                text: "User data was successfully updated.",
+                type: "success",
+                duration: 3000,
+              });
+
             }
           } catch (error) {
             if (error.response && error.response.data && error.response.data.errors) {

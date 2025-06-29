@@ -6,6 +6,7 @@
           :guest="guest"
           :key="guest.idPerson"
           @deleteGuest="deleteGuest"
+          @notificationDeleteAttempt="notificationDeleteAttempt"
       />
     </transition-group>
   </div>
@@ -26,6 +27,9 @@ export default {
   methods: {
     deleteGuest(idPerson) {
       this.$emit('deleteGuest', idPerson);
+    },
+    notificationDeleteAttempt(){
+      this.$emit('notificationDeleteAttempt');
     }
   }
 }

@@ -33,6 +33,11 @@ export default {
       this.$router.push({ name: 'RoomDetails', params: { idRoom: idRoom } });
     },
     deleteRoom(idRoom) {
+      if (this.room.status === 'Occupied') {
+        this.$emit('occupiedDeleteAttempt');
+        return;
+      }
+
       axios.delete(`https://localhost:44384/api/Room/${idRoom}`, {
         headers: {
           'Authorization': `Bearer ${store.getters.getToken}`
@@ -45,6 +50,7 @@ export default {
             console.error(error);
           });
     }
+
   }
 }
 </script>

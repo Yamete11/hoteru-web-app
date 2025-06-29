@@ -1,5 +1,6 @@
 <template>
   <div class="newService-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <sidebar></sidebar>
     <div class="main">
@@ -76,6 +77,8 @@ import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/val
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "NewService",
@@ -110,11 +113,16 @@ export default {
               'Authorization': `Bearer ${store.getters.getToken}`
             }
           });
-          console.log('Response:', response.data);
+
           if (response.data && response.data.httpStatusCode === 200) {
-            await router.push('/services');
+            await router.push({
+              path: '/services',
+              query: { created: 'true' }
+            });
+
           }
-          } catch (error) {
+
+        } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
             state.errors = error.response.data.errors;
           }
@@ -122,6 +130,7 @@ export default {
         }
       }
     }
+
 
     return { state, v$, addService };
   }

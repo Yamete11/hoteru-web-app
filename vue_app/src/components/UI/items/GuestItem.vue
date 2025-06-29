@@ -39,12 +39,12 @@ export default {
       })
           .then(() => {
             this.$emit('deleteGuest', idPerson);
+            this.$emit('notificationDeleteAttempt');
           })
           .catch(error => {
             console.error(error);
           });
     }
-
   }
 }
 </script>

@@ -1,5 +1,6 @@
 <template>
   <div class="room-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -29,7 +30,7 @@
             <span class="header action">Action</span>
           </div>
           <div v-if="!isLoading">
-            <room-list :rooms="rooms" @deleteRoom="deleteRoom" />
+            <room-list :rooms="rooms" @deleteRoom="deleteRoom" @occupiedDeleteAttempt="showOccupiedWarning" />
             <div v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
@@ -43,6 +44,8 @@
 
 <script>
 import axios from 'axios';
+import { notify } from "@kyvg/vue3-notification";
+
 
 export default {
   name: "Room",
@@ -57,16 +60,45 @@ export default {
       roomTypes: [],
       roomStatuses: [],
       totalRooms: 0,
+      isOccupiedWarningVisible: false
     };
   },
   mounted() {
     this.fetchRooms();
+
+    if (this.$route.query.created === 'true') {
+      notify({
+        title: 'Room Created',
+        text: 'Room has been successfully created.',
+        type: 'success',
+        duration: 3000
+      });
+
+      this.$router.replace({ query: {} });
+    }
   },
   watch: {
     searchQuery: 'fetchRooms',
     searchField: 'fetchRooms'
   },
   methods: {
+    showOccupiedWarning() {
+      if (this.isOccupiedWarningVisible) return;
+
+      this.isOccupiedWarningVisible = true;
+
+      notify({
+        title: "Warning",
+        text: 'Cannot delete a room with status "Occupied".',
+        type: 'warn',
+        duration: 3000
+      });
+
+      setTimeout(() => {
+        this.isOccupiedWarningVisible = false;
+      }, 3000);
+    }
+    ,
     deleteRoom(idRoom) {
       this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
     },
@@ -152,4 +184,16 @@ export default {
   height: 10px;
   margin-bottom: 20px;
 }
+
+.warning-banner {
+  background-color: #ffcccc;
+  color: #990000;
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+  font-weight: bold;
+  border: 1px solid #cc0000;
+  border-radius: 5px;
+}
+
 </style>

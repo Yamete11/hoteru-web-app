@@ -2,6 +2,7 @@
   <navbar></navbar>
   <sidebar></sidebar>
   <div class="main">
+    <notifications position="top right" />
     <h1>{{ detailsType }} Details</h1>
     <form>
       <div class="date-inputs">
@@ -192,6 +193,8 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {differenceInCalendarDays} from "date-fns";
+import { notify } from '@kyvg/vue3-notification';
+
 
 export default {
   name: "ArrivalDetails",
@@ -293,6 +296,14 @@ export default {
             const foundRoom = state.rooms.find(status => status.idRoom === state.formData.idRoom);
             state.selectedRoom =  foundRoom.number + " - Capacity: " + foundRoom.capacity;
             state.roomType = foundRoom.type;
+
+            notify({
+              title: 'Reservation Updated',
+              text: 'Reservation details were successfully updated.',
+              type: 'success',
+              duration: 4000,
+            });
+
           } catch (error) {
             console.log('Error:', error);
           }

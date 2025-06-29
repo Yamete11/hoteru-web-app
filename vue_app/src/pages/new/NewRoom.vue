@@ -176,7 +176,6 @@ export default {
 
     async function addRoom() {
       v$.value.$touch();
-      console.log(state.formData)
       if (!v$.value.$error) {
         try {
           const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
@@ -184,15 +183,17 @@ export default {
               'Authorization': `Bearer ${store.getters.getToken}`
             }
           });
-          console.log('Response:', response.data);
+
           if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
             state.errors = response.data.errors || {};
-            console.log('Error', response.data.message);
           } else {
-            await router.push('/rooms');
+            await router.push({
+              path: '/rooms',
+              query: { created: 'true' }
+            });
           }
         } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
+          if (error.response?.data?.errors) {
             state.errors = error.response.data.errors;
           }
           console.log('Error', error);

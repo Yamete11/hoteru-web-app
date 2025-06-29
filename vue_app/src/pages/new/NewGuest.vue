@@ -206,7 +206,10 @@ export default {
             state.errors = response.data.errors || {};
             console.log('Error', response.data.message);
           } else {
-            await router.push('/guests');
+            await router.push({
+              path: '/guests',
+              query: { created: 'true' }
+            });
           }
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {

@@ -1,5 +1,6 @@
 <template>
   <div class="room-component">
+    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -59,6 +60,8 @@
 
 <script>
 import axios from "axios";
+import { notify } from "@kyvg/vue3-notification";
+
 
 export default {
   name: "Reservation",
@@ -108,6 +111,12 @@ export default {
   methods: {
     deleteReservation(idReservation) {
       this.reservations = this.reservations.filter(res => res.idReservation !== idReservation);
+      notify({
+        title: 'Reservation Deleted',
+        text: `Reservation has been deleted.`,
+        type: 'success',
+        duration: 3000
+      });
     },
     async fetchReservations() {
       try {
