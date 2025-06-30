@@ -33,6 +33,11 @@ namespace hoteru_be.Entities
         [ForeignKey(nameof(IdRoomType))]
         public RoomType RoomType { get; set; }
 
+        public int IdUser { get; set; }
+        [Required]
+        [ForeignKey(nameof(IdUser))]
+        public User User { get; set; }
+
         public ICollection<Reservation> Reservations { get; set; }
     }
 }

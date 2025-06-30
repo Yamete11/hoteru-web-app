@@ -1,111 +1,223 @@
-﻿using hoteru_be.Context;
-using hoteru_be.DTOs;
-using hoteru_be.Entities;
-using hoteru_be.Services.Implementations;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using hoteru_be.Context;
+using hoteru_be.DTOs;
+using hoteru_be.Entities;
+using hoteru_be.Services.Implementations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
-using System.Linq;
 
-namespace hoteru_be.UnitTests
+
+public class ServiceServiceTests
 {
-    public class ServiceServiceTests
+    private MyDbContext GetDbContext()
     {
-        private MyDbContext GetInMemoryDbContext()
+        var options = new DbContextOptionsBuilder<MyDbContext>()
+                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                 .Options;
+
+        var context = new MyDbContext(options);
+
+        var hotelId = 1;
+        var user = new User
         {
-            var options = new DbContextOptionsBuilder<MyDbContext>()
-                .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
-                .Options;
+            IdPerson = 1,
+            Person = new Person { IdHotel = hotelId }
+        };
+        context.Users.Add(user);
 
-            var context = new MyDbContext(options);
-
-            context.Services.AddRange(
-                new Service { IdService = 1, Title = "Cleaning", Sum = 50, Description = "Room cleaning" },
-                new Service { IdService = 2, Title = "Laundry", Sum = 30, Description = "Laundry service" }
-            );
-
-            context.SaveChanges();
-            return context;
-        }
-
-        [Fact]
-        public async Task GetSpecificService_ReturnsCorrectService()
+        var services = new List<Service>
         {
-            var context = GetInMemoryDbContext();
-            var service = new ServiceService(context);
+            new Service { IdService = 1, Title = "Cleaning", Description = "Room cleaning", Sum = 100, User = user, IdUser = user.IdPerson },
+            new Service { IdService = 2, Title = "Breakfast", Description = "Breakfast service", Sum = 50, User = user, IdUser = user.IdPerson },
+        };
 
-            var result = await service.GetSpecificService(1);
+        context.Services.AddRange(services);
+        context.SaveChanges();
 
-            Assert.Equal("Cleaning", result.Title);
-            Assert.Equal(50, result.Sum);
-        }
+        return context;
+    }
 
-        [Fact]
-        public async Task PostService_CreatesService()
+    private Mock<IHttpContextAccessor> GetHttpContextAccessorMock(int? hotelId = 1, int? userId = 1)
+    {
+        var claims = new List<Claim>();
+        if (hotelId.HasValue)
+            claims.Add(new Claim("hotelId", hotelId.Value.ToString()));
+        if (userId.HasValue)
+            claims.Add(new Claim("id", userId.Value.ToString()));
+
+        var identity = new ClaimsIdentity(claims, "TestAuthType");
+        var claimsPrincipal = new ClaimsPrincipal(identity);
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(x => x.User).Returns(claimsPrincipal);
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContextMock.Object);
+
+        return httpContextAccessorMock;
+    }
+
+    [Fact]
+    public async Task GetServices_ReturnsServices_ForValidHotelId()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+
+        var result = await serviceService.GetServices(1, 10, null, null);
+
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.List.Count());
+        Assert.Contains(result.List, s => s.Title == "Cleaning");
+    }
+
+    [Fact]
+    public async Task GetServices_ReturnsEmpty_ForMissingHotelId()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: null);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var result = await serviceService.GetServices(1, 10, null, null);
+
+        Assert.NotNull(result);
+        Assert.Empty(result.List);
+        Assert.Equal(0, result.TotalCount);
+    }
+
+    [Fact]
+    public async Task DeleteService_DeletesExistingService()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var serviceIdToDelete = 1;
+
+        var beforeCount = context.Services.Count();
+
+        var result = await serviceService.DeleteService(serviceIdToDelete);
+
+        var afterCount = context.Services.Count();
+
+        Assert.Equal(beforeCount - 1, afterCount);
+        Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
+        Assert.Equal("Deleted", result.Message);
+    }
+
+    [Fact]
+    public async Task DeleteService_ReturnsNotFound_IfServiceNotExist()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var result = await serviceService.DeleteService(999);
+
+        Assert.Equal(HttpStatusCode.NotFound, result.HttpStatusCode);
+        Assert.Equal("Service not found", result.Message);
+    }
+
+    [Fact]
+    public async Task PostService_CreatesService_ForValidUser()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1, userId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var newServiceDto = new ServiceDTO
         {
-            var context = GetInMemoryDbContext();
-            var service = new ServiceService(context);
+            Title = "Laundry",
+            Sum = 30,
+            Description = "Laundry service"
+        };
 
-            var newService = new ServiceDTO
-            {
-                Title = "Breakfast",
-                Sum = 20,
-                Description = "Morning meal"
-            };
+        var beforeCount = context.Services.Count();
 
-            var result = await service.PostService(newService);
+        var result = await serviceService.PostService(newServiceDto);
 
-            Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
-            Assert.Equal(3, context.Services.Count());
-        }
+        var afterCount = context.Services.Count();
 
-        [Fact]
-        public async Task DeleteService_RemovesService()
+        Assert.Equal(beforeCount + 1, afterCount);
+        Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
+        Assert.Equal("Created", result.Message);
+    }
+
+    [Fact]
+    public async Task PostService_ReturnsForbidden_IfHotelIdMissing()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: null);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var result = await serviceService.PostService(new ServiceDTO { Title = "Test" });
+
+        Assert.Equal(HttpStatusCode.Forbidden, result.HttpStatusCode);
+        Assert.Equal("Hotel ID missing or invalid", result.Message);
+    }
+
+    [Fact]
+    public async Task UpdateService_UpdatesExistingService()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var updateDto = new ServiceDTO
         {
-            var context = GetInMemoryDbContext();
-            var service = new ServiceService(context);
+            IdService = 1,
+            Title = "Updated Cleaning",
+            Sum = 150,
+            Description = "Updated description"
+        };
 
-            var result = await service.DeleteService(1);
+        var result = await serviceService.UpdateService(updateDto);
 
-            Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
-            Assert.Null(context.Services.FirstOrDefault(s => s.IdService == 1));
-        }
+        var updatedService = await context.Services.FindAsync(1);
 
-        [Fact]
-        public async Task UpdateService_UpdatesFields()
+        Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
+        Assert.Equal("Updated", result.Message);
+        Assert.Equal("Updated Cleaning", updatedService.Title);
+        Assert.Equal(150, updatedService.Sum);
+        Assert.Equal("Updated description", updatedService.Description);
+    }
+
+    [Fact]
+    public async Task UpdateService_ReturnsNotFound_ForInvalidService()
+    {
+        var context = GetDbContext();
+        var httpContextAccessor = GetHttpContextAccessorMock(hotelId: 1);
+
+        var serviceService = new ServiceService(context, httpContextAccessor.Object);
+
+        var updateDto = new ServiceDTO
         {
-            var context = GetInMemoryDbContext();
-            var service = new ServiceService(context);
+            IdService = 999,
+            Title = "No service",
+            Sum = 0,
+            Description = "N/A"
+        };
 
-            var updated = new ServiceDTO
-            {
-                IdService = 1,
-                Title = "Deep Cleaning",
-                Sum = 70,
-                Description = "Full room deep cleaning"
-            };
+        var result = await serviceService.UpdateService(updateDto);
 
-            var result = await service.UpdateService(updated);
-
-            Assert.Equal(HttpStatusCode.OK, result.HttpStatusCode);
-            var s = context.Services.First(s => s.IdService == 1);
-            Assert.Equal("Deep Cleaning", s.Title);
-            Assert.Equal(70, s.Sum);
-        }
-
-        [Fact]
-        public async Task GetServices_WithTitleSearch_ReturnsFiltered()
-        {
-            var context = GetInMemoryDbContext();
-            var service = new ServiceService(context);
-
-            var result = await service.GetServices(1, 10, "title", "clean");
-
-            Assert.Single(result.List);
-            Assert.Equal("Cleaning", result.List.ElementAt(0).Title);
-        }
+        Assert.Equal(HttpStatusCode.NotFound, result.HttpStatusCode);
+        Assert.Equal("Service not found", result.Message);
     }
 }

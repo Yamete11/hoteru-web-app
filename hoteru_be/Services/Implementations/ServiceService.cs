@@ -2,6 +2,7 @@
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,30 +14,55 @@ namespace hoteru_be.Services.Implementations
     public class ServiceService : IServiceService
     {
         private readonly MyDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ServiceService(MyDbContext context)
+        public ServiceService(MyDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? GetHotelIdFromToken()
+        {
+            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
+            return int.TryParse(hotelIdClaim, out int hotelId) ? hotelId : null;
         }
 
         public async Task<MethodResultDTO> DeleteService(int idService)
         {
-            Service service = _context.Services.SingleOrDefault(x => x.IdService == idService);
+            var hotelId = GetHotelIdFromToken();
+            if (hotelId == null) return ForbiddenResult();
+
+            var service = await _context.Services
+                .Include(s => s.User)
+                .ThenInclude(u => u.Person)
+                .FirstOrDefaultAsync(x => x.IdService == idService && x.User.Person.IdHotel == hotelId);
+
+            if (service == null)
+                return NotFound("Service not found");
 
             _context.Services.Remove(service);
-
             await _context.SaveChangesAsync();
 
-            return new MethodResultDTO
-            {
-                HttpStatusCode = HttpStatusCode.OK,
-                Message = "Deleted"
-            };
+            return Success("Deleted");
         }
 
         public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit, string searchField, string searchQuery)
         {
-            IQueryable<Service> query = _context.Services;
+            var hotelId = GetHotelIdFromToken();
+            if (hotelId == null) return new PaginatedResultDTO<ServiceDTO>
+            {
+                List = new List<ServiceDTO>(),
+                TotalCount = 0,
+                Page = page,
+                Limit = limit
+            };
+
+
+            IQueryable<Service> query = _context.Services
+                .Include(s => s.User)
+                .ThenInclude(u => u.Person)
+                .Where(s => s.User.Person.IdHotel == hotelId);
 
             if (!string.IsNullOrWhiteSpace(searchField) && !string.IsNullOrWhiteSpace(searchQuery))
             {
@@ -87,65 +113,102 @@ namespace hoteru_be.Services.Implementations
             };
         }
 
-
-
-
         public async Task<ServiceDTO> GetSpecificService(int idService)
         {
-            var service = await _context.Services.FirstOrDefaultAsync(x => x.IdService == idService);
+            var hotelId = GetHotelIdFromToken();
+            if (hotelId == null) return null;
+
+            var service = await _context.Services
+                .Include(s => s.User)
+                .ThenInclude(u => u.Person)
+                .Where(s => s.IdService == idService && s.User.Person.IdHotel == hotelId)
+                .FirstOrDefaultAsync();
+
+            if (service == null) return null;
 
             return new ServiceDTO
             {
                 IdService = service.IdService,
-                Title= service.Title,
-                Sum= service.Sum,
-                Description= service.Description
+                Title = service.Title,
+                Sum = service.Sum,
+                Description = service.Description
             };
         }
 
         public async Task<MethodResultDTO> PostService(ServiceDTO serviceDTO)
         {
-            Service service = new Service
+            var hotelId = GetHotelIdFromToken();
+            if (hotelId == null) return ForbiddenResult();
+
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("id")?.Value;
+            if (!int.TryParse(userId, out int idUser))
+                return Error("Invalid user id");
+
+            var user = await _context.Users
+                .Include(u => u.Person)
+                .FirstOrDefaultAsync(u => u.IdPerson == idUser && u.Person.IdHotel == hotelId);
+
+            if (user == null)
+                return Error("User not found or not from this hotel");
+
+            var service = new Service
             {
                 Title = serviceDTO.Title,
-                Sum = serviceDTO.Sum.Value,
-                Description= serviceDTO.Description
+                Sum = serviceDTO.Sum ?? 0,
+                Description = serviceDTO.Description,
+                IdUser = user.IdPerson
             };
-            _context.Services.Add(service);
 
+            _context.Services.Add(service);
             await _context.SaveChangesAsync();
-            return new MethodResultDTO
-            {
-                HttpStatusCode = HttpStatusCode.OK,
-                Message = "Created"
-            };
+
+            return Success("Created");
         }
 
         public async Task<MethodResultDTO> UpdateService(ServiceDTO serviceDTO)
         {
+            var hotelId = GetHotelIdFromToken();
+            if (hotelId == null) return ForbiddenResult();
+
             var service = await _context.Services
-                             .FirstOrDefaultAsync(r => r.IdService == serviceDTO.IdService);
+                .Include(s => s.User)
+                .ThenInclude(u => u.Person)
+                .FirstOrDefaultAsync(s => s.IdService == serviceDTO.IdService && s.User.Person.IdHotel == hotelId);
 
             if (service == null)
-            {
-                return new MethodResultDTO
-                {
-                    HttpStatusCode = HttpStatusCode.NotFound,
-                    Message = "Service not found"
-                };
-            }
+                return NotFound("Service not found");
 
             service.Title = serviceDTO.Title;
-            service.Sum = serviceDTO.Sum.Value;
+            service.Sum = serviceDTO.Sum ?? 0;
             service.Description = serviceDTO.Description;
 
             await _context.SaveChangesAsync();
-            return new MethodResultDTO
-            {
-                HttpStatusCode = HttpStatusCode.OK,
-                Message = "Updated"
-            };
-
+            return Success("Updated");
         }
+
+
+        private MethodResultDTO ForbiddenResult() => new MethodResultDTO
+        {
+            HttpStatusCode = HttpStatusCode.Forbidden,
+            Message = "Hotel ID missing or invalid"
+        };
+
+        private MethodResultDTO NotFound(string message) => new MethodResultDTO
+        {
+            HttpStatusCode = HttpStatusCode.NotFound,
+            Message = message
+        };
+
+        private MethodResultDTO Error(string message) => new MethodResultDTO
+        {
+            HttpStatusCode = HttpStatusCode.InternalServerError,
+            Message = message
+        };
+
+        private MethodResultDTO Success(string message) => new MethodResultDTO
+        {
+            HttpStatusCode = HttpStatusCode.OK,
+            Message = message
+        };
     }
 }

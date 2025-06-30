@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace hoteru_be.Migrations
 {
-    public partial class asd : Migration
+    public partial class sdaasd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -96,21 +96,6 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Services",
-                columns: table => new
-                {
-                    IdService = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sum = table.Column<float>(type: "real", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Services", x => x.IdService);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserTypes",
                 columns: table => new
                 {
@@ -160,35 +145,6 @@ namespace hoteru_be.Migrations
                         column: x => x.IdDepositType,
                         principalTable: "DepositTypes",
                         principalColumn: "IdDepositType",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Rooms",
-                columns: table => new
-                {
-                    IdRoom = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<float>(type: "real", nullable: false),
-                    IdRoomStatus = table.Column<int>(type: "int", nullable: false),
-                    IdRoomType = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rooms", x => x.IdRoom);
-                    table.ForeignKey(
-                        name: "FK_Rooms_RoomStatuses_IdRoomStatus",
-                        column: x => x.IdRoomStatus,
-                        principalTable: "RoomStatuses",
-                        principalColumn: "IdRoomStatus",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Rooms_RoomTypes_IdRoomType",
-                        column: x => x.IdRoomType,
-                        principalTable: "RoomTypes",
-                        principalColumn: "IdRoomType",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -264,6 +220,64 @@ namespace hoteru_be.Migrations
                         principalTable: "UserTypes",
                         principalColumn: "IdUserType",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rooms",
+                columns: table => new
+                {
+                    IdRoom = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    IdRoomStatus = table.Column<int>(type: "int", nullable: false),
+                    IdRoomType = table.Column<int>(type: "int", nullable: false),
+                    IdUser = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rooms", x => x.IdRoom);
+                    table.ForeignKey(
+                        name: "FK_Rooms_RoomStatuses_IdRoomStatus",
+                        column: x => x.IdRoomStatus,
+                        principalTable: "RoomStatuses",
+                        principalColumn: "IdRoomStatus",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Rooms_RoomTypes_IdRoomType",
+                        column: x => x.IdRoomType,
+                        principalTable: "RoomTypes",
+                        principalColumn: "IdRoomType",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Rooms_Users_IdUser",
+                        column: x => x.IdUser,
+                        principalTable: "Users",
+                        principalColumn: "IdPerson",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    IdService = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sum = table.Column<float>(type: "real", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdUser = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.IdService);
+                    table.ForeignKey(
+                        name: "FK_Services_Users_IdUser",
+                        column: x => x.IdUser,
+                        principalTable: "Users",
+                        principalColumn: "IdPerson",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -348,7 +362,11 @@ namespace hoteru_be.Migrations
             migrationBuilder.InsertData(
                 table: "Addresses",
                 columns: new[] { "IdAddress", "City", "Country", "Postcode", "Street" },
-                values: new object[] { 1, "Warsaw", "Poland", "02-913", "Koszykowa 86" });
+                values: new object[,]
+                {
+                    { 1, "Warsaw", "Poland", "02-913", "Koszykowa 86" },
+                    { 2, "Krakow", "Poland", "31-042", "Main Square 1" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Bills",
@@ -378,9 +396,9 @@ namespace hoteru_be.Migrations
                 columns: new[] { "IdRoomStatus", "Title" },
                 values: new object[,]
                 {
+                    { 1, "Out of service" },
                     { 2, "Occupied" },
-                    { 3, "Ready" },
-                    { 1, "Out of service" }
+                    { 3, "Ready" }
                 });
 
             migrationBuilder.InsertData(
@@ -393,22 +411,12 @@ namespace hoteru_be.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Services",
-                columns: new[] { "IdService", "Description", "Sum", "Title" },
-                values: new object[,]
-                {
-                    { 1, "None", 355.5f, "Breakfast" },
-                    { 2, "None", 120.5f, "Spa" },
-                    { 3, "None", 248.5f, "Assistent" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "UserTypes",
                 columns: new[] { "IdUserType", "Title" },
                 values: new object[,]
                 {
-                    { 2, "Admin" },
                     { 1, "Superadmin" },
+                    { 2, "Admin" },
                     { 3, "Employee" }
                 });
 
@@ -426,47 +434,10 @@ namespace hoteru_be.Migrations
             migrationBuilder.InsertData(
                 table: "Hotels",
                 columns: new[] { "IdHotel", "IdAddress", "Title" },
-                values: new object[] { 1, 1, "Nobu" });
-
-            migrationBuilder.InsertData(
-                table: "Rooms",
-                columns: new[] { "IdRoom", "Capacity", "IdRoomStatus", "IdRoomType", "Number", "Price" },
                 values: new object[,]
                 {
-                    { 19, 19, 3, 2, "301", 100f },
-                    { 20, 20, 3, 2, "302", 110f },
-                    { 21, 21, 3, 2, "303", 115f },
-                    { 22, 22, 3, 2, "304", 125f },
-                    { 23, 23, 3, 2, "305", 135f },
-                    { 24, 24, 3, 2, "306", 95f },
-                    { 25, 25, 3, 2, "307", 85f },
-                    { 27, 27, 3, 2, "309", 140f },
-                    { 18, 18, 3, 1, "209", 135f },
-                    { 28, 28, 3, 2, "401", 145f },
-                    { 29, 29, 3, 2, "402", 150f },
-                    { 30, 30, 3, 2, "403", 125f },
-                    { 31, 31, 3, 2, "404", 135f },
-                    { 32, 32, 3, 2, "405", 100f },
-                    { 26, 26, 3, 2, "308", 125f },
-                    { 17, 17, 3, 1, "208", 140f },
-                    { 15, 15, 3, 1, "206", 85f },
-                    { 33, 33, 3, 2, "406", 110f },
-                    { 1, 1, 3, 1, "101", 45f },
-                    { 2, 2, 2, 1, "102", 75f },
-                    { 3, 3, 2, 1, "103", 60f },
-                    { 4, 4, 3, 1, "104", 90f },
-                    { 5, 5, 2, 1, "105", 85f },
-                    { 6, 6, 2, 1, "106", 65f },
-                    { 16, 16, 3, 1, "207", 105f },
-                    { 7, 7, 2, 1, "107", 55f },
-                    { 9, 9, 2, 1, "109", 110f },
-                    { 10, 10, 2, 1, "201", 95f },
-                    { 11, 11, 3, 1, "202", 100f },
-                    { 12, 12, 3, 1, "203", 120f },
-                    { 13, 13, 3, 1, "204", 130f },
-                    { 14, 14, 3, 1, "205", 75f },
-                    { 8, 8, 2, 1, "108", 70f },
-                    { 34, 34, 3, 2, "407", 95f }
+                    { 1, 1, "Nobu" },
+                    { 2, 2, "Grand Krakow" }
                 });
 
             migrationBuilder.InsertData(
@@ -487,7 +458,8 @@ namespace hoteru_be.Migrations
                     { 11, "sophia.martinez@gmail.com", 1, "Sophia", "Martinez" },
                     { 12, "james.anderson@gmail.com", 1, "James", "Anderson" },
                     { 13, "isabella.thomas@gmail.com", 1, "Isabella", "Thomas" },
-                    { 14, "william.lee@gmail.com", 1, "William", "Lee" }
+                    { 14, "william.lee@gmail.com", 1, "William", "Lee" },
+                    { 15, "jan.kowalski@grandkrakow.pl", 2, "Jan", "Kowalski" }
                 });
 
             migrationBuilder.InsertData(
@@ -512,10 +484,96 @@ namespace hoteru_be.Migrations
                 columns: new[] { "IdPerson", "IdUserType", "LoginName", "Password" },
                 values: new object[,]
                 {
-                    { 1, 3, "asd", "asd" },
-                    { 2, 1, "qwe", "qwe" },
-                    { 3, 2, "zxc", "zxc" },
-                    { 4, 3, "qaz", "qaz" }
+                    { 1, 3, "asd", "AQAAAAEAACcQAAAAEJunn01F8InkwA3s5UmJeDNm+7oc9bBue4HftYt26KB5wusHnnCHpRLynWhQeBsldA==" },
+                    { 2, 1, "qwe", "AQAAAAEAACcQAAAAEICoXzMwe+5LQpNMHJ9xEsMYZiyVq4kyrIabFuBt2/BsE6XIdwdsn7Ix3pYtLVZArQ==" },
+                    { 3, 2, "zxc", "AQAAAAEAACcQAAAAEHlv7ELDN76gkuMFVbat1+yHM+NR013pVL1SXY4+aYORlcApNaEoX33ZXJhZU6CAVQ==" },
+                    { 4, 3, "qaz", "AQAAAAEAACcQAAAAEE69t49gGUi3mfUZdq9NYEgY84I2oG9t9KLonzFLjeXimp3t+ZdPufmjFp/JuJP9bg==" },
+                    { 15, 1, "jan", "AQAAAAEAACcQAAAAEOo/kz63BA27/UpNrJX44IQqU2KaOlNvYXmzbSBbwIAQ/Ark0EqXJM/rH3/HS99Gnw==" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "IdRoom", "Capacity", "IdRoomStatus", "IdRoomType", "IdUser", "Number", "Price" },
+                values: new object[,]
+                {
+                    { 1, 1, 3, 1, 2, "101", 45f },
+                    { 28, 28, 3, 2, 15, "401", 145f },
+                    { 29, 29, 3, 2, 15, "402", 150f },
+                    { 30, 30, 3, 2, 15, "403", 125f },
+                    { 31, 31, 3, 2, 15, "404", 135f },
+                    { 32, 32, 3, 2, 15, "405", 100f },
+                    { 33, 33, 3, 2, 15, "406", 110f },
+                    { 34, 34, 3, 2, 15, "407", 95f },
+                    { 25, 25, 3, 2, 15, "307", 85f },
+                    { 24, 24, 3, 2, 15, "306", 95f },
+                    { 23, 23, 3, 2, 15, "305", 135f },
+                    { 22, 22, 3, 2, 15, "304", 125f },
+                    { 21, 21, 3, 2, 15, "303", 115f },
+                    { 20, 20, 3, 2, 2, "302", 110f },
+                    { 19, 19, 3, 2, 2, "301", 100f },
+                    { 18, 18, 3, 1, 2, "209", 135f },
+                    { 17, 17, 3, 1, 2, "208", 140f },
+                    { 16, 16, 3, 1, 2, "207", 105f },
+                    { 2, 2, 2, 1, 2, "102", 75f },
+                    { 3, 3, 2, 1, 2, "103", 60f },
+                    { 4, 4, 3, 1, 2, "104", 90f },
+                    { 5, 5, 2, 1, 2, "105", 85f },
+                    { 6, 6, 2, 1, 2, "106", 65f },
+                    { 7, 7, 2, 1, 2, "107", 55f },
+                    { 27, 27, 3, 2, 15, "309", 140f },
+                    { 8, 8, 1, 1, 2, "108", 70f },
+                    { 10, 10, 2, 1, 2, "201", 95f },
+                    { 11, 11, 3, 1, 2, "202", 100f },
+                    { 12, 12, 3, 1, 2, "203", 120f },
+                    { 13, 13, 3, 1, 2, "204", 130f },
+                    { 14, 14, 3, 1, 2, "205", 75f },
+                    { 15, 15, 3, 1, 2, "206", 85f },
+                    { 9, 9, 2, 1, 2, "109", 110f },
+                    { 26, 26, 3, 2, 15, "308", 125f }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Services",
+                columns: new[] { "IdService", "Description", "IdUser", "Sum", "Title" },
+                values: new object[,]
+                {
+                    { 28, "Certified staff", 15, 220f, "Babysitter" },
+                    { 25, "Cake, balloons", 15, 400f, "Birthday Package" },
+                    { 26, "Romantic setup", 15, 500f, "Anniversary Package" },
+                    { 27, "Local wines", 15, 280f, "Wine Tasting" },
+                    { 23, "Express delivery", 2, 90f, "Courier Service" },
+                    { 24, "In-hotel shoot", 15, 300f, "Photo Session" },
+                    { 22, "On-site translator", 2, 180f, "Translation" },
+                    { 12, "1-hour massage", 2, 95f, "Massage" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Services",
+                columns: new[] { "IdService", "Description", "IdUser", "Sum", "Title" },
+                values: new object[,]
+                {
+                    { 20, "Printing & scanning", 2, 50f, "Business Center" },
+                    { 1, "None", 2, 355.5f, "Breakfast" },
+                    { 2, "None", 2, 120.5f, "Spa" },
+                    { 3, "None", 2, 248.5f, "Assistent" },
+                    { 4, "Daily laundry service", 2, 40f, "Laundry" },
+                    { 5, "Underground parking", 2, 75f, "Parking" },
+                    { 6, "Extra room cleaning", 2, 30f, "Room Cleaning" },
+                    { 7, "Mini bar refill", 2, 60f, "Mini Bar" },
+                    { 8, "2-hour guided tour", 2, 150f, "City Tour" },
+                    { 9, "24/7 access", 2, 45f, "Gym Access" },
+                    { 10, "Outdoor pool", 2, 55f, "Pool Access" },
+                    { 11, "Private sauna session", 2, 65f, "Sauna" },
+                    { 29, "Luxury car", 15, 600f, "Car Rental" },
+                    { 13, "Buffet dinner", 2, 300f, "Dinner" },
+                    { 14, "Until 18:00", 2, 80f, "Late Checkout" },
+                    { 15, "From 6:00 AM", 2, 70f, "Early Check-in" },
+                    { 16, "Pet-friendly room", 2, 100f, "Pet Stay" },
+                    { 17, "Luxury car", 2, 200f, "Airport Pickup" },
+                    { 18, "Porter assistance", 2, 20f, "Baggage Service" },
+                    { 19, "Premium internet", 2, 15f, "WiFi" },
+                    { 21, "Per hour", 2, 250f, "Conference Room" },
+                    { 30, "Per day", 15, 60f, "Bike Rental" }
                 });
 
             migrationBuilder.InsertData(
@@ -525,11 +583,11 @@ namespace hoteru_be.Migrations
                 {
                     { 1, 1, true, null, 1, 5, 2, 1, new DateTime(2025, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), 150f },
                     { 2, 2, true, null, 2, 6, 3, 2, new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), 180f },
-                    { 7, 3, false, null, null, 6, 9, 3, new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 27, 0, 0, 0, 0, DateTimeKind.Unspecified), 330f },
                     { 3, 3, true, null, 3, 7, 5, 3, new DateTime(2025, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), 340f },
                     { 4, 4, true, null, 4, 8, 6, 3, new DateTime(2025, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), 325f },
                     { 5, 1, true, null, null, 9, 7, 3, new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 28, 0, 0, 0, 0, DateTimeKind.Unspecified), 330f },
                     { 6, 2, true, 1, null, 10, 8, 3, new DateTime(2025, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), 140f },
+                    { 7, 3, false, null, null, 6, 9, 3, new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 27, 0, 0, 0, 0, DateTimeKind.Unspecified), 330f },
                     { 8, 4, false, null, null, 11, 10, 3, new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 6, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), 380f }
                 });
 
@@ -615,6 +673,16 @@ namespace hoteru_be.Migrations
                 column: "IdRoomType");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Rooms_IdUser",
+                table: "Rooms",
+                column: "IdUser");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_IdUser",
+                table: "Services",
+                column: "IdUser");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_IdUserType",
                 table: "Users",
                 column: "IdUserType");
@@ -644,9 +712,6 @@ namespace hoteru_be.Migrations
                 name: "Rooms");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "DepositTypes");
 
             migrationBuilder.DropTable(
@@ -657,6 +722,9 @@ namespace hoteru_be.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoomTypes");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Persons");

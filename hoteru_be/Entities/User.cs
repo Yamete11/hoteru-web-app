@@ -26,6 +26,8 @@ namespace hoteru_be.Entities
 
         public virtual ICollection<Service> Services { get; set; }
 
+        public virtual ICollection<Room> Rooms { get; set; }
+
         public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }

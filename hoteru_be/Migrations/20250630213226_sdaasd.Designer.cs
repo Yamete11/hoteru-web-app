@@ -10,8 +10,8 @@ using hoteru_be.Context;
 namespace hoteru_be.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250619230141_asd")]
-    partial class asd
+    [Migration("20250630213226_sdaasd")]
+    partial class sdaasd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,6 +52,14 @@ namespace hoteru_be.Migrations
                             Country = "Poland",
                             Postcode = "02-913",
                             Street = "Koszykowa 86"
+                        },
+                        new
+                        {
+                            IdAddress = 2,
+                            City = "Krakow",
+                            Country = "Poland",
+                            Postcode = "31-042",
+                            Street = "Main Square 1"
                         });
                 });
 
@@ -331,6 +339,12 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             IdAddress = 1,
                             Title = "Nobu"
+                        },
+                        new
+                        {
+                            IdHotel = 2,
+                            IdAddress = 2,
+                            Title = "Grand Krakow"
                         });
                 });
 
@@ -471,6 +485,14 @@ namespace hoteru_be.Migrations
                             IdHotel = 1,
                             Name = "William",
                             Surname = "Lee"
+                        },
+                        new
+                        {
+                            IdPerson = 15,
+                            Email = "jan.kowalski@grandkrakow.pl",
+                            IdHotel = 2,
+                            Name = "Jan",
+                            Surname = "Kowalski"
                         });
                 });
 
@@ -704,6 +726,9 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdRoomType")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -717,6 +742,8 @@ namespace hoteru_be.Migrations
 
                     b.HasIndex("IdRoomType");
 
+                    b.HasIndex("IdUser");
+
                     b.ToTable("Rooms");
 
                     b.HasData(
@@ -726,6 +753,7 @@ namespace hoteru_be.Migrations
                             Capacity = 1,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "101",
                             Price = 45f
                         },
@@ -735,6 +763,7 @@ namespace hoteru_be.Migrations
                             Capacity = 2,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "102",
                             Price = 75f
                         },
@@ -744,6 +773,7 @@ namespace hoteru_be.Migrations
                             Capacity = 3,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "103",
                             Price = 60f
                         },
@@ -753,6 +783,7 @@ namespace hoteru_be.Migrations
                             Capacity = 4,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "104",
                             Price = 90f
                         },
@@ -762,6 +793,7 @@ namespace hoteru_be.Migrations
                             Capacity = 5,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "105",
                             Price = 85f
                         },
@@ -771,6 +803,7 @@ namespace hoteru_be.Migrations
                             Capacity = 6,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "106",
                             Price = 65f
                         },
@@ -780,6 +813,7 @@ namespace hoteru_be.Migrations
                             Capacity = 7,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "107",
                             Price = 55f
                         },
@@ -787,8 +821,9 @@ namespace hoteru_be.Migrations
                         {
                             IdRoom = 8,
                             Capacity = 8,
-                            IdRoomStatus = 2,
+                            IdRoomStatus = 1,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "108",
                             Price = 70f
                         },
@@ -798,6 +833,7 @@ namespace hoteru_be.Migrations
                             Capacity = 9,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "109",
                             Price = 110f
                         },
@@ -807,6 +843,7 @@ namespace hoteru_be.Migrations
                             Capacity = 10,
                             IdRoomStatus = 2,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "201",
                             Price = 95f
                         },
@@ -816,6 +853,7 @@ namespace hoteru_be.Migrations
                             Capacity = 11,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "202",
                             Price = 100f
                         },
@@ -825,6 +863,7 @@ namespace hoteru_be.Migrations
                             Capacity = 12,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "203",
                             Price = 120f
                         },
@@ -834,6 +873,7 @@ namespace hoteru_be.Migrations
                             Capacity = 13,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "204",
                             Price = 130f
                         },
@@ -843,6 +883,7 @@ namespace hoteru_be.Migrations
                             Capacity = 14,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "205",
                             Price = 75f
                         },
@@ -852,6 +893,7 @@ namespace hoteru_be.Migrations
                             Capacity = 15,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "206",
                             Price = 85f
                         },
@@ -861,6 +903,7 @@ namespace hoteru_be.Migrations
                             Capacity = 16,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "207",
                             Price = 105f
                         },
@@ -870,6 +913,7 @@ namespace hoteru_be.Migrations
                             Capacity = 17,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "208",
                             Price = 140f
                         },
@@ -879,6 +923,7 @@ namespace hoteru_be.Migrations
                             Capacity = 18,
                             IdRoomStatus = 3,
                             IdRoomType = 1,
+                            IdUser = 2,
                             Number = "209",
                             Price = 135f
                         },
@@ -888,6 +933,7 @@ namespace hoteru_be.Migrations
                             Capacity = 19,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 2,
                             Number = "301",
                             Price = 100f
                         },
@@ -897,6 +943,7 @@ namespace hoteru_be.Migrations
                             Capacity = 20,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 2,
                             Number = "302",
                             Price = 110f
                         },
@@ -906,6 +953,7 @@ namespace hoteru_be.Migrations
                             Capacity = 21,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "303",
                             Price = 115f
                         },
@@ -915,6 +963,7 @@ namespace hoteru_be.Migrations
                             Capacity = 22,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "304",
                             Price = 125f
                         },
@@ -924,6 +973,7 @@ namespace hoteru_be.Migrations
                             Capacity = 23,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "305",
                             Price = 135f
                         },
@@ -933,6 +983,7 @@ namespace hoteru_be.Migrations
                             Capacity = 24,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "306",
                             Price = 95f
                         },
@@ -942,6 +993,7 @@ namespace hoteru_be.Migrations
                             Capacity = 25,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "307",
                             Price = 85f
                         },
@@ -951,6 +1003,7 @@ namespace hoteru_be.Migrations
                             Capacity = 26,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "308",
                             Price = 125f
                         },
@@ -960,6 +1013,7 @@ namespace hoteru_be.Migrations
                             Capacity = 27,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "309",
                             Price = 140f
                         },
@@ -969,6 +1023,7 @@ namespace hoteru_be.Migrations
                             Capacity = 28,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "401",
                             Price = 145f
                         },
@@ -978,6 +1033,7 @@ namespace hoteru_be.Migrations
                             Capacity = 29,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "402",
                             Price = 150f
                         },
@@ -987,6 +1043,7 @@ namespace hoteru_be.Migrations
                             Capacity = 30,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "403",
                             Price = 125f
                         },
@@ -996,6 +1053,7 @@ namespace hoteru_be.Migrations
                             Capacity = 31,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "404",
                             Price = 135f
                         },
@@ -1005,6 +1063,7 @@ namespace hoteru_be.Migrations
                             Capacity = 32,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "405",
                             Price = 100f
                         },
@@ -1014,6 +1073,7 @@ namespace hoteru_be.Migrations
                             Capacity = 33,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "406",
                             Price = 110f
                         },
@@ -1023,6 +1083,7 @@ namespace hoteru_be.Migrations
                             Capacity = 34,
                             IdRoomStatus = 3,
                             IdRoomType = 2,
+                            IdUser = 15,
                             Number = "407",
                             Price = 95f
                         });
@@ -1097,6 +1158,9 @@ namespace hoteru_be.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
                     b.Property<float>("Sum")
                         .HasColumnType("real");
 
@@ -1105,6 +1169,8 @@ namespace hoteru_be.Migrations
 
                     b.HasKey("IdService");
 
+                    b.HasIndex("IdUser");
+
                     b.ToTable("Services");
 
                     b.HasData(
@@ -1112,6 +1178,7 @@ namespace hoteru_be.Migrations
                         {
                             IdService = 1,
                             Description = "None",
+                            IdUser = 2,
                             Sum = 355.5f,
                             Title = "Breakfast"
                         },
@@ -1119,6 +1186,7 @@ namespace hoteru_be.Migrations
                         {
                             IdService = 2,
                             Description = "None",
+                            IdUser = 2,
                             Sum = 120.5f,
                             Title = "Spa"
                         },
@@ -1126,8 +1194,225 @@ namespace hoteru_be.Migrations
                         {
                             IdService = 3,
                             Description = "None",
+                            IdUser = 2,
                             Sum = 248.5f,
                             Title = "Assistent"
+                        },
+                        new
+                        {
+                            IdService = 4,
+                            Description = "Daily laundry service",
+                            IdUser = 2,
+                            Sum = 40f,
+                            Title = "Laundry"
+                        },
+                        new
+                        {
+                            IdService = 5,
+                            Description = "Underground parking",
+                            IdUser = 2,
+                            Sum = 75f,
+                            Title = "Parking"
+                        },
+                        new
+                        {
+                            IdService = 6,
+                            Description = "Extra room cleaning",
+                            IdUser = 2,
+                            Sum = 30f,
+                            Title = "Room Cleaning"
+                        },
+                        new
+                        {
+                            IdService = 7,
+                            Description = "Mini bar refill",
+                            IdUser = 2,
+                            Sum = 60f,
+                            Title = "Mini Bar"
+                        },
+                        new
+                        {
+                            IdService = 8,
+                            Description = "2-hour guided tour",
+                            IdUser = 2,
+                            Sum = 150f,
+                            Title = "City Tour"
+                        },
+                        new
+                        {
+                            IdService = 9,
+                            Description = "24/7 access",
+                            IdUser = 2,
+                            Sum = 45f,
+                            Title = "Gym Access"
+                        },
+                        new
+                        {
+                            IdService = 10,
+                            Description = "Outdoor pool",
+                            IdUser = 2,
+                            Sum = 55f,
+                            Title = "Pool Access"
+                        },
+                        new
+                        {
+                            IdService = 11,
+                            Description = "Private sauna session",
+                            IdUser = 2,
+                            Sum = 65f,
+                            Title = "Sauna"
+                        },
+                        new
+                        {
+                            IdService = 12,
+                            Description = "1-hour massage",
+                            IdUser = 2,
+                            Sum = 95f,
+                            Title = "Massage"
+                        },
+                        new
+                        {
+                            IdService = 13,
+                            Description = "Buffet dinner",
+                            IdUser = 2,
+                            Sum = 300f,
+                            Title = "Dinner"
+                        },
+                        new
+                        {
+                            IdService = 14,
+                            Description = "Until 18:00",
+                            IdUser = 2,
+                            Sum = 80f,
+                            Title = "Late Checkout"
+                        },
+                        new
+                        {
+                            IdService = 15,
+                            Description = "From 6:00 AM",
+                            IdUser = 2,
+                            Sum = 70f,
+                            Title = "Early Check-in"
+                        },
+                        new
+                        {
+                            IdService = 16,
+                            Description = "Pet-friendly room",
+                            IdUser = 2,
+                            Sum = 100f,
+                            Title = "Pet Stay"
+                        },
+                        new
+                        {
+                            IdService = 17,
+                            Description = "Luxury car",
+                            IdUser = 2,
+                            Sum = 200f,
+                            Title = "Airport Pickup"
+                        },
+                        new
+                        {
+                            IdService = 18,
+                            Description = "Porter assistance",
+                            IdUser = 2,
+                            Sum = 20f,
+                            Title = "Baggage Service"
+                        },
+                        new
+                        {
+                            IdService = 19,
+                            Description = "Premium internet",
+                            IdUser = 2,
+                            Sum = 15f,
+                            Title = "WiFi"
+                        },
+                        new
+                        {
+                            IdService = 20,
+                            Description = "Printing & scanning",
+                            IdUser = 2,
+                            Sum = 50f,
+                            Title = "Business Center"
+                        },
+                        new
+                        {
+                            IdService = 21,
+                            Description = "Per hour",
+                            IdUser = 2,
+                            Sum = 250f,
+                            Title = "Conference Room"
+                        },
+                        new
+                        {
+                            IdService = 22,
+                            Description = "On-site translator",
+                            IdUser = 2,
+                            Sum = 180f,
+                            Title = "Translation"
+                        },
+                        new
+                        {
+                            IdService = 23,
+                            Description = "Express delivery",
+                            IdUser = 2,
+                            Sum = 90f,
+                            Title = "Courier Service"
+                        },
+                        new
+                        {
+                            IdService = 24,
+                            Description = "In-hotel shoot",
+                            IdUser = 15,
+                            Sum = 300f,
+                            Title = "Photo Session"
+                        },
+                        new
+                        {
+                            IdService = 25,
+                            Description = "Cake, balloons",
+                            IdUser = 15,
+                            Sum = 400f,
+                            Title = "Birthday Package"
+                        },
+                        new
+                        {
+                            IdService = 26,
+                            Description = "Romantic setup",
+                            IdUser = 15,
+                            Sum = 500f,
+                            Title = "Anniversary Package"
+                        },
+                        new
+                        {
+                            IdService = 27,
+                            Description = "Local wines",
+                            IdUser = 15,
+                            Sum = 280f,
+                            Title = "Wine Tasting"
+                        },
+                        new
+                        {
+                            IdService = 28,
+                            Description = "Certified staff",
+                            IdUser = 15,
+                            Sum = 220f,
+                            Title = "Babysitter"
+                        },
+                        new
+                        {
+                            IdService = 29,
+                            Description = "Luxury car",
+                            IdUser = 15,
+                            Sum = 600f,
+                            Title = "Car Rental"
+                        },
+                        new
+                        {
+                            IdService = 30,
+                            Description = "Per day",
+                            IdUser = 15,
+                            Sum = 60f,
+                            Title = "Bike Rental"
                         });
                 });
 
@@ -1157,28 +1442,35 @@ namespace hoteru_be.Migrations
                             IdPerson = 1,
                             IdUserType = 3,
                             LoginName = "asd",
-                            Password = "asd"
+                            Password = "AQAAAAEAACcQAAAAEJunn01F8InkwA3s5UmJeDNm+7oc9bBue4HftYt26KB5wusHnnCHpRLynWhQeBsldA=="
                         },
                         new
                         {
                             IdPerson = 2,
                             IdUserType = 1,
                             LoginName = "qwe",
-                            Password = "qwe"
+                            Password = "AQAAAAEAACcQAAAAEICoXzMwe+5LQpNMHJ9xEsMYZiyVq4kyrIabFuBt2/BsE6XIdwdsn7Ix3pYtLVZArQ=="
                         },
                         new
                         {
                             IdPerson = 3,
                             IdUserType = 2,
                             LoginName = "zxc",
-                            Password = "zxc"
+                            Password = "AQAAAAEAACcQAAAAEHlv7ELDN76gkuMFVbat1+yHM+NR013pVL1SXY4+aYORlcApNaEoX33ZXJhZU6CAVQ=="
                         },
                         new
                         {
                             IdPerson = 4,
                             IdUserType = 3,
                             LoginName = "qaz",
-                            Password = "qaz"
+                            Password = "AQAAAAEAACcQAAAAEE69t49gGUi3mfUZdq9NYEgY84I2oG9t9KLonzFLjeXimp3t+ZdPufmjFp/JuJP9bg=="
+                        },
+                        new
+                        {
+                            IdPerson = 15,
+                            IdUserType = 1,
+                            LoginName = "jan",
+                            Password = "AQAAAAEAACcQAAAAEOo/kz63BA27/UpNrJX44IQqU2KaOlNvYXmzbSBbwIAQ/Ark0EqXJM/rH3/HS99Gnw=="
                         });
                 });
 
@@ -1338,9 +1630,28 @@ namespace hoteru_be.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("hoteru_be.Entities.User", "User")
+                        .WithMany("Rooms")
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("RoomStatus");
 
                     b.Navigation("RoomType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("hoteru_be.Entities.Service", b =>
+                {
+                    b.HasOne("hoteru_be.Entities.User", "User")
+                        .WithMany("Services")
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.User", b =>
@@ -1427,6 +1738,10 @@ namespace hoteru_be.Migrations
             modelBuilder.Entity("hoteru_be.Entities.User", b =>
                 {
                     b.Navigation("Reservations");
+
+                    b.Navigation("Rooms");
+
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("hoteru_be.Entities.UserType", b =>
