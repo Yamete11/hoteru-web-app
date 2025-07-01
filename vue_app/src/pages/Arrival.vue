@@ -117,6 +117,16 @@ export default {
 
       this.$router.replace({ query: {} });
     }
+
+    if (this.$route.query.confirmed === 'true') {
+      notify({
+        title: 'Reservation Confirmed',
+        text: 'Reservation has been successfully confirmed.',
+        type: 'success',
+        duration: 3000
+      });
+      this.$router.replace({ query: {} });
+    }
   },
   watch: {
     searchQuery: 'fetchReservations',

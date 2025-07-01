@@ -68,7 +68,7 @@ export default {
         title: 'Service Created',
         text: 'The service has been successfully created.',
         type: 'success',
-        duration: 4000
+        duration: 3000
       });
 
       this.$router.replace({ query: {} });

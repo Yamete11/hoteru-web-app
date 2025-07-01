@@ -107,6 +107,16 @@ export default {
   },
   mounted() {
     this.fetchReservations();
+
+    if (this.$route.query.confirmed === 'true') {
+      notify({
+        title: 'Reservation Confirmed',
+        text: 'Reservation has been successfully closed.',
+        type: 'success',
+        duration: 3000
+      });
+      this.$router.replace({ query: {} });
+    }
   },
   methods: {
     deleteReservation(idReservation) {

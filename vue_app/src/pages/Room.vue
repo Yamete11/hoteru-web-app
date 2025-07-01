@@ -101,6 +101,13 @@ export default {
     ,
     deleteRoom(idRoom) {
       this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
+
+      notify({
+        title: 'Room Deleted',
+        text: `Room has been deleted.`,
+        type: 'success',
+        duration: 3000
+      });
     },
     async fetchRooms() {
       try {

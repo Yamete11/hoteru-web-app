@@ -1,5 +1,6 @@
 ﻿using hoteru_be.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -8,23 +9,37 @@ namespace hoteru_be.Services.Implementations
 {
     public class EmailService : IEmailService
     {
+        private readonly IConfiguration _configuration;
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        public EmailService(IConfiguration configuration)
         {
-            var mail = "vasya.developer11@outlook.com";
-            var pw = "Urahara1!";
+            _configuration = configuration;
+        }
 
-            var client = new SmtpClient("smtp-mail.outlook.com", 587)
+        public async Task SendEmailAsync(string email, string subject, string message)
+        {
+            var mail = _configuration["EmailSettings:Email"];
+            var pw = _configuration["EmailSettings:Password"];
+            var smtpServer = _configuration["EmailSettings:SmtpServer"];
+            var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
+
+            try
             {
-                EnableSsl = true,
-                Credentials = new NetworkCredential(mail, pw)
-            };
+                var client = new SmtpClient(smtpServer, smtpPort)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(mail, pw)
+                };
 
-            return client.SendMailAsync(
-                new MailMessage(from: mail,
-                to: email,
-                subject, message));
-
+                var mailMessage = new MailMessage(mail, email, subject, message);
+                await client.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SMTP error: {ex.Message}");
+                Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+                throw;
+            }
         }
     }
 }

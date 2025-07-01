@@ -140,24 +140,15 @@ namespace hoteru_be.Services.Implementations
             var hotelId = GetHotelIdFromToken();
             if (hotelId == null) return ForbiddenResult();
 
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("id")?.Value;
-            if (!int.TryParse(userId, out int idUser))
-                return Error("Invalid user id");
-
-            var user = await _context.Users
-                .Include(u => u.Person)
-                .FirstOrDefaultAsync(u => u.IdPerson == idUser && u.Person.IdHotel == hotelId);
-
-            if (user == null)
-                return Error("User not found or not from this hotel");
 
             var service = new Service
             {
                 Title = serviceDTO.Title,
                 Sum = serviceDTO.Sum ?? 0,
                 Description = serviceDTO.Description,
-                IdUser = user.IdPerson
+                User = await _context.Users.Include(u => u.Person).FirstOrDefaultAsync(u => u.Person.IdHotel == hotelId)
             };
+
 
             _context.Services.Add(service);
             await _context.SaveChangesAsync();

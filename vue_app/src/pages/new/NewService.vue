@@ -113,6 +113,7 @@ export default {
               'Authorization': `Bearer ${store.getters.getToken}`
             }
           });
+          console.log("Ответ сервера:", response);
 
           if (response.data && response.data.httpStatusCode === 200) {
             await router.push({

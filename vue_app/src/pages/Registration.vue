@@ -243,11 +243,7 @@ export default {
       console.log(v$.value.$error)
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Hotel', state.formData, {
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
+          const response = await axios.post('https://localhost:44384/api/Hotel', state.formData);
           console.log('Success:', response.data);
           if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
             state.errors = response.data.errors || {};

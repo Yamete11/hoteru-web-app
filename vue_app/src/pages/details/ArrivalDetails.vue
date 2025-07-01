@@ -380,7 +380,7 @@ export default {
         );
 
         console.log('Confirmation Success:', confirmResponse.data);
-        await router.push('/arrivals');
+        await router.push({path: '/arrivals', query: {confirmed: 'true'}});
       } catch (error) {
         console.error('Confirmation Error:', error);
       }

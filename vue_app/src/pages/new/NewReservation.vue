@@ -119,6 +119,7 @@
                 class="input"
                 type="number"
                 data-testid="deposit-input"
+                @input="v$.formData.Sum.$touch()"
             >
             <span class="error-message" v-if="v$.formData.Sum.$error">
               <span v-if="v$.formData.Sum.required?.$invalid">The field is required*</span>
@@ -128,7 +129,7 @@
             <span class="error-message" v-if="state.errors.Sum">{{ state.errors.Sum[0] }}</span>
 
             <label>Choose type: </label>
-            <select v-model="state.formData.IdDepositType" data-testid="deposit-select">
+            <select v-model="state.formData.IdDepositType" @change="v$.formData.IdDepositType.$touch()" data-testid="deposit-select">
               <option disabled value="0">Select type</option>
               <option v-for="type in state.depositTypes" :key="type.idType" :value="type.idType" data-testid="deposit-option">
                 {{ type.title }}
@@ -320,6 +321,7 @@ export default {
     async function addReservation(){
       v$.value.$touch();
       if (!v$.value.$error) {
+        console.log(state.formData)
         try {
           const response = await axios.post('https://localhost:44384/api/Reservation', state.formData, {
             headers: {
@@ -429,8 +431,8 @@ export default {
         delete state.formData.Sum;
         delete state.formData.IdDepositType;
       } else {
-        state.formData.depositSum = '';
-        state.formData.idDepositType = 0;
+        state.formData.Sum = 0;
+        state.formData.IdDepositType = 0;
       }
 
       delete state.errors.Sum;

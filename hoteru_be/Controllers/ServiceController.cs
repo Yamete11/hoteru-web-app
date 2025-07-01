@@ -40,10 +40,13 @@ namespace hoteru_be.Controllers
         }
 
         [HttpPost]
-        public async Task<MethodResultDTO> PostService([FromBody] ServiceDTO serviceDTO)
+        public async Task<IActionResult> PostService([FromBody] ServiceDTO serviceDTO)
         {
-            return await _service.PostService(serviceDTO);
+            var result = await _service.PostService(serviceDTO);
+
+            return StatusCode((int)result.HttpStatusCode, result);
         }
+
 
         [HttpPut]
         public async Task<MethodResultDTO> UpdateService([FromBody] ServiceDTO serviceDTO)

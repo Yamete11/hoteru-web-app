@@ -2,6 +2,7 @@
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
 using hoteru_be.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,13 +82,18 @@ namespace hoteru_be.Services.Implementations
                 Email = hotelDTO.Email,
                 Hotel = hotel
             };
+
+            var passwordHasher = new PasswordHasher<User>();
+
             User user = new User
             {
                 LoginName = hotelDTO.LoginName,
-                Password = hotelDTO.Password,
                 Person = person,
                 IdUserType = 1,
             };
+
+            user.Password = passwordHasher.HashPassword(user, hotelDTO.Password);
+
 
             _context.Hotels.Add(hotel);
             _context.Persons.Add(person);
