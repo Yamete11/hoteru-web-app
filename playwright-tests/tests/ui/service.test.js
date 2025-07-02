@@ -28,6 +28,8 @@ test('Create new Service', async ({ page }) => {
     );
     await newServicePage.confirmForm();
 
+    await servicePage.enterSearch(testData.serviceTitle)
+
     await servicePage.assertValues(
         testData.serviceTitle,
         testData.servicePrice,
