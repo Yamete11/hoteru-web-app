@@ -34,4 +34,30 @@ module.exports = {
     reservationDepositSum: 100,
     reservationDepositType: '2',
     reservationService: 'Spa: 120.5',
+
+    newUser: {
+        name: 'Volodya',
+        surname: 'Box',
+        email: 'volodya@example.com',
+        login: 'checkthisout',
+        password: 'password123',
+        userType: 'Employee'
+    },
+
+    reservationSearchField: 'Room',
+    reservationSearchValue: '104',
+    roomStatusAfterTest: '3',
+
+    newRegistrationUser: {
+        firstName: 'Jack',
+        lastName: 'Mathews',
+        email: 'glebasher11@gmail.com',
+        login: 'tyu',
+        password: 'tyu',
+        companyName: 'TestCorp',
+        country: 'USA',
+        city: 'California',
+        street: '5thAvenue',
+        postcode: '10001'
+    }
 };

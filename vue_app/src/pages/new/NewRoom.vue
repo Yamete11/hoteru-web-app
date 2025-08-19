@@ -158,13 +158,13 @@ export default {
 
     async function fetchRoomTypes() {
       try {
-        const response = await axios.get(API.ROOMTYPE,{
+        const response = await axios.get(API.ROOM_TYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.roomTypes = response.data;
-        const response2 = await axios.get(API.ROOMSTATUS,{
+        const response2 = await axios.get(API.ROOM_STATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

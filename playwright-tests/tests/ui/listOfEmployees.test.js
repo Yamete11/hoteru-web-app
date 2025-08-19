@@ -27,21 +27,11 @@ test('Creating new user', async ({ page }) => {
 
     await navbar.openListOfEmployees();
 
-    const newUser = {
-        name: 'Volodya',
-        surname: 'Box',
-        email: 'volodya@example.com',
-        login: 'checkthisout',
-        password: 'password123',
-        userType: 'Employee'
-    };
-
-    await listOfEmployees.fillNewUserForm(newUser);
+    await listOfEmployees.fillNewUserForm(testData.newUser);
     await listOfEmployees.submitForm()
-    await navbar.openListOfEmployees();
-    const isUserPresent = await listOfEmployees.isUserPresent(newUser.login);
+    const isUserPresent = await listOfEmployees.isUserPresent(testData.newUser.login);
     expect(isUserPresent).toBe(true);
 
-    await listOfEmployees.deleteUserByLogin(newUser.login)
+    await listOfEmployees.deleteUserByLogin(testData.newUser.login)
 });
 

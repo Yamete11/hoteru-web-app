@@ -35,24 +35,25 @@ test('Create new Reservation', async ({ page }) => {
         testData.reservationDepositSum,
         testData.reservationDepositType,
         testData.reservationService
-    )
+    );
 
-    await newReservationPage.submitForm()
-    await arrivalPage.search("Room", "104")
-    await arrivalPage.deleteReservation()
-
+    await newReservationPage.submitForm();
+    await arrivalPage.search(testData.reservationSearchField, testData.reservationSearchValue);
+    await arrivalPage.deleteReservation();
 });
 
 test.afterEach(async ({ page }) => {
     const sidebar = new Sidebar(page)
     const roomPage = new RoomPage(page)
     const roomDetailsPage = new RoomDetailsPage(page)
-    await sidebar.clickButton("rooms")
 
-    await roomPage.fillSearchInput("104")
+    await sidebar.clickButton("rooms");
+
+    await roomPage.fillSearchInput(testData.reservationSearchValue);
     await roomPage.openDetails();
-    await roomDetailsPage.clickSubmit()
-    await roomDetailsPage.changeStatus('3')
-    await roomDetailsPage.clickSubmit()
+    await roomDetailsPage.clickSubmit();
+    await roomDetailsPage.changeStatus(testData.roomStatusAfterTest);
+    await roomDetailsPage.clickSubmit();
 });
+
 

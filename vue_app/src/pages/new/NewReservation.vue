@@ -273,13 +273,13 @@ export default {
 
     async function fetchRooms() {
       try {
-        const response = await axios.get(API.FREEROOM,{
+        const response = await axios.get(API.FREE_ROOM,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.rooms = response.data;
-        const response2 = await axios.get(API.ROOMTYPE,{
+        const response2 = await axios.get(API.ROOM_TYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -292,14 +292,14 @@ export default {
         });
         state.guests = response3.data.list;
 
-        const responseStatus = await axios.get(API.GUESTSTATUS,{
+        const responseStatus = await axios.get(API.GUEST_STATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.guestStatuses = responseStatus.data;
 
-        const responseDepositType = await axios.get(API.DEPOSITTYPE,{
+        const responseDepositType = await axios.get(API.DEPOSIT_TYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -324,7 +324,7 @@ export default {
       if (!v$.value.$error) {
         console.log(state.formData)
         try {
-          const response = await axios.post(API.RESERVATION, state.formData, {
+          const response = await axios.post(API.RESERVATION.RESERVATION, state.formData, {
             headers: {
               'Authorization': `Bearer ${store.getters.getToken}`
             }

@@ -32,7 +32,7 @@ namespace hoteru_be
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"База недоступна, пробуем снова: {ex.Message}");
+                        Console.WriteLine($"DB is not ready yet: {ex.Message}");
                         Thread.Sleep(5000);
                         retries--;
                     }

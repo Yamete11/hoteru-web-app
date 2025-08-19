@@ -181,7 +181,7 @@ export default {
     async function fetchGuestStatuses() {
       console.log(this.$store.getters.getToken)
       try {
-        const response = await axios.get(API.GUESTSTATUS,{
+        const response = await axios.get(API.GUEST_STATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           }

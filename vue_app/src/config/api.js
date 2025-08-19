@@ -27,7 +27,7 @@ export default {
 
     ROOM: `${API_BASE_URL}/api/Room`,
     ROOM_ID: (id) => `${API_BASE_URL}/api/Room/${id}`,
-    FREE_ROOM: `${API_BASE_URL}/api/freeRooms`,
+    FREE_ROOM: `${API_BASE_URL}/api/Room/freeRooms`,
     FREE_ROOM_BY_ID: (idRoom) => `${API_BASE_URL}/api/Room/freeRooms?idRoom=${idRoom}`,
     ROOM_TYPE: `${API_BASE_URL}/api/RoomType`,
     ROOM_STATUS: `${API_BASE_URL}/api/RoomStatus`,

@@ -47,6 +47,7 @@ class NewReservationPage {
 
 
     async submitForm() {
+        await this.submitButton.waitFor({ state: 'visible' });
         await this.submitButton.click();
     }
 
