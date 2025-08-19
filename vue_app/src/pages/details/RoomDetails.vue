@@ -104,6 +104,8 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -153,7 +155,7 @@ export default {
           state.formData.type = String(state.formData.type);
           state.formData.status = String(state.formData.status);
           try {
-            const response = await axios.put('https://localhost:44384/api/Room', state.formData, {
+            const response = await axios.put(API.ROOM, state.formData, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
@@ -187,7 +189,7 @@ export default {
 
     async function fetchSpecificRoom(idRoom) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Room/' + idRoom,{
+        const response = await axios.get(API.ROOM_ID(idRoom),{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -196,14 +198,14 @@ export default {
 
         console.log(state.formData)
 
-        const responseType = await axios.get('https://localhost:44384/api/RoomType',{
+        const responseType = await axios.get(API.ROOM_TYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.roomTypes = responseType.data;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/RoomStatus',{
+        const responseStatus = await axios.get(API.ROOM_STATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

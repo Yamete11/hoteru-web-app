@@ -50,7 +50,7 @@ export default createStore({
         },
         async fetchUserData({ commit, getters }, userName) {
             try {
-                const response = await axios.get('https://localhost:44384/api/User/' + userName, {
+                const response = await axios.get('http://localhost:8080/api/User/' + userName, {
                     headers: {
                         'Authorization': `Bearer ${getters.getToken}`
                     },

@@ -111,6 +111,8 @@ import { useRouter } from 'vue-router';
 import {reactive} from "vue";
 import {email} from "@vuelidate/validators";
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -159,7 +161,7 @@ export default {
         console.log(state.formData)
         if (!v$.value.$error) {
           try {
-            const response = await axios.put('https://localhost:44384/api/User', state.formData, {
+            const response = await axios.put(API.USER.USER, state.formData, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
@@ -196,14 +198,14 @@ export default {
 
     async function fetchUser(idUser){
       try {
-        const response = await axios.get('https://localhost:44384/api/User/fullUser/' + idUser, {
+        const response = await axios.get(API.USER.FULL_USER(idUser), {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.formData = response.data;
 
-        const responseUserTypes = await axios.get('https://localhost:44384/api/UserType',{
+        const responseUserTypes = await axios.get(API.USER_TYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

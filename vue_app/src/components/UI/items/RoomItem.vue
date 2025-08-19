@@ -19,6 +19,8 @@
 <script>
 import axios from "axios";
 import store from "@/store";
+import API from '@/config/api.js';
+
 
 export default {
   name: "RoomItem",
@@ -38,7 +40,7 @@ export default {
         return;
       }
 
-      axios.delete(`https://localhost:44384/api/Room/${idRoom}`, {
+      axios.delete(API.ROOM_ID(idRoom), {
         headers: {
           'Authorization': `Bearer ${store.getters.getToken}`
         }

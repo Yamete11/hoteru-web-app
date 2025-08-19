@@ -124,6 +124,7 @@ import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/val
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import API from '@/config/api.js';
 
 export default {
   name: "NewRoom",
@@ -157,13 +158,13 @@ export default {
 
     async function fetchRoomTypes() {
       try {
-        const response = await axios.get('https://localhost:44384/api/RoomType',{
+        const response = await axios.get(API.ROOMTYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.roomTypes = response.data;
-        const response2 = await axios.get('https://localhost:44384/api/RoomStatus',{
+        const response2 = await axios.get(API.ROOMSTATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -178,7 +179,7 @@ export default {
       v$.value.$touch();
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Room', state.formData, {
+          const response = await axios.post(API.ROOM, state.formData, {
             headers: {
               'Authorization': `Bearer ${store.getters.getToken}`
             }

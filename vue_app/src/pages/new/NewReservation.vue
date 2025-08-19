@@ -182,6 +182,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { differenceInCalendarDays } from 'date-fns';
+import API from '@/config/api.js';
 
 export default {
   name: "NewReservation",
@@ -272,40 +273,40 @@ export default {
 
     async function fetchRooms() {
       try {
-        const response = await axios.get('https://localhost:44384/api/Room/freeRooms',{
+        const response = await axios.get(API.FREEROOM,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.rooms = response.data;
-        const response2 = await axios.get('https://localhost:44384/api/RoomType',{
+        const response2 = await axios.get(API.ROOMTYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.roomTypes = response2.data;
-        const response3 = await axios.get('https://localhost:44384/api/Guest',{
+        const response3 = await axios.get(API.GUEST,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.guests = response3.data.list;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus',{
+        const responseStatus = await axios.get(API.GUESTSTATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.guestStatuses = responseStatus.data;
 
-        const responseDepositType = await axios.get('https://localhost:44384/api/DepositType',{
+        const responseDepositType = await axios.get(API.DEPOSITTYPE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.depositTypes = responseDepositType.data;
 
-        const responseServices = await axios.get('https://localhost:44384/api/Service',{
+        const responseServices = await axios.get(API.SERVICE,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -323,7 +324,7 @@ export default {
       if (!v$.value.$error) {
         console.log(state.formData)
         try {
-          const response = await axios.post('https://localhost:44384/api/Reservation', state.formData, {
+          const response = await axios.post(API.RESERVATION, state.formData, {
             headers: {
               'Authorization': `Bearer ${store.getters.getToken}`
             }

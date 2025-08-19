@@ -45,6 +45,8 @@
 <script>
 import axios from "axios";
 import { notify } from "@kyvg/vue3-notification";
+import API from '@/config/api.js';
+
 
 export default {
   name: "Service",
@@ -102,7 +104,7 @@ export default {
       try {
         this.isLoading = true;
         this.page = 1;
-        const response = await axios.get('https://localhost:44384/api/Service', {
+        const response = await axios.get(API.SERVICE, {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -126,7 +128,7 @@ export default {
       if (this.page >= this.totalServices) return;
       try {
         this.page++;
-        const response = await axios.get('https://localhost:44384/api/Service', {
+        const response = await axios.get(API.SERVICE, {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

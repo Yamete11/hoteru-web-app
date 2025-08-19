@@ -192,6 +192,8 @@ import { required, email, maxLength } from '@vuelidate/validators';
 import axios from 'axios';
 import {useRouter} from "vue-router/dist/vue-router";
 import {useStore} from "vuex";
+import API from '@/config/api.js';
+
 
 export default {
   name: "Registration",
@@ -243,7 +245,7 @@ export default {
       console.log(v$.value.$error)
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Hotel', state.formData);
+          const response = await axios.post(API.REGISTRATION.HOTEL, state.formData);
           console.log('Success:', response.data);
           if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
             state.errors = response.data.errors || {};

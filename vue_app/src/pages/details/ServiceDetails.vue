@@ -77,6 +77,8 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
+
 
 export default {
   name: "ServiceDetails",
@@ -116,7 +118,7 @@ export default {
         v$.value.$touch();
         if (!v$.value.$error) {
           try {
-            const response = await axios.put('https://localhost:44384/api/Service', state.formData, {
+            const response = await axios.put(API.SERVICE, state.formData, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
@@ -150,7 +152,7 @@ export default {
 
     async function fetchSpecificService(idService) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Service/' + idService,{
+        const response = await axios.get(API.SERVICE_ID(idService),{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

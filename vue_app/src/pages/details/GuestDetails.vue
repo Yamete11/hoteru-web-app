@@ -119,6 +119,8 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {email} from "@vuelidate/validators";
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -171,7 +173,7 @@ export default {
         if (!v$.value.$error) {
           state.formData.idGuestStatus = String(state.formData.idGuestStatus);
           try {
-            const response = await axios.put('https://localhost:44384/api/Guest', state.formData, {
+            const response = await axios.put(API.GUEST, state.formData, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
@@ -208,14 +210,14 @@ export default {
 
     async function fetchSpecificGuest(idPerson) {
       try {
-        const response = await axios.get('https://localhost:44384/api/Guest/' + idPerson, {
+        const response = await axios.get(API.GUEST_ID(idPerson), {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
         });
         state.formData = response.data;
 
-        const responseStatus = await axios.get('https://localhost:44384/api/GuestStatus',{
+        const responseStatus = await axios.get(API.GUEST_STATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

@@ -140,6 +140,7 @@ import {useVuelidate} from "@vuelidate/core";
 import {email, numeric, maxLength, required} from "@vuelidate/validators";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import API from '@/config/api.js';
 
 
 export default {
@@ -180,7 +181,7 @@ export default {
     async function fetchGuestStatuses() {
       console.log(this.$store.getters.getToken)
       try {
-        const response = await axios.get('https://localhost:44384/api/GuestStatus',{
+        const response = await axios.get(API.GUESTSTATUS,{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           }
@@ -196,7 +197,7 @@ export default {
       if (!v$.value.$error) {
         console.log(state.formData)
         try {
-          const response = await axios.post('https://localhost:44384/api/Guest', state.formData,{
+          const response = await axios.post(API.GUEST, state.formData,{
             headers: {
               'Authorization': `Bearer ${store.getters.getToken}`
             }

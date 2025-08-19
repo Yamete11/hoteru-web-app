@@ -61,6 +61,8 @@
 <script>
 import axios from "axios";
 import { notify } from "@kyvg/vue3-notification";
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -131,7 +133,7 @@ export default {
     async fetchReservations() {
       try {
         this.isLoading = true;
-        const response = await axios.get('https://localhost:44384/api/Reservation', {
+        const response = await axios.get(API.RESERVATION.RESERVATION, {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
@@ -154,7 +156,7 @@ export default {
     async loadMore() {
       try {
         this.page++;
-        const response = await axios.get('https://localhost:44384/api/Reservation', {
+        const response = await axios.get(API.RESERVATION.RESERVATION, {
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },

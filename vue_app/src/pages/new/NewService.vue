@@ -78,6 +78,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
 
 
 export default {
@@ -108,7 +109,7 @@ export default {
       v$.value.$validate();
       if (!v$.value.$error) {
         try {
-          const response = await axios.post('https://localhost:44384/api/Service', state.formData, {
+          const response = await axios.post(API.SERVICE, state.formData, {
             headers: {
               'Authorization': `Bearer ${store.getters.getToken}`
             }

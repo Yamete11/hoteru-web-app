@@ -194,6 +194,8 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import {differenceInCalendarDays} from "date-fns";
 import { notify } from '@kyvg/vue3-notification';
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -277,7 +279,7 @@ export default {
         if (!v$.value.$error) {
           console.log(state.formData)
           try {
-            const response = await axios.put('https://localhost:44384/api/Reservation', state.formData, {
+            const response = await axios.put(API.RESERVATION.RESERVATION, state.formData, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },
@@ -321,16 +323,16 @@ export default {
           },
         };
 
-        const responseReservation = await axios.get(`https://localhost:44384/api/Reservation/arrival/${idReservation}`, headers);
+        const responseReservation = await axios.get(API.RESERVATION.ARRIVAL_BY_ID(idReservation), headers);
         state.formData = responseReservation.data;
         state.formData.services = state.formData.services || [];
         state.formData.in = isoToLocalDate(state.formData.in);
         state.formData.out = isoToLocalDate(state.formData.out);
 
-        const responseRooms = await axios.get(`https://localhost:44384/api/Room/freeRooms?idRoom=${state.formData.idRoom}`, headers);
+        const responseRooms = await axios.get(API.FREE_ROOM_BY_ID(state.formData.idRoom), headers);
         state.rooms = responseRooms.data;
 
-        const responseRoomTypes = await axios.get(`https://localhost:44384/api/RoomType`, headers);
+        const responseRoomTypes = await axios.get(API.ROOM_TYPE, headers);
         state.roomTypes = responseRoomTypes.data;
 
         const foundRoom = state.rooms.find(room => room.idRoom === state.formData.idRoom);
@@ -342,7 +344,7 @@ export default {
           state.formData.price = foundRoom.price * nights;
         }
 
-        const responseGuests = await axios.get(`https://localhost:44384/api/Guest`, headers);
+        const responseGuests = await axios.get(API.GUEST, headers);
         state.guests = responseGuests.data.list;
 
         const foundGuest = state.guests.find(guest => guest.idPerson === state.formData.idGuest);
@@ -350,7 +352,7 @@ export default {
           state.selectedGuest = `${foundGuest.name} ${foundGuest.surname}, ${foundGuest.passport}`;
         }
 
-        const responseDepositType = await axios.get(`https://localhost:44384/api/DepositType`, headers);
+        const responseDepositType = await axios.get(API.DEPOSIT_TYPE, headers);
         state.depositTypes = responseDepositType.data;
 
         const foundDeposit = state.depositTypes.find(type => type.idType === state.formData.idDepositType);
@@ -358,7 +360,7 @@ export default {
           state.selectedDepositType = foundDeposit.title;
         }
 
-        const responseServices = await axios.get(`https://localhost:44384/api/Service`, headers);
+        const responseServices = await axios.get(API.SERVICE, headers);
         state.services = responseServices.data.list;
 
         state.hasDeposit = state.formData.idDepositType !== 0;
@@ -372,7 +374,7 @@ export default {
     async function confirmReservation() {
       console.log("Token:", store.getters.getToken);
       try {
-        const confirmResponse = await axios.put('https://localhost:44384/confirm/' + state.formData.idReservation, {}, {
+        const confirmResponse = await axios.put(API.CONFIRM(state.formData.idReservation), {}, {
               headers: {
                 'Authorization': `Bearer ${store.getters.getToken}`
               },

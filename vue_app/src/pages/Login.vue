@@ -32,6 +32,7 @@
 <script>
 import axios from "axios";
 import { parseJwt } from "../utils/jwt";
+import API from '@/config/api.js';
 
 export default {
   name: "Login",
@@ -47,7 +48,7 @@ export default {
       console.log("Logging in");
       this.errors = {};
       try {
-        const response = await fetch('https://localhost:44384/api/Login', {
+        const response = await fetch(API.LOGIN, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ Login: this.login, Password: this.password })

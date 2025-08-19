@@ -17,6 +17,8 @@
 <script>
 import axios from "axios";
 import store from "@/store";
+import API from '@/config/api.js';
+
 
 
 export default {
@@ -32,7 +34,7 @@ export default {
       this.$router.push({ name: 'ServiceDetails', params: { idService: idService } });
     },
     deleteService(idService) {
-      axios.delete(`https://localhost:44384/api/Service/${idService}`, {
+      axios.delete(API.SERVICE_ID(idService), {
         headers: {
           'Authorization': `Bearer ${store.getters.getToken}`
         },

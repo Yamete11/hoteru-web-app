@@ -53,6 +53,8 @@
 
 <script>
 import axios from "axios";
+import API from '@/config/api.js';
+
 
 export default {
   name: "HistoryDetails",
@@ -70,7 +72,7 @@ export default {
   methods:{
     async fetchSpecificHistory(idReservation){
       try{
-        const response = await axios.get('https://localhost:44384/api/Reservation/history/' + idReservation,{
+        const response = await axios.get(API.RESERVATION.HISTORY_ID(idReservation),{
           headers: {
             'Authorization': `Bearer ${this.$store.getters.getToken}`
           },
