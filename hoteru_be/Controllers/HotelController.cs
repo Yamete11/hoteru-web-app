@@ -23,5 +23,12 @@ namespace hoteru_be.Controllers
             return await _service.PostHotel(hotelDTO);
         }
 
+
+        [HttpDelete]
+        public async Task<MethodResultDTO> DeleteHotel([FromBody] DeleteHotelRequestDTO request)
+        {
+            return await _service.DeleteHotel(request.HotelTitle);
+        }
+
     }
 }

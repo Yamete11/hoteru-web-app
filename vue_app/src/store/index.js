@@ -1,5 +1,7 @@
 import { createStore } from 'vuex';
 import axios from "axios";
+import API from '@/config/api.js';
+
 
 export default createStore({
     state: {
@@ -50,7 +52,7 @@ export default createStore({
         },
         async fetchUserData({ commit, getters }, userName) {
             try {
-                const response = await axios.get('http://localhost:8080/api/User/' + userName, {
+                const response = await axios.get(API.USER.USER_BY_NAME(userName), {
                     headers: {
                         'Authorization': `Bearer ${getters.getToken}`
                     },

@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {}
+    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {
+    "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+        "projectUniqueName": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
         "projectName": "hoteru_be",
-        "projectPath": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
-        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\obj\\",
+        "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+        "packagesPath": "C:\\Users\\Glebasher\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Glebasher\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -38,13 +34,7 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net5.0": {
@@ -99,11 +89,16 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[5.0.17, 5.0.17]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -112,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }

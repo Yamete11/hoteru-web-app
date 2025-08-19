@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const RegistrationPage = require('../../pages/registration-page');
 const LoginPage = require('../../pages/login-page');
 const testData = require('../test-data/user-data');
+import { deleteHotelByTitle } from '../../utils/api';
 
 
 test('Successful registration redirects to login page', async ({ page }) => {
@@ -15,6 +16,8 @@ test('Successful registration redirects to login page', async ({ page }) => {
 
     await registrationPage.assertRedirectToLogin();
     expect(await loginPage.isLoginButtonVisible()).toBeTruthy();
+
+    await deleteHotelByTitle(testData.newRegistrationUser.companyName);
 });
 
 test('Submitting empty registration form shows error', async ({ page }) => {

@@ -7,5 +7,7 @@ namespace hoteru_be.Services.Interfaces
     public interface IHotelService
     {
         public Task<MethodResultDTO> PostHotel(HotelDTO hotelDTO);
+
+        public Task<MethodResultDTO> DeleteHotel(string hotelTitle);
     }
 }

@@ -22,6 +22,32 @@ namespace hoteru_be.Services.Implementations
             _emailService = emailService;
         }
 
+        public async Task<MethodResultDTO> DeleteHotel(string hotelTitle)
+        {
+            var hotel = await _context.Hotels
+                .FirstOrDefaultAsync(h => h.Title == hotelTitle);
+
+            if (hotel == null)
+            {
+                return new MethodResultDTO
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = $"Hotel with title '{hotelTitle}' not found."
+                };
+            }
+
+            _context.Hotels.Remove(hotel);
+            await _context.SaveChangesAsync();
+
+            return new MethodResultDTO
+            {
+                HttpStatusCode = HttpStatusCode.OK,
+                Message = $"Hotel '{hotelTitle}' deleted successfully."
+            };
+        }
+
+
+
         public async Task<MethodResultDTO> PostHotel(HotelDTO hotelDTO)
         {
             var errors = new Dictionary<string, List<string>>();

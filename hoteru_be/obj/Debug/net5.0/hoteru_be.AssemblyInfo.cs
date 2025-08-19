@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("hoteru_be")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+791b32e95395ed68db9e51f4b983c9ed5e66cc34")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("hoteru_be")]
 [assembly: System.Reflection.AssemblyTitleAttribute("hoteru_be")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
