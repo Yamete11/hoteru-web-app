@@ -13,9 +13,9 @@ namespace hoteru_be.DTOs
         public string RoomType { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public float DepositSum { get; set; }
+        public decimal DepositSum { get; set; }
         public string DepositType { get; set; }
-        public float BillSum { get; set; }
+        public decimal BillSum { get; set; }
         public string Created { get; set; }
 
         public List<ServiceHistoryDTO> Services { get; set; }

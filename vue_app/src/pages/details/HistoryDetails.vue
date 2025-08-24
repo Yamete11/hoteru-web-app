@@ -53,7 +53,6 @@
 
 <script>
 import axios from "axios";
-import API from '@/config/api.js';
 
 
 export default {

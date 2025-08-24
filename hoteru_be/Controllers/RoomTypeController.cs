@@ -1,16 +1,17 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class RoomTypeController : ControllerBase
     {
         private readonly IRoomTypeService _service;
@@ -21,9 +22,12 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<TypeDTO>> GetRoomTypes()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<IEnumerable<TypeDTO>>> GetRoomTypes(CancellationToken ct)
         {
-            return await _service.GetRoomTypes();
+            var list = await _service.GetRoomTypes(ct);
+            return Ok(list);
         }
     }
 }

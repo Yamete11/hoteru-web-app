@@ -10,7 +10,7 @@ namespace hoteru_be.Entities
         [Key]
         public int IdReservation { get; set; }
         public int Capacity { get; set; }
-        public float Price { get; set; }
+        public decimal Price { get; set; }
         public DateTime In { get; set; }
         public DateTime Out { get; set; }
 

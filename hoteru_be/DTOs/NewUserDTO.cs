@@ -8,12 +8,12 @@ namespace hoteru_be.DTOs
 
         [Required(ErrorMessage = "Name is required")]
         [MaxLength(20, ErrorMessage = "Name must be less than 20 characters")]
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Name must contain only letters")]
+        [RegularExpression(@"^\p{L}+(?:[ '-]\p{L}+)*$", ErrorMessage = "Name contains invalid characters")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Surname is required")]
         [MaxLength(20, ErrorMessage = "Surname must be less than 20 characters")]
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Surname must contain only letters")]
+        [RegularExpression(@"^\p{L}+(?:[ '-]\p{L}+)*$", ErrorMessage = "Surname contains invalid characters")]
         public string Surname { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
@@ -22,13 +22,15 @@ namespace hoteru_be.DTOs
 
         [Required(ErrorMessage = "Login name is required")]
         [MaxLength(15, ErrorMessage = "Login name must be less than 15 characters")]
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Login name must contain only letters")]
+        [RegularExpression(@"^[a-zA-Z0-9._-]{3,15}$", ErrorMessage = "Login name can contain letters, digits, dot, underscore and hyphen")]
         public string LoginName { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "User type is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "User type is invalid")]
         public int IdUserType { get; set; }
     }
 }

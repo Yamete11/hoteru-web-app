@@ -1,17 +1,17 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _service;
@@ -22,44 +22,70 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedResultDTO<RoomDTO>>> GetRooms([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = "", [FromQuery] string searchField = "number")
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<PaginatedResultDTO<RoomDTO>>> GetRooms(
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 15,
+            [FromQuery] string searchQuery = "",
+            [FromQuery] string searchField = "number",
+            CancellationToken ct = default)
         {
-            var result = await _service.GetRooms(page, limit, searchQuery, searchField);
+            var result = await _service.GetRooms(page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
-
-
         [HttpGet("freeRooms")]
-        public async Task<List<RoomDTO>> GetFreeRooms([FromQuery] int idRoom = 0)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<List<RoomDTO>>> GetFreeRooms([FromQuery] int idRoom = 0, CancellationToken ct = default)
         {
-            return await _service.GetFreeRooms(idRoom);
+            var list = await _service.GetFreeRooms(idRoom, ct);
+            return Ok(list);
+        }
+
+        [HttpGet("{idRoom:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSpecificRoom(int idRoom, CancellationToken ct)
+        {
+            var result = await _service.GetSpecificRoom(idRoom, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
 
-        [HttpGet("{IdRoom}")]
-        public async Task<SpecificRoomDTO> GetSpecificRoom(int IdRoom)
+        [HttpDelete("{idRoom:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteRoom(int idRoom, CancellationToken ct)
         {
-            return await _service.GetSpecificRoom(IdRoom);
+            var result = await _service.DeleteRoom(idRoom, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
-        [HttpDelete("{IdRoom}")]
-        public async Task<MethodResultDTO> DeleteRoom(int IdRoom)
-        {
-            return await _service.DeleteRoom(IdRoom);
-        }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateRoom([FromBody] RoomDTO roomDTO)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateRoom([FromBody] RoomDTO roomDTO, CancellationToken ct)
         {
-            return await _service.UpdateRoom(roomDTO);
+            var result = await _service.UpdateRoom(roomDTO, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
-        [HttpPost]
-        public async Task<MethodResultDTO> PostRoom([FromBody] RoomDTO roomDTO)
-        {
 
-            return await _service.PostRoom(roomDTO);
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> PostRoom([FromBody] RoomDTO roomDTO, CancellationToken ct)
+        {
+            var result = await _service.PostRoom(roomDTO, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
     }
 }

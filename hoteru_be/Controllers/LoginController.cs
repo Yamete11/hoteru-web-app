@@ -1,34 +1,32 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
-[ApiController]
-public class LoginController : ControllerBase
+namespace hoteru_be.Controllers
 {
-    private readonly IAuthService _authService;
-
-    public LoginController(IAuthService authService)
+    [AllowAnonymous]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class LoginController : ControllerBase
     {
-        _authService = authService;
-    }
+        private readonly IAuthService _authService;
 
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] LoginDTO loginDTO)
-    {
-        var result = await _authService.AuthenticateAsync(loginDTO);
-
-        if (!result.Success)
-            return Unauthorized(new { message = result.ErrorMessage });
-
-        return Ok(new
+        public LoginController(IAuthService authService)
         {
-            Token = result.Token,
-            Type = "Bearer",
-            Expiry = DateTime.UtcNow.AddMinutes(120),
-            message = "Login works fine"
-        });
+            _authService = authService;
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Post([FromBody] LoginDTO dto, CancellationToken ct)
+        {
+            var result = await _authService.AuthenticateAsync(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
+        }
     }
 }

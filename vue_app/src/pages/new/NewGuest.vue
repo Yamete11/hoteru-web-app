@@ -135,12 +135,14 @@
 
 <script>
 import axios from "axios";
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
 import {useVuelidate} from "@vuelidate/core";
 import {email, numeric, maxLength, required} from "@vuelidate/validators";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import API from '@/config/api.js';
+import {notify} from "@kyvg/vue3-notification";
+import { guests } from '@/api';
+
 
 
 export default {
@@ -179,53 +181,59 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     async function fetchGuestStatuses() {
-      console.log(this.$store.getters.getToken)
       try {
-        const response = await axios.get(API.GUEST_STATUS,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          }
-        });
-        state.guestStatuses = response.data;
+        const dto = await guests.status();
+        state.guestStatuses = dto.data;
       } catch (error) {
+        notify({ title: 'Load failed', text: error?.message || 'Failed to load guest statuses', type: 'error' });
         console.error(error);
       }
     }
 
+
     async function addGuest() {
-      v$.value.$validate();
-      if (!v$.value.$error) {
-        console.log(state.formData)
-        try {
-          const response = await axios.post(API.GUEST, state.formData,{
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
-          console.log('Response:', response.data);
-          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
-            state.errors = response.data.errors || {};
-            console.log('Error', response.data.message);
-          } else {
-            await router.push({
-              path: '/guests',
-              query: { created: 'true' }
-            });
-          }
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
+      state.errors = {};
+      v$.value.$touch();
+      if (v$.value.$error) return;
+
+      try {
+        state.isSubmitting = true;
+
+        const payload = {
+          Name: String(state.formData.Name ?? '').trim(),
+          Surname: String(state.formData.Surname ?? '').trim(),
+          Email: String(state.formData.Email ?? '').trim(),
+          TelNumber: String(state.formData.TelNumber ?? '').trim(),
+          Passport: String(state.formData.Passport ?? '').trim(),
+          IdGuestStatus: String(state.formData.IdGuestStatus)
+        };
+
+        const res = await guests.create(payload);
+
+        if (res?.httpStatusCode === 201 || res?.httpStatusCode === 200) {
+          notify({ title: 'Guest Created', text: 'Guest has been created successfully.', type: 'success', duration: 3000 });
+          await router.push({ path: '/guests', query: { created: 'true' } });
+          return;
         }
+
+        const errors = res?.errors || res?.data?.errors;
+        if (errors) state.errors = errors;
+
+        notify({ title: 'Create failed', text: res?.message || res?.data?.message || 'Validation failed', type: 'error' });
+      } catch (error) {
+        const backendErrors = error?.response?.data?.errors || error?.details;
+        if (backendErrors) state.errors = backendErrors;
+
+        notify({ title: 'Create failed', text: error?.response?.data?.message || error?.message || 'Unexpected error', type: 'error' });
+      } finally {
+        state.isSubmitting = false;
       }
     }
 
-    return { state, v$, addGuest, fetchGuestStatuses};
+    onMounted(fetchGuestStatuses);
+
+    return { state, v$, addGuest };
   },
-  mounted(){
-    this.fetchGuestStatuses();
-  }
 }
 </script>
 

@@ -30,57 +30,33 @@
 </template>
 
 <script>
-import axios from "axios";
-import { parseJwt } from "../utils/jwt";
-import API from '@/config/api.js';
-
 export default {
   name: "Login",
   data() {
     return {
-      login: '',
-      password: '',
+      login: "",
+      password: "",
       errors: {}
-    }
+    };
   },
   methods: {
     async loginIn() {
-      console.log("Logging in");
       this.errors = {};
       try {
-        const response = await fetch(API.LOGIN, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ Login: this.login, Password: this.password })
+        await this.$store.dispatch("login", {
+          login: this.login,
+          password: this.password
         });
-
-        if (!response.ok){
-          this.errors.validation = 'Validation failed, login or password is wrong';
-          throw new Error('Login failed');
-        }
-
-        const data = await response.json();
-        console.log("JWT Token:", data.token);
-
-        localStorage.setItem('token', data.token);
-        this.$store.commit('setToken', data.token);
-
-        const payload = parseJwt(data.token);
-        console.log("JWT payload:", payload);
-        console.log("User role:", payload?.role);
-
-        this.$store.commit('setUserRole', payload?.role);
-        console.log("Role from the Store: " + this.$store.getters.getUserRole)
-
-        await this.$store.dispatch('fetchUserData', this.login);
-
-        this.$router.push('/arrivals');
-      } catch (error) {
-        console.error(error);
+        this.$router.push("/arrivals");
+      } catch (err) {
+        this.errors.validation =
+            err?.status === 401
+                ? "Validation failed, login or password is wrong"
+                : err?.message || "Unexpected error. Please try again.";
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>

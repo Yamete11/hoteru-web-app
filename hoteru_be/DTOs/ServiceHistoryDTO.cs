@@ -6,7 +6,7 @@ namespace hoteru_be.DTOs
     {
         public int IdService { get; set; }
         public string Title { get; set; }     
-        public float Sum { get; set; }
-        public string Date { get; set; }
+        public decimal Sum { get; set; }
+        public DateTime Date { get; set; }
     }
 }

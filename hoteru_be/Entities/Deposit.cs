@@ -7,7 +7,7 @@ namespace hoteru_be.Entities
     {
         [Key]
         public int IdDeposit { get; set; }
-        public float Sum { get; set; }
+        public decimal Sum { get; set; }
         public int IdDepositType { get; set; }
 
         [Required]

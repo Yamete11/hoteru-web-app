@@ -16,7 +16,7 @@ namespace hoteru_be.DTOs
 
         [Required(ErrorMessage = "Price is required")]
         [Range(1, 1000000, ErrorMessage = "Price must be a number between 1 and 1,000,000")]
-        public float Price { get; set; }
+        public decimal Price { get; set; }
 
 
         [Required(ErrorMessage = "Status is required")]

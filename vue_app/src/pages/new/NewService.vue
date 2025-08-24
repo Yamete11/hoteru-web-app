@@ -74,11 +74,11 @@
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
-import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
-import API from '@/config/api.js';
+import { services } from '@/api';
+
 
 
 export default {
@@ -106,30 +106,33 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     async function addService() {
-      v$.value.$validate();
-      if (!v$.value.$error) {
-        try {
-          const response = await axios.post(API.SERVICE, state.formData, {
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
-          console.log("Ответ сервера:", response);
+      state.errors = {};
+      v$.value.$touch();
+      if (v$.value.$error) return;
 
-          if (response.data && response.data.httpStatusCode === 200) {
-            await router.push({
-              path: '/services',
-              query: { created: 'true' }
-            });
+      try {
+        state.isSubmitting = true;
 
-          }
+        const payload = {
+          title: state.formData.Title,
+          sum: Number(state.formData.Sum),
+          description: state.formData.Description || ''
+        };
 
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
+        const res = await services.create(payload);
+
+        if (res?.httpStatusCode === 201) {
+          notify({ title: 'Service Created', text: 'The service has been successfully created.', type: 'success', duration: 3000 });
+          await router.push({ path: '/services', query: { created: 'true' } });
+        } else {
+          state.errors = res?.errors || {};
+          notify({ title: 'Create failed', text: res?.message || 'Validation failed', type: 'error' });
         }
+      } catch (err) {
+        if (err?.details) state.errors = err.details;
+        notify({ title: 'Create failed', text: err?.message || 'Unexpected error', type: 'error' });
+      } finally {
+        state.isSubmitting = false;
       }
     }
 

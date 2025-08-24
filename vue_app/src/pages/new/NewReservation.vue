@@ -182,7 +182,6 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { differenceInCalendarDays } from 'date-fns';
-import API from '@/config/api.js';
 
 export default {
   name: "NewReservation",

@@ -100,13 +100,10 @@
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
-import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
-import API from '@/config/api.js';
-
-
+import { rooms } from '@/api';
 
 export default {
   name: "RoomDetails",
@@ -119,15 +116,15 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-    const state = reactive( {
+    const state = reactive({
       isEditing: false,
       formData: {
-        idRoom: '',
+        idRoom: 0,
         number: '',
         capacity: 0,
         price: 0,
-        type: '',
-        status: ''
+        type: null,
+        status: null,
       },
       typeTitle: '',
       statusTitle: '',
@@ -135,6 +132,7 @@ export default {
       roomStatuses: [],
       errors: {}
     });
+
 
     const rules = {
       formData: {
@@ -149,80 +147,86 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     async function toggleEdit() {
-      if (state.isEditing) {
-        v$.value.$touch();
-        if (!v$.value.$error) {
-          state.formData.type = String(state.formData.type);
-          state.formData.status = String(state.formData.status);
-          try {
-            const response = await axios.put(API.ROOM, state.formData, {
-              headers: {
-                'Authorization': `Bearer ${store.getters.getToken}`
-              },
-            });
-
-            console.log('Success:', response.data);
-            state.isEditing = false;
-
-            const foundType = state.roomTypes.find(type => type.idType == state.formData.type);
-            state.typeTitle = foundType ? foundType.title : 'Type not found';
-
-            const foundStatus = state.roomStatuses.find(status => status.idStatus == state.formData.status);
-            state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
-
-            notify({
-              title: 'Room Updated',
-              text: 'Room has been successfully updated.',
-              type: 'success',
-              duration: 4000
-            });
-
-          } catch (error) {
-            console.log('Error:', error);
-          }
-        }
-      } else {
+      if (!state.isEditing) {
         state.isEditing = true;
+        return;
+      }
+
+      v$.value.$touch();
+      if (v$.value.$error) return;
+
+      try {
+        state.errors = {};
+
+        const payload = {
+          idRoom: state.formData.idRoom,
+          number: state.formData.number,
+          capacity: Number(state.formData.capacity),
+          price: Number(state.formData.price),
+          type: String(state.formData.type),
+          status: String(state.formData.status),
+        };
+
+        console.log(payload);
+        const res = await rooms.update(payload);
+
+        if (res?.httpStatusCode && res.httpStatusCode !== 200) {
+          state.errors = res.errors || {};
+          notify({ title: 'Update failed', text: res?.message || 'Validation failed', type: 'error' });
+          return;
+        }
+
+        notify({
+          title: 'Room Updated',
+          text: 'Room has been successfully updated.',
+          type: 'success',
+          duration: 4000
+        });
+
+        state.isEditing = false;
+      } catch (err) {
+        if (err?.details) state.errors = err.details;
+        notify({ title: 'Update failed', text: err?.message || 'Unexpected error', type: 'error' });
       }
     }
-
 
     async function fetchSpecificRoom(idRoom) {
       try {
-        const response = await axios.get(API.ROOM_ID(idRoom),{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.formData = response.data;
+        state.errors = {};
 
-        console.log(state.formData)
+        const [roomRes, typesRes, statusesRes] = await Promise.all([
+          rooms.get(idRoom),
+          rooms.types(),
+          rooms.statuses(),
+        ]);
 
-        const responseType = await axios.get(API.ROOM_TYPE,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.roomTypes = responseType.data;
+        const room = roomRes?.data ?? roomRes;
+        const types = typesRes?.data ?? typesRes;
+        const statuses = statusesRes?.data ?? statusesRes;
 
-        const responseStatus = await axios.get(API.ROOM_STATUS,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.roomStatuses = responseStatus.data;
+        state.roomTypes = Array.isArray(types) ? types : [];
+        state.roomStatuses = Array.isArray(statuses) ? statuses : [];
 
-        const foundType = state.roomTypes.find(type => type.idType === state.formData.type);
-        state.typeTitle = foundType ? foundType.title : 'Type not found';
+        state.formData = {
+          idRoom: room.idRoom,
+          number: room.number,
+          capacity: Number(room.capacity),
+          price: Number(room.price),
+          type: Number(room.type),
+          status: Number(room.status),
+        };
 
-        const foundStatus = state.roomStatuses.find(status => status.idStatus === state.formData.status);
-        state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
+        const t = state.roomTypes.find(x => x.idType === state.formData.type);
+        state.typeTitle = t?.title ?? 'Type not found';
 
-        console.log(state.roomTypes)
-      } catch (error) {
-        console.error(error);
+        const s = state.roomStatuses.find(x => x.idStatus === state.formData.status);
+        state.statusTitle = s?.title ?? 'Status not found';
+
+      } catch (err) {
+        notify({ title: 'Load failed', text: err?.message || 'Error loading room', type: 'error' });
       }
     }
+
 
     return { state, v$, toggleEdit, fetchSpecificRoom };
 

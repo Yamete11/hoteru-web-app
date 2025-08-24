@@ -18,21 +18,22 @@
 <script>
 export default {
   name: "GuestList",
-  props:{
-    guests:{
+  props: {
+    guests: {
       type: Array,
-      required: true
-    }
+      default: () => [],
+    },
   },
+  emits: ["deleteGuest", "notificationDeleteAttempt"],
   methods: {
     deleteGuest(idPerson) {
-      this.$emit('deleteGuest', idPerson);
+      this.$emit("deleteGuest", idPerson);
     },
-    notificationDeleteAttempt(){
-      this.$emit('notificationDeleteAttempt');
-    }
-  }
-}
+    notificationDeleteAttempt() {
+      this.$emit("notificationDeleteAttempt");
+    },
+  },
+};
 </script>
 
 <style scoped>

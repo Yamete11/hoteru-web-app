@@ -1,41 +1,49 @@
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "");
+const withBase = (path) => `${API_BASE_URL}${path}`;
 
-export default {
+export const ENDPOINTS = {
     BASE_URL: API_BASE_URL,
-    REGISTRATION: {
-        HOTEL: `${API_BASE_URL}/api/Hotel`
-    },
+
+    REGISTRATION: { HOTEL: withBase("/api/Hotel") },
+
     RESERVATION: {
-        RESERVATION: `${API_BASE_URL}/api/Reservation`,
-        RESERVATION_BY_ID: (id) => `${API_BASE_URL}/api/Reservation/${id}`,
-        HISTORY: `${API_BASE_URL}/api/Reservation/history`,
-        HISTORY_ID: (id) => `${API_BASE_URL}/api/Reservation/history/${id}`,
-        ARRIVALS: `${API_BASE_URL}/api/Reservation/arrivals`,
-        ARRIVAL_BY_ID: (id) => `${API_BASE_URL}/api/Reservation/arrival/${id}`,
+        ROOT: withBase("/api/Reservation"),
+        BY_ID: (id) => withBase(`/api/Reservation/${id}`),
+        HISTORY: withBase("/api/Reservation/history"),
+        HISTORY_BY_ID: (id) => withBase(`/api/Reservation/history/${id}`),
+        ARRIVALS: withBase("/api/Reservation/arrivals"),
+        ARRIVAL_BY_ID: (id) => withBase(`/api/Reservation/arrival/${id}`),
+        CONFIRM: (id) => withBase(`/api/Reservation/confirm/${id}`),
     },
-    CONFIRM: (id) => `${API_BASE_URL}/api/confirm/${id}`,
-    LOGIN: `${API_BASE_URL}/api/Login`,
+
+    AUTH: { LOGIN: withBase("/api/Login") },
+
     USER: {
-        USER: `${API_BASE_URL}/api/User`,
-        USER_BY_NAME: (userName) => `${API_BASE_URL}/api/User/${userName}`,
-        PERSON: (id) => `${API_BASE_URL}/api/User/${id}`,
-        FULL_USER: (id) => `${API_BASE_URL}/api/User/fullUser/${id}`,
+        ROOT: withBase("/api/User"),
+        BY_NAME: (userName) => withBase(`/api/User/${encodeURIComponent(userName)}`),
+        FULL: (id) => withBase(`/api/User/fullUser/${id}`),
     },
 
-    SERVICE: `${API_BASE_URL}/api/Service`,
-    SERVICE_ID: (id) => `${API_BASE_URL}/api/Service/${id}`,
+    SERVICE: {
+        ROOT: withBase("/api/Service"),
+        BY_ID: (id) => withBase(`/api/Service/${id}`)
+    },
 
-    ROOM: `${API_BASE_URL}/api/Room`,
-    ROOM_ID: (id) => `${API_BASE_URL}/api/Room/${id}`,
-    FREE_ROOM: `${API_BASE_URL}/api/Room/freeRooms`,
-    FREE_ROOM_BY_ID: (idRoom) => `${API_BASE_URL}/api/Room/freeRooms?idRoom=${idRoom}`,
-    ROOM_TYPE: `${API_BASE_URL}/api/RoomType`,
-    ROOM_STATUS: `${API_BASE_URL}/api/RoomStatus`,
+    ROOM: {
+        ROOT: withBase("/api/Room"),
+        BY_ID: (id) => withBase(`/api/Room/${id}`),
+        FREE: withBase("/api/Room/freeRooms"),
+        FREE_BY_ID: (idRoom) => withBase(`/api/Room/freeRooms?idRoom=${encodeURIComponent(idRoom)}`),
+        TYPE: withBase("/api/RoomType"),
+        STATUS: withBase("/api/RoomStatus"),
+    },
 
-    GUEST: `${API_BASE_URL}/api/Guest`,
-    GUEST_ID: (id) => `${API_BASE_URL}/api/Guest/${id}`,
-    GUEST_STATUS: `${API_BASE_URL}/api/GuestStatus`,
+    GUEST: {
+        ROOT: withBase("/api/Guest"),
+        BY_ID: (id) => withBase(`/api/Guest/${id}`),
+        STATUS: withBase("/api/GuestStatus"),
+    },
 
-    USER_TYPE: `${API_BASE_URL}/api/UserType`,
-    DEPOSIT_TYPE: `${API_BASE_URL}/api/DepositType`,
+    USER_TYPE: withBase("/api/UserType"),
+    DEPOSIT_TYPE: withBase("/api/DepositType"),
 };

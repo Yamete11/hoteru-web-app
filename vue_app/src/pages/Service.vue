@@ -43,9 +43,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { notify } from "@kyvg/vue3-notification";
-import API from '@/config/api.js';
+import { services } from '@/api';
 
 
 export default {
@@ -53,6 +52,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      isLoadingMore: false,
       services: [],
       searchQuery: '',
       searchField: 'title',
@@ -104,44 +104,48 @@ export default {
       try {
         this.isLoading = true;
         this.page = 1;
-        const response = await axios.get(API.SERVICE, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+
+        const data = await services.list({
+          page: this.page,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField
         });
-        this.services = response.data.list;
-        this.totalServices = Math.ceil(response.data.totalCount / this.limit);
-      } catch (error) {
-        console.error(error);
+        console.log(data);
+        this.services = data?.list ?? [];
+        const totalCount = data?.totalCount ?? 0;
+        this.totalServices = Math.max(1, Math.ceil(totalCount / this.limit));
+      } catch (e) {
+        console.error(e);
+        this.services = [];
+        this.totalServices = 1;
       } finally {
         this.isLoading = false;
       }
     },
 
     async loadMore() {
+      if (this.isLoadingMore) return;
       if (this.page >= this.totalServices) return;
+
       try {
-        this.page++;
-        const response = await axios.get(API.SERVICE, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+        this.isLoadingMore = true;
+        const nextPage = this.page + 1;
+
+        const data = await services.list({
+          page: nextPage,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField
         });
-        this.services = [...this.services, ...response.data.list];
-      } catch (error) {
-        console.error(error);
+
+        const nextChunk = data?.list ?? [];
+        this.services = [...(this.services || []), ...nextChunk];
+        this.page = nextPage;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isLoadingMore = false;
       }
     }
   }

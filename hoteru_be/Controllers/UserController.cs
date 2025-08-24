@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using hoteru_be.Services.Interfaces;
-using hoteru_be.DTOs;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
@@ -21,42 +24,104 @@ namespace hoteru_be.Controllers
         }
 
         [HttpGet("{login}")]
-        public Task<UserDTO> GetUser(string login)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUser([FromRoute] string login, CancellationToken ct)
         {
-            return _service.GetUser(login);
+            var result = await _service.GetUser(login, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
-        [HttpGet("fullUser/{idUser}")]
-        public Task<FullUserDTO> GetFullUser(int idUser)
+        [HttpGet("fullUser/{idUser:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetFullUser([FromRoute] int idUser, CancellationToken ct)
         {
-            return _service.GetFullUser(idUser);
+            var result = await _service.GetFullUser(idUser, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin,Superadmin")]
-        public Task<List<ListUserDTO>> GetUsers()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<ListUserDTO>>> GetUsers(CancellationToken ct)
         {
-            return _service.GetUsers();
+            var users = await _service.GetUsers(ct);
+            return Ok(users);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin,Superadmin")]
-        public async Task<MethodResultDTO> PostUser([FromBody] NewUserDTO newUserDTO)
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> PostUser([FromBody] NewUserDTO dto, CancellationToken ct)
         {
-            return await _service.PostUser(newUserDTO);
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(kv => kv.Value?.Errors?.Count > 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToList()
+                    );
+
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    MethodResultDTO.BadRequest("Validation failed", errors));
+            }
+
+            var result = await _service.PostUser(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateUser([FromBody] UpdateUserDTO updateUserDTO)
+        [Authorize]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto, CancellationToken ct)
         {
-            return await _service.UpdateUser(updateUserDTO);
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(kv => kv.Value?.Errors?.Count > 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToList()
+                    );
+
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    MethodResultDTO.BadRequest("Validation failed", errors));
+            }
+
+            var result = await _service.UpdateUser(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
-        [HttpDelete("{IdPerson}")]
+        [HttpDelete("{idPerson:int}")]
         [Authorize(Roles = "Admin,Superadmin")]
-        public async Task<MethodResultDTO> DeleteUser(int IdPerson)
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser([FromRoute] int idPerson, CancellationToken ct)
         {
-            return await _service.DeleteUser(IdPerson);
+            var result = await _service.DeleteUser(idPerson, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
     }
 }

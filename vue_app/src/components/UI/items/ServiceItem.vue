@@ -15,9 +15,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import store from "@/store";
-import API from '@/config/api.js';
+import { services } from '@/api';
 
 
 
@@ -33,19 +31,14 @@ export default {
     viewServiceDetails(idService) {
       this.$router.push({ name: 'ServiceDetails', params: { idService: idService } });
     },
-    deleteService(idService) {
-      axios.delete(API.SERVICE_ID(idService), {
-        headers: {
-          'Authorization': `Bearer ${store.getters.getToken}`
-        },
-      })
-          .then(() => {
-            this.$emit('deleteService', idService);
-            this.$emit('notificationDeleteAttempt');
-          })
-          .catch(error => {
-            console.error(error);
-          });
+    async deleteService(idService) {
+      try {
+        await services.remove(idService);
+        this.$emit('deleteService', idService);
+        this.$emit('notificationDeleteAttempt');
+      } catch (e) {
+        console.error(e);
+      }
     }
 
   }

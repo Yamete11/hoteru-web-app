@@ -43,23 +43,21 @@
 </template>
 
 <script>
-import axios from "axios";
 import { notify } from "@kyvg/vue3-notification";
-import API from '@/config/api.js';
-
-
+import { guests } from "@/api";
 
 export default {
   name: "Guest",
   data() {
     return {
-      totalGuests: 0,
       isLoading: false,
+      isLoadingMore: false,
       guests: [],
       searchQuery: '',
       searchField: 'name',
       page: 1,
       limit: 15,
+      totalGuests: 0,
       isGuestDeletedNotificationVisible: false
     };
   },
@@ -105,43 +103,49 @@ export default {
       try {
         this.isLoading = true;
         this.page = 1;
-        const response = await axios.get(API.GUEST, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+
+        const data = await guests.list({
+          page: this.page,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
         });
-        this.guests = response.data.list;
-        this.totalGuests = Math.ceil(response.data.totalCount / this.limit);
-      } catch (error) {
-        console.error(error);
+        console.log(data);
+        this.guests = data?.list ?? [];
+        console.log(this.guests);
+        const totalCount = data?.totalCount ?? 0;
+        this.totalGuests = Math.max(1, Math.ceil(totalCount / this.limit));
+      } catch (e) {
+        console.error(e);
+        this.guests = [];
+        this.totalGuests = 1;
       } finally {
         this.isLoading = false;
       }
     },
+
     async loadMore() {
+      if (this.isLoadingMore) return;
       if (this.page >= this.totalGuests) return;
+
       try {
-        this.page++;
-        const response = await axios.get(API.GUEST, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+        this.isLoadingMore = true;
+        const nextPage = this.page + 1;
+
+        const data = await guests.list({
+          page: nextPage,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
         });
-        this.guests = [...this.guests, ...response.data.list];
-      } catch (error) {
-        console.error(error);
+
+        const nextChunk = data?.list ?? [];
+        this.guests = [...(this.guests || []), ...nextChunk];
+        this.page = nextPage;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isLoadingMore = false;
       }
     },
   },

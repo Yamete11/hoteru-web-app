@@ -59,9 +59,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { notify } from "@kyvg/vue3-notification";
-import API from '@/config/api.js';
+import { reservations } from "@/api";
 
 
 
@@ -133,44 +132,45 @@ export default {
     async fetchReservations() {
       try {
         this.isLoading = true;
-        const response = await axios.get(API.RESERVATION.RESERVATION, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: 1,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
-        });
         this.page = 1;
-        this.reservations = response.data.list;
-        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
-      } catch (error) {
-        console.error(error);
+
+        const data = await reservations.list({
+          page: this.page,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
+        });
+
+        this.reservations = data.list;
+        this.totalReservations = Math.ceil(data.totalCount / this.limit);
+      } catch (e) {
+        console.error(e);
       } finally {
         this.isLoading = false;
       }
     },
     async loadMore() {
+      if (this.isLoading || this.isLoadingMore) return;
+      if (this.page >= this.totalReservations) return;
+
+      this.isLoadingMore = true;
       try {
-        this.page++;
-        const response = await axios.get(API.RESERVATION.RESERVATION, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+        const nextPage = this.page + 1;
+
+        const data = await reservations.list({
+          page: nextPage,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
         });
-        this.totalReservations = Math.ceil(response.data.totalCount / this.limit);
-        this.reservations = [...this.reservations, ...response.data.list];
-      } catch (error) {
-        console.error(error);
+
+        this.page = nextPage;
+        this.reservations = [...this.reservations, ...data.list];
+        this.totalReservations = Math.ceil(data.totalCount / this.limit);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isLoadingMore = false;
       }
     }
   }

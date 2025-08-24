@@ -16,39 +16,36 @@
 </template>
 
 <script>
-import axios from "axios";
-import store from "@/store";
-import API from '@/config/api.js';
-
+import { guests } from "@/api";
 
 export default {
   name: "GuestItem",
-  props:{
-    guest:{
-      type: Object,
-      required: true
-    }
+  props: {
+    guest: { type: Object, required: true },
+  },
+  emits: ["deleteGuest", "notificationDeleteAttempt"],
+  data() {
+    return { busy: false };
   },
   methods: {
     viewGuestDetails(idPerson) {
-      this.$router.push({ name: 'GuestDetails', params: { idPerson: idPerson } });
+      this.$router.push({ name: "GuestDetails", params: { idPerson } });
     },
-    deleteGuest(idPerson) {
-      axios.delete(API.GUEST_ID(idPerson), {
-        headers: {
-          'Authorization': `Bearer ${store.getters.getToken}`
-        }
-      })
-          .then(() => {
-            this.$emit('deleteGuest', idPerson);
-            this.$emit('notificationDeleteAttempt');
-          })
-          .catch(error => {
-            console.error(error);
-          });
-    }
-  }
-}
+    async deleteGuest(idPerson) {
+      if (this.busy) return;
+      this.busy = true;
+      try {
+        await guests.remove(idPerson);
+        this.$emit("deleteGuest", idPerson);
+        this.$emit("notificationDeleteAttempt");
+      } catch (err) {
+        console.error("Delete guest failed:", err);
+      } finally {
+        this.busy = false;
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

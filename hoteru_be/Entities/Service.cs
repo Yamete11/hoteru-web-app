@@ -9,7 +9,7 @@ namespace hoteru_be.Entities
         [Key]
         public int IdService { get; set; }
         public string Title { get; set; }
-        public float Sum { get; set; }
+        public decimal Sum { get; set; }
         public string Description { get; set; }
 
         public int IdUser { get; set; }

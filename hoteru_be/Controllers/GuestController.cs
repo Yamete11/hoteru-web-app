@@ -1,16 +1,17 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class GuestController : ControllerBase
     {
         private readonly IGuestService _service;
@@ -20,42 +21,88 @@ namespace hoteru_be.Controllers
             _service = service;
         }
 
+
         [HttpGet]
-        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchQuery = null, [FromQuery] string searchField = null)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<PaginatedResultDTO<GuestDTO>>> GetGuests(
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 15,
+            [FromQuery] string? searchQuery = null,
+            [FromQuery] string? searchField = null,
+            CancellationToken ct = default)
         {
-            return await _service.GetGuests(page, limit, searchQuery, searchField);
+            var result = await _service.GetGuests(page, limit, searchQuery, searchField, ct);
+            return Ok(result);
         }
 
 
-        [HttpGet("{IdPerson}")]
-        public async Task<ActionResult<SpecificGuestDTO>> GetSpecificGuest(int IdPerson)
+        [HttpGet("{idPerson:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetSpecificGuest([FromRoute] int idPerson, CancellationToken ct = default)
         {
-            var guest = await _service.GetSpecificGuest(IdPerson);
-            if (guest == null)
-            {
-                return NotFound(new { Message = $"Guest with IdPerson {IdPerson} not found." });
-            }
-            return Ok(guest);
+            var result = await _service.GetSpecificGuest(idPerson, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
-
-        [HttpDelete("{IdPerson}")]
-        public async Task<MethodResultDTO> DeleteGuest(int IdPerson)
+        [HttpDelete("{idPerson:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> DeleteGuest([FromRoute] int idPerson, CancellationToken ct = default)
         {
-            return await _service.DeleteGuest(IdPerson);
+            var result = await _service.DeleteGuest(idPerson, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPut]
-        public async Task<MethodResultDTO> UpdateGuest([FromBody] GuestDTO guestDTO)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UpdateGuest([FromBody] GuestDTO dto, CancellationToken ct = default)
         {
-            return await _service.UpdateGuest(guestDTO);
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(kv => kv.Value?.Errors?.Count > 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToList()
+                    );
+
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    MethodResultDTO.BadRequest("Validation failed", errors));
+            }
+
+            var result = await _service.UpdateGuest(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPost]
-        public async Task<MethodResultDTO> PostGuest([FromBody] GuestDTO guestDTO)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> PostGuest([FromBody] GuestDTO dto, CancellationToken ct = default)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(kv => kv.Value?.Errors?.Count > 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToList()
+                    );
 
-            return await _service.PostGuest(guestDTO);
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    MethodResultDTO.BadRequest("Validation failed", errors));
+            }
+
+            var result = await _service.PostGuest(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
-using hoteru_be.Services.Implementations;
+using hoteru_be.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

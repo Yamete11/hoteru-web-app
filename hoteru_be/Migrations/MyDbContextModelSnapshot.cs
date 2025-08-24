@@ -96,8 +96,8 @@ namespace hoteru_be.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Sum")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Sum")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IdBill");
 
@@ -114,7 +114,7 @@ namespace hoteru_be.Migrations
                             InDate = new DateTime(2025, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             OutDate = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RoomNumber = "108",
-                            Sum = 140f
+                            Sum = 140m
                         });
                 });
 
@@ -128,8 +128,8 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdDepositType")
                         .HasColumnType("int");
 
-                    b.Property<float>("Sum")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Sum")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IdDeposit");
 
@@ -142,25 +142,25 @@ namespace hoteru_be.Migrations
                         {
                             IdDeposit = 1,
                             IdDepositType = 1,
-                            Sum = 200f
+                            Sum = 200m
                         },
                         new
                         {
                             IdDeposit = 2,
                             IdDepositType = 1,
-                            Sum = 300f
+                            Sum = 300m
                         },
                         new
                         {
                             IdDeposit = 3,
                             IdDepositType = 2,
-                            Sum = 500f
+                            Sum = 500m
                         },
                         new
                         {
                             IdDeposit = 4,
                             IdDepositType = 2,
-                            Sum = 1000f
+                            Sum = 1000m
                         });
                 });
 
@@ -528,8 +528,8 @@ namespace hoteru_be.Migrations
                     b.Property<DateTime>("Out")
                         .HasColumnType("datetime2");
 
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IdReservation");
 
@@ -561,7 +561,7 @@ namespace hoteru_be.Migrations
                             IdUser = 1,
                             In = new DateTime(2025, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 150f
+                            Price = 150m
                         },
                         new
                         {
@@ -574,7 +574,7 @@ namespace hoteru_be.Migrations
                             IdUser = 2,
                             In = new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 180f
+                            Price = 180m
                         },
                         new
                         {
@@ -587,7 +587,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 340f
+                            Price = 340m
                         },
                         new
                         {
@@ -600,7 +600,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 325f
+                            Price = 325m
                         },
                         new
                         {
@@ -612,7 +612,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 330f
+                            Price = 330m
                         },
                         new
                         {
@@ -625,7 +625,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 140f
+                            Price = 140m
                         },
                         new
                         {
@@ -637,7 +637,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 330f
+                            Price = 330m
                         },
                         new
                         {
@@ -649,7 +649,7 @@ namespace hoteru_be.Migrations
                             IdUser = 3,
                             In = new DateTime(2025, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Out = new DateTime(2025, 6, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Price = 380f
+                            Price = 380m
                         });
                 });
 
@@ -729,10 +729,11 @@ namespace hoteru_be.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IdRoom");
 
@@ -753,7 +754,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "101",
-                            Price = 45f
+                            Price = 45m
                         },
                         new
                         {
@@ -763,7 +764,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "102",
-                            Price = 75f
+                            Price = 75m
                         },
                         new
                         {
@@ -773,7 +774,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "103",
-                            Price = 60f
+                            Price = 60m
                         },
                         new
                         {
@@ -783,7 +784,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "104",
-                            Price = 90f
+                            Price = 90m
                         },
                         new
                         {
@@ -793,7 +794,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "105",
-                            Price = 85f
+                            Price = 85m
                         },
                         new
                         {
@@ -803,7 +804,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "106",
-                            Price = 65f
+                            Price = 65m
                         },
                         new
                         {
@@ -813,7 +814,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "107",
-                            Price = 55f
+                            Price = 55m
                         },
                         new
                         {
@@ -823,7 +824,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "108",
-                            Price = 70f
+                            Price = 70m
                         },
                         new
                         {
@@ -833,7 +834,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "109",
-                            Price = 110f
+                            Price = 110m
                         },
                         new
                         {
@@ -843,7 +844,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "201",
-                            Price = 95f
+                            Price = 95m
                         },
                         new
                         {
@@ -853,7 +854,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "202",
-                            Price = 100f
+                            Price = 100m
                         },
                         new
                         {
@@ -863,7 +864,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "203",
-                            Price = 120f
+                            Price = 120m
                         },
                         new
                         {
@@ -873,7 +874,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "204",
-                            Price = 130f
+                            Price = 130m
                         },
                         new
                         {
@@ -883,7 +884,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "205",
-                            Price = 75f
+                            Price = 75m
                         },
                         new
                         {
@@ -893,7 +894,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "206",
-                            Price = 85f
+                            Price = 85m
                         },
                         new
                         {
@@ -903,7 +904,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "207",
-                            Price = 105f
+                            Price = 105m
                         },
                         new
                         {
@@ -913,7 +914,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "208",
-                            Price = 140f
+                            Price = 140m
                         },
                         new
                         {
@@ -923,7 +924,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 1,
                             IdUser = 2,
                             Number = "209",
-                            Price = 135f
+                            Price = 135m
                         },
                         new
                         {
@@ -933,7 +934,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 2,
                             Number = "301",
-                            Price = 100f
+                            Price = 100m
                         },
                         new
                         {
@@ -943,7 +944,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 2,
                             Number = "302",
-                            Price = 110f
+                            Price = 110m
                         },
                         new
                         {
@@ -953,7 +954,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "303",
-                            Price = 115f
+                            Price = 115m
                         },
                         new
                         {
@@ -963,7 +964,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "304",
-                            Price = 125f
+                            Price = 125m
                         },
                         new
                         {
@@ -973,7 +974,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "305",
-                            Price = 135f
+                            Price = 135m
                         },
                         new
                         {
@@ -983,7 +984,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "306",
-                            Price = 95f
+                            Price = 95m
                         },
                         new
                         {
@@ -993,7 +994,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "307",
-                            Price = 85f
+                            Price = 85m
                         },
                         new
                         {
@@ -1003,7 +1004,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "308",
-                            Price = 125f
+                            Price = 125m
                         },
                         new
                         {
@@ -1013,7 +1014,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "309",
-                            Price = 140f
+                            Price = 140m
                         },
                         new
                         {
@@ -1023,7 +1024,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "401",
-                            Price = 145f
+                            Price = 145m
                         },
                         new
                         {
@@ -1033,7 +1034,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "402",
-                            Price = 150f
+                            Price = 150m
                         },
                         new
                         {
@@ -1043,7 +1044,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "403",
-                            Price = 125f
+                            Price = 125m
                         },
                         new
                         {
@@ -1053,7 +1054,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "404",
-                            Price = 135f
+                            Price = 135m
                         },
                         new
                         {
@@ -1063,7 +1064,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "405",
-                            Price = 100f
+                            Price = 100m
                         },
                         new
                         {
@@ -1073,7 +1074,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "406",
-                            Price = 110f
+                            Price = 110m
                         },
                         new
                         {
@@ -1083,7 +1084,7 @@ namespace hoteru_be.Migrations
                             IdRoomType = 2,
                             IdUser = 15,
                             Number = "407",
-                            Price = 95f
+                            Price = 95m
                         });
                 });
 
@@ -1159,8 +1160,8 @@ namespace hoteru_be.Migrations
                     b.Property<int>("IdUser")
                         .HasColumnType("int");
 
-                    b.Property<float>("Sum")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Sum")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -1177,7 +1178,7 @@ namespace hoteru_be.Migrations
                             IdService = 1,
                             Description = "None",
                             IdUser = 2,
-                            Sum = 355.5f,
+                            Sum = 355m,
                             Title = "Breakfast"
                         },
                         new
@@ -1185,7 +1186,7 @@ namespace hoteru_be.Migrations
                             IdService = 2,
                             Description = "None",
                             IdUser = 2,
-                            Sum = 120.5f,
+                            Sum = 120m,
                             Title = "Spa"
                         },
                         new
@@ -1193,7 +1194,7 @@ namespace hoteru_be.Migrations
                             IdService = 3,
                             Description = "None",
                             IdUser = 2,
-                            Sum = 248.5f,
+                            Sum = 248m,
                             Title = "Assistent"
                         },
                         new
@@ -1201,7 +1202,7 @@ namespace hoteru_be.Migrations
                             IdService = 4,
                             Description = "Daily laundry service",
                             IdUser = 2,
-                            Sum = 40f,
+                            Sum = 40m,
                             Title = "Laundry"
                         },
                         new
@@ -1209,7 +1210,7 @@ namespace hoteru_be.Migrations
                             IdService = 5,
                             Description = "Underground parking",
                             IdUser = 2,
-                            Sum = 75f,
+                            Sum = 75m,
                             Title = "Parking"
                         },
                         new
@@ -1217,7 +1218,7 @@ namespace hoteru_be.Migrations
                             IdService = 6,
                             Description = "Extra room cleaning",
                             IdUser = 2,
-                            Sum = 30f,
+                            Sum = 30m,
                             Title = "Room Cleaning"
                         },
                         new
@@ -1225,7 +1226,7 @@ namespace hoteru_be.Migrations
                             IdService = 7,
                             Description = "Mini bar refill",
                             IdUser = 2,
-                            Sum = 60f,
+                            Sum = 60m,
                             Title = "Mini Bar"
                         },
                         new
@@ -1233,7 +1234,7 @@ namespace hoteru_be.Migrations
                             IdService = 8,
                             Description = "2-hour guided tour",
                             IdUser = 2,
-                            Sum = 150f,
+                            Sum = 150m,
                             Title = "City Tour"
                         },
                         new
@@ -1241,7 +1242,7 @@ namespace hoteru_be.Migrations
                             IdService = 9,
                             Description = "24/7 access",
                             IdUser = 2,
-                            Sum = 45f,
+                            Sum = 45m,
                             Title = "Gym Access"
                         },
                         new
@@ -1249,7 +1250,7 @@ namespace hoteru_be.Migrations
                             IdService = 10,
                             Description = "Outdoor pool",
                             IdUser = 2,
-                            Sum = 55f,
+                            Sum = 55m,
                             Title = "Pool Access"
                         },
                         new
@@ -1257,7 +1258,7 @@ namespace hoteru_be.Migrations
                             IdService = 11,
                             Description = "Private sauna session",
                             IdUser = 2,
-                            Sum = 65f,
+                            Sum = 65m,
                             Title = "Sauna"
                         },
                         new
@@ -1265,7 +1266,7 @@ namespace hoteru_be.Migrations
                             IdService = 12,
                             Description = "1-hour massage",
                             IdUser = 2,
-                            Sum = 95f,
+                            Sum = 95m,
                             Title = "Massage"
                         },
                         new
@@ -1273,7 +1274,7 @@ namespace hoteru_be.Migrations
                             IdService = 13,
                             Description = "Buffet dinner",
                             IdUser = 2,
-                            Sum = 300f,
+                            Sum = 300m,
                             Title = "Dinner"
                         },
                         new
@@ -1281,7 +1282,7 @@ namespace hoteru_be.Migrations
                             IdService = 14,
                             Description = "Until 18:00",
                             IdUser = 2,
-                            Sum = 80f,
+                            Sum = 80m,
                             Title = "Late Checkout"
                         },
                         new
@@ -1289,7 +1290,7 @@ namespace hoteru_be.Migrations
                             IdService = 15,
                             Description = "From 6:00 AM",
                             IdUser = 2,
-                            Sum = 70f,
+                            Sum = 70m,
                             Title = "Early Check-in"
                         },
                         new
@@ -1297,7 +1298,7 @@ namespace hoteru_be.Migrations
                             IdService = 16,
                             Description = "Pet-friendly room",
                             IdUser = 2,
-                            Sum = 100f,
+                            Sum = 100m,
                             Title = "Pet Stay"
                         },
                         new
@@ -1305,7 +1306,7 @@ namespace hoteru_be.Migrations
                             IdService = 17,
                             Description = "Luxury car",
                             IdUser = 2,
-                            Sum = 200f,
+                            Sum = 200m,
                             Title = "Airport Pickup"
                         },
                         new
@@ -1313,7 +1314,7 @@ namespace hoteru_be.Migrations
                             IdService = 18,
                             Description = "Porter assistance",
                             IdUser = 2,
-                            Sum = 20f,
+                            Sum = 20m,
                             Title = "Baggage Service"
                         },
                         new
@@ -1321,7 +1322,7 @@ namespace hoteru_be.Migrations
                             IdService = 19,
                             Description = "Premium internet",
                             IdUser = 2,
-                            Sum = 15f,
+                            Sum = 15m,
                             Title = "WiFi"
                         },
                         new
@@ -1329,7 +1330,7 @@ namespace hoteru_be.Migrations
                             IdService = 20,
                             Description = "Printing & scanning",
                             IdUser = 2,
-                            Sum = 50f,
+                            Sum = 50m,
                             Title = "Business Center"
                         },
                         new
@@ -1337,7 +1338,7 @@ namespace hoteru_be.Migrations
                             IdService = 21,
                             Description = "Per hour",
                             IdUser = 2,
-                            Sum = 250f,
+                            Sum = 250m,
                             Title = "Conference Room"
                         },
                         new
@@ -1345,7 +1346,7 @@ namespace hoteru_be.Migrations
                             IdService = 22,
                             Description = "On-site translator",
                             IdUser = 2,
-                            Sum = 180f,
+                            Sum = 180m,
                             Title = "Translation"
                         },
                         new
@@ -1353,7 +1354,7 @@ namespace hoteru_be.Migrations
                             IdService = 23,
                             Description = "Express delivery",
                             IdUser = 2,
-                            Sum = 90f,
+                            Sum = 90m,
                             Title = "Courier Service"
                         },
                         new
@@ -1361,7 +1362,7 @@ namespace hoteru_be.Migrations
                             IdService = 24,
                             Description = "In-hotel shoot",
                             IdUser = 15,
-                            Sum = 300f,
+                            Sum = 300m,
                             Title = "Photo Session"
                         },
                         new
@@ -1369,7 +1370,7 @@ namespace hoteru_be.Migrations
                             IdService = 25,
                             Description = "Cake, balloons",
                             IdUser = 15,
-                            Sum = 400f,
+                            Sum = 400m,
                             Title = "Birthday Package"
                         },
                         new
@@ -1377,7 +1378,7 @@ namespace hoteru_be.Migrations
                             IdService = 26,
                             Description = "Romantic setup",
                             IdUser = 15,
-                            Sum = 500f,
+                            Sum = 500m,
                             Title = "Anniversary Package"
                         },
                         new
@@ -1385,7 +1386,7 @@ namespace hoteru_be.Migrations
                             IdService = 27,
                             Description = "Local wines",
                             IdUser = 15,
-                            Sum = 280f,
+                            Sum = 280m,
                             Title = "Wine Tasting"
                         },
                         new
@@ -1393,7 +1394,7 @@ namespace hoteru_be.Migrations
                             IdService = 28,
                             Description = "Certified staff",
                             IdUser = 15,
-                            Sum = 220f,
+                            Sum = 220m,
                             Title = "Babysitter"
                         },
                         new
@@ -1401,7 +1402,7 @@ namespace hoteru_be.Migrations
                             IdService = 29,
                             Description = "Luxury car",
                             IdUser = 15,
-                            Sum = 600f,
+                            Sum = 600m,
                             Title = "Car Rental"
                         },
                         new
@@ -1409,7 +1410,7 @@ namespace hoteru_be.Migrations
                             IdService = 30,
                             Description = "Per day",
                             IdUser = 15,
-                            Sum = 60f,
+                            Sum = 60m,
                             Title = "Bike Rental"
                         });
                 });

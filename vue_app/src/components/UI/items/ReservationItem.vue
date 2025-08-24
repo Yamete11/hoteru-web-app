@@ -17,40 +17,29 @@
 </template>
 
 <script>
-import axios from "axios";
-import store from "@/store";
-import API from '@/config/api.js';
-
+import { reservations } from '@/api';
 
 export default {
-  name: "ReservationItem",
-  props:{
-    reservation:{
-      type: Object,
-      required: true
-    }
+  name: 'ReservationItem',
+  props: {
+    reservation: { type: Object, required: true },
   },
   methods: {
     viewReservationDetails(idReservation) {
-      this.$router.push({ name: 'ReservationDetails', params: { idReservation: idReservation } });
+      this.$router.push({ name: 'ReservationDetails', params: { idReservation } });
     },
-    deleteReservation(idReservation) {
-      axios.delete(API.RESERVATION.RESERVATION_BY_ID(idReservation), {
-        headers: {
-          'Authorization': `Bearer ${store.getters.getToken}`
-        }
-      })
-          .then(() => {
-            this.$emit('deleteReservation', idReservation);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-    }
-
-  }
-}
+    async deleteReservation(idReservation) {
+      try {
+        await reservations.remove(idReservation);
+        this.$emit('deleteReservation', idReservation);
+      } catch (err) {
+        console.error('Failed to delete reservation:', err);
+      }
+    },
+  },
+};
 </script>
+
 
 <style scoped>
 .item-div{

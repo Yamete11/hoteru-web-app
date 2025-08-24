@@ -13,8 +13,8 @@ namespace hoteru_be.DTOs
         public int IdRoomType { get; set; }
         public int IdGuest { get; set; }
         public int IdDepositType { get; set; }
-        public float DepositSum { get; set; }
-        public float Price { get; set; }
+        public decimal DepositSum { get; set; }
+        public decimal Price { get; set; }
         public bool Confirmed { get; set; }
 
         public List<ServiceHistoryDTO> Services { get; set; }

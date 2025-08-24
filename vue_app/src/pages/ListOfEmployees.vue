@@ -1,105 +1,123 @@
 <template>
   <div class="newRoom-component">
     <notifications position="top right" />
-    <navbar></navbar>
-    <sidebar></sidebar>
-    <div class="main">
+    <navbar />
+    <sidebar />
 
+    <div class="main">
       <div class="newUser-section">
         <form @submit.prevent="addUser" class="creating-form">
           <h1>Add new user</h1>
+
           <div class="input-form">
             <label>Name: </label>
-            <input v-model="state.newUser.name"
-                   class="input"
-                   type="text"
-                   placeholder="Enter name"
-                   @input="v$.newUser.name.$touch()"
-                   data-testid="input-name"
-            >
+            <input
+                v-model="state.newUser.name"
+                class="input"
+                type="text"
+                placeholder="Enter name"
+                @input="v$.newUser.name.$touch()"
+                data-testid="input-name"
+            />
             <span class="error-message" v-if="v$.newUser.name.$error">
-            <span v-if="!v$.newUser.name.required.$response">Name is required*</span>
-            <span v-else-if="!v$.newUser.name.maxLength.$response">Name must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.name.onlyLetters.$response">Name must contain only letters*</span>
-          </span>
-            <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name[0] }}</span>
+              <span v-if="!v$.newUser.name.required.$response">Name is required*</span>
+              <span v-else-if="!v$.newUser.name.maxLength.$response">Name must be less than 20 characters*</span>
+              <span v-else-if="!v$.newUser.name.onlyLetters.$response">Name must contain only letters*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name?.[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Surname: </label>
-            <input v-model="state.newUser.surname"
-                   class="input"
-                   type="text"
-                   placeholder="Enter surname"
-                   @input="v$.newUser.surname.$touch()"
-                   data-testid="input-surname"
-            >
+            <input
+                v-model="state.newUser.surname"
+                class="input"
+                type="text"
+                placeholder="Enter surname"
+                @input="v$.newUser.surname.$touch()"
+                data-testid="input-surname"
+            />
             <span class="error-message" v-if="v$.newUser.surname.$error">
-            <span v-if="!v$.newUser.surname.required.$response">Surname is required*</span>
-            <span v-else-if="!v$.newUser.surname.maxLength.$response">Surname must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.surname.onlyLetters.$response">Name must contain only letters*</span>
-          </span>
-            <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname[0] }}</span>
+              <span v-if="!v$.newUser.surname.required.$response">Surname is required*</span>
+              <span v-else-if="!v$.newUser.surname.maxLength.$response">Surname must be less than 20 characters*</span>
+              <span v-else-if="!v$.newUser.surname.onlyLetters.$response">Surname must contain only letters*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname?.[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Email: </label>
-            <input v-model="state.newUser.email"
-                   class="input"
-                   type="text"
-                   placeholder="Enter email"
-                   @input="v$.newUser.email.$touch()"
-                   data-testid="input-email"
-            >
+            <input
+                v-model="state.newUser.email"
+                class="input"
+                type="text"
+                placeholder="Enter email"
+                @input="v$.newUser.email.$touch()"
+                data-testid="input-email"
+            />
             <span class="error-message" v-if="v$.newUser.email.$error">
-            <span v-if="!v$.newUser.email.required.$response">Email is required*</span>
-            <span v-if="!v$.newUser.email.email.$response">Invalid email format*</span>
-          </span>
-            <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email[0] }}</span>
+              <span v-if="!v$.newUser.email.required.$response">Email is required*</span>
+              <span v-else-if="!v$.newUser.email.email.$response">Invalid email format*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email?.[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Login: </label>
-            <input v-model="state.newUser.loginName"
-                   class="input"
-                   type="text"
-                   placeholder="Enter login"
-                   @input="v$.newUser.loginName.$touch()"
-                   data-testid="input-login"
-            >
+            <input
+                v-model="state.newUser.loginName"
+                class="input"
+                type="text"
+                placeholder="Enter login"
+                @input="v$.newUser.loginName.$touch()"
+                data-testid="input-login"
+            />
             <span class="error-message" v-if="v$.newUser.loginName.$error">
-            <span v-if="!v$.newUser.loginName.required.$response">Login is required*</span>
-            <span v-else-if="!v$.newUser.loginName.maxLength.$response">Login must be less than 20 characters*</span>
-            <span v-else-if="!v$.newUser.loginName.onlyLetters.$response">Login must contain only letters*</span>
-          </span>
-            <span class="error-message" v-if="state.errors.Login">{{ state.errors.Login[0] }}</span>
+              <span v-if="!v$.newUser.loginName.required.$response">Login is required*</span>
+              <span v-else-if="!v$.newUser.loginName.maxLength.$response">Login must be less than 15 characters*</span>
+              <span v-else-if="!v$.newUser.loginName.loginValid.$response">Only letters, numbers, dot, dash and underscore*</span>
+            </span>
+            <!-- ВАЖНО: ключ ошибки с бэка — LoginName -->
+            <span class="error-message" v-if="state.errors.LoginName">{{ state.errors.LoginName?.[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Password: </label>
-            <input v-model="state.newUser.password"
-                   class="input"
-                   type="password"
-                   placeholder="Enter password"
-                   @input="v$.newUser.password.$touch()"
-                   data-testid="input-password"
-            >
+            <input
+                v-model="state.newUser.password"
+                class="input"
+                type="password"
+                placeholder="Enter password"
+                @input="v$.newUser.password.$touch()"
+                data-testid="input-password"
+            />
             <span class="error-message" v-if="v$.newUser.password.$error">
-          <span v-if="!v$.newUser.password.required.$response">Password is required*</span>
-        </span>
-            <span class="error-message" v-if="state.errors.Password">{{ state.errors.Password[0] }}</span>
+              <span v-if="!v$.newUser.password.required.$response">Password is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.Password">{{ state.errors.Password?.[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Type: </label>
-            <select v-model="state.newUser.idUserType" class="input" @change="v$.newUser.idUserType.$touch()" data-testid="select-user-type">
-            <option disabled value="">Select type</option>
-              <option v-for="type in filteredUserTypes" :value="type.idType" :key="type.idType">{{ type.title }}</option>
+            <select
+                v-model="state.newUser.idUserType"
+                class="input"
+                @change="v$.newUser.idUserType.$touch()"
+                data-testid="select-user-type"
+            >
+              <option disabled value="">Select type</option>
+              <option
+                  v-for="type in filteredUserTypes"
+                  :key="type.idType"
+                  :value="String(type.idType)"
+              >
+                {{ type.title }}
+              </option>
             </select>
             <span class="error-message" v-if="v$.newUser.idUserType.$error">
-            <span v-if="!v$.newUser.idUserType.required.$response">Type is required*</span>
-          </span>
-            <span class="error-message" v-if="state.errors.idUserType">{{ state.errors.idUserType[0] }}</span>
+              <span v-if="!v$.newUser.idUserType.required.$response">Type is required*</span>
+            </span>
+            <span class="error-message" v-if="state.errors.IdUserType">{{ state.errors.IdUserType?.[0] }}</span>
           </div>
 
           <div class="registration-class">
@@ -112,13 +130,22 @@
           <h1>List of employees: </h1>
           <div class="service-list">
             <ul class="added-services-list">
-              <li class="element" v-for="user in state.users" :key="user.idPerson" :data-testid="'user-item-' + user.loginName">
-              <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
-                <button v-if="user.userType !== 'Superadmin'" class="btn" @click.prevent="deleteUser(user.idPerson)" :data-testid="'delete-user-' + user.loginName">
-                Remove
+              <li
+                  class="element"
+                  v-for="user in state.users"
+                  :key="user.idPerson"
+                  :data-testid="'user-item-' + user.loginName"
+              >
+                <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
+                <button
+                    v-if="user.userType !== 'Superadmin'"
+                    class="btn"
+                    @click.prevent="deleteUser(user.idPerson)"
+                    :data-testid="'delete-user-' + user.loginName"
+                >
+                  Remove
                 </button>
               </li>
-
             </ul>
           </div>
         </div>
@@ -128,154 +155,113 @@
 </template>
 
 <script>
+import { reactive, computed, onMounted } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue } from '@vuelidate/validators';
-import axios from 'axios';
+import { required, maxLength, email as emailV } from '@vuelidate/validators';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import {computed, reactive} from "vue";
-import {email} from "@vuelidate/validators";
 import { notify } from '@kyvg/vue3-notification';
-import API from '@/config/api.js';
-
-
+import http from '@/lib/http';
+import { ENDPOINTS } from '@/config/api';
 
 export default {
-  name: "ListOfEmployees",
-  setup(){
+  name: 'ListOfEmployees',
+  setup() {
     const store = useStore();
-    const router = useRouter();
+
     const state = reactive({
-      newUser:{
+      newUser: {
         name: '',
         surname: '',
         email: '',
         loginName: '',
         password: '',
-        idUserType: ''
+        idUserType: '',
       },
-      newUserTypeTitle: '',
       userTypes: [],
-      typeTitle: '',
       errors: {},
-      users: []
+      users: [],
     });
 
-    function onlyLetters(value) {
-      return /^[A-Za-z]+$/.test(value);
-    }
+    const onlyLetters = (v) => typeof v === 'string' && /^[\p{L}]+$/u.test(v);
+    const loginValid  = (v) => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v);
 
     const rules = {
       newUser: {
         name: { required, maxLength: maxLength(20), onlyLetters },
         surname: { required, maxLength: maxLength(20), onlyLetters },
-        email: { required, email },
-        loginName: { required, maxLength: maxLength(15), onlyLetters },
+        email: { required, email: emailV },
+        loginName: { required, maxLength: maxLength(15), loginValid },
         password: { required },
-        idUserType: { required }
-      }
-    }
-
-    const filteredUserTypes = computed(() => {
-      return state.userTypes.filter(type => type.title !== 'Superadmin');
-    });
-
+        idUserType: { required },
+      },
+    };
     const v$ = useVuelidate(rules, state);
 
-
-    async function fetchUser(idUser){
-      try {
-        const response = await axios.get(API.USER.FULL_USER(idUser), {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.formData = response.data;
-
-        const responseUserTypes = await axios.get(API.USER_TYPE,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.userTypes = responseUserTypes.data;
+    const filteredUserTypes = computed(() =>
+        (state.userTypes || []).filter(t => t.title !== 'Superadmin')
+    );
 
 
-        const foundType = state.userTypes.find(status => status.idType === state.formData.idUserType);
-        state.typeTitle = foundType ? foundType.title : 'Status not found';
-
-        state.formData.idPerson = this.$store.getters.getUserData.idUser;
-        console.log(state.formData)
-
-      } catch (error) {
-        console.error(error);
-      }
+    async function loadUserTypes() {
+      const { data } = await http.get(ENDPOINTS.USER_TYPE);
+      state.userTypes = data?.data ?? data ?? [];
     }
 
     async function fetchUsers() {
-      try {
-        const response = await axios.get(API.USER.USER, {
-          headers: {
-            'Authorization': `Bearer ${store.getters.getToken}`
-          }
-        });
-        state.users = response.data;
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
+      console.log("hello")
+      const { data } = await http.get(ENDPOINTS.USER.ROOT);
+      console.log(data)
+      const rows = data?.data ?? data ?? [];
+      state.users = rows.map(u => ({
+        idPerson: u.idPerson ?? u.idUser ?? 0,
+        loginName: u.loginName ?? u.login ?? '',
+        userType: u.userType?.title ?? u.userTypeTitle ?? u.userType ?? '',
+      }));
     }
 
-
-
-    async function addUser(){
-      console.log(state.newUser)
+    async function addUser() {
+      state.errors = {};
       v$.value.$touch();
-      if (!v$.value.$error) {
-        try {
-          const response = await axios.post(API.USER.USER, state.newUser, {
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
-          console.log('Response:', response.data);
-          if (response.data && response.data.httpStatusCode === 200) {
-            notify({
-              title: 'User Created',
-              text: 'User has been successfully created.',
-              type: 'success',
-              duration: 4000
-            });
-            await fetchUsers();
+      if (v$.value.$error) return;
 
-            clearNewUserForm();
-          }
+      const payload = {
+        Name: String(state.newUser.name).trim(),
+        Surname: String(state.newUser.surname).trim(),
+        Email: String(state.newUser.email).trim(),
+        LoginName: String(state.newUser.loginName).trim(),
+        Password: String(state.newUser.password),
+        IdUserType: Number(state.newUser.idUserType),
+      };
 
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
+      try {
+        const { data } = await http.post(ENDPOINTS.USER.ROOT, payload);
+
+        if (data?.httpStatusCode && data.httpStatusCode !== 200 && data.httpStatusCode !== 201) {
+          state.errors = data.errors || {};
+          notify({ title: 'Create failed', text: data?.message || 'Validation failed', type: 'error' });
+          return;
         }
+
+        notify({ title: 'User Created', text: 'User has been successfully created.', type: 'success', duration: 3000 });
+        await fetchUsers();
+        clearNewUserForm();
+      } catch (err) {
+        state.errors = err?.response?.data?.errors || {};
+        notify({ title: 'Create failed', text: err?.response?.data?.message || err?.message || 'Unexpected error', type: 'error' });
       }
     }
 
     async function deleteUser(idPerson) {
       try {
-        await axios.delete(API.USER.PERSON(idPerson), {
-          headers: {
-            'Authorization': `Bearer ${store.getters.getToken}`
-          }
-        });
-        state.users = state.users.filter(user => user.idPerson !== idPerson);
-
-        notify({
-          title: 'User Deleted',
-          text: 'User has been successfully deleted.',
-          type: 'success',
-          duration: 4000
-        });
-
-      } catch (error) {
-        console.error('Error deleting user:', error);
+        const { data } = await http.delete(ENDPOINTS.USER.BY_ID(idPerson));
+        if (data?.httpStatusCode && data.httpStatusCode !== 200) {
+          notify({ title: 'Delete failed', text: data?.message || 'Operation failed', type: 'error' });
+          return;
+        }
+        state.users = state.users.filter(u => u.idPerson !== idPerson);
+        notify({ title: 'User Deleted', text: 'User has been successfully deleted.', type: 'success', duration: 3000 });
+      } catch (err) {
+        notify({ title: 'Delete failed', text: err?.response?.data?.message || err?.message || 'Unexpected error', type: 'error' });
       }
     }
 
@@ -286,19 +272,20 @@ export default {
         email: '',
         loginName: '',
         password: '',
-        idUserType: ''
+        idUserType: '',
       };
       v$.value.newUser.$reset();
+      state.errors = {};
     }
 
+    onMounted(async () => {
+      await loadUserTypes();
+      await fetchUsers();
+    });
 
-    return {state, fetchUser, addUser, v$, clearNewUserForm, fetchUsers, deleteUser, filteredUserTypes}
+    return { state, v$, filteredUserTypes, addUser, deleteUser, clearNewUserForm, fetchUsers };
   },
-  mounted(){
-    this.fetchUser(this.$store.getters.getUserData.idUser);
-    this.fetchUsers();
-  }
-}
+};
 </script>
 
 <style scoped>

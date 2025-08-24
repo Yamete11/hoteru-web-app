@@ -111,31 +111,21 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { reactive, onMounted, toRefs } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
-import axios from 'axios';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import {email} from "@vuelidate/validators";
+import { required, maxLength, email as emailV } from '@vuelidate/validators';
 import { notify } from '@kyvg/vue3-notification';
-import API from '@/config/api.js';
-
-
+import * as guests from '@/api/guests';
 
 export default {
-  name: "GuestDetails",
+  name: 'GuestDetails',
   props: {
-    idPerson: {
-      type: Number,
-      required: true
-    }
+    idPerson: { type: Number, required: true },
   },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const state = reactive( {
+  setup(props) {
+    const state = reactive({
       isEditing: false,
+      isSubmitting: false,
       formData: {
         idPerson: '',
         name: '',
@@ -143,101 +133,108 @@ export default {
         email: '',
         telNumber: '',
         passport: '',
-        idGuestStatus: ''
+        idGuestStatus: '',
       },
       statusTitle: '',
       guestStatuses: [],
-      errors: {}
-    })
+      errors: {},
+    });
 
-    function onlyLetters(value) {
-      return /^[A-Za-z]+$/.test(value);
-    }
+    const onlyLetters = (value) => typeof value === 'string' && /^[\p{L}]+$/u.test(value);
+    const onlyDigits = (value) => typeof value === 'string' && /^\d+$/.test(value);
 
     const rules = {
       formData: {
-        name: { required, maxLength: maxLength(20), onlyLetters },
-        surname: { required, maxLength: maxLength(20), onlyLetters},
-        email: { required, email },
-        telNumber: { required, maxLength: maxLength(15) },
-        passport: { required, maxLength: maxLength(10) },
-        idGuestStatus: { required }
-      }
-    }
-
+        name:       { required, maxLength: maxLength(20), onlyLetters },
+        surname:    { required, maxLength: maxLength(20), onlyLetters },
+        email:      { required, email: emailV },
+        telNumber:  { required, maxLength: maxLength(15), onlyDigits },
+        passport:   { required, maxLength: maxLength(10) },
+        idGuestStatus: { required },
+      },
+    };
     const v$ = useVuelidate(rules, state);
 
+    function mapFromApi(api) {
+      return {
+        idPerson: api.idPerson ?? '',
+        name: String(api.name ?? api.Name ?? '').trim(),
+        surname: String(api.surname ?? api.Surname ?? '').trim(),
+        email: String(api.email ?? api.Email ?? '').trim(),
+        telNumber: String(api.telNumber ?? api.TelNumber ?? '').trim(),
+        passport: String(api.passport ?? api.Passport ?? '').trim(),
+        idGuestStatus: String(api.idGuestStatus ?? api.IdGuestStatus ?? ''),
+      };
+    }
+
+    function mapToApi(ui) {
+      return {
+        idPerson: ui.idPerson,
+        Name: String(ui.name ?? '').trim(),
+        Surname: String(ui.surname ?? '').trim(),
+        Email: String(ui.email ?? '').trim(),
+        TelNumber: String(ui.telNumber ?? '').trim(),
+        Passport: String(ui.passport ?? '').trim(),
+        IdGuestStatus: String(ui.idGuestStatus),
+      };
+    }
+
+    async function loadDictionaries() {
+      const dto = await guests.status();
+      state.guestStatuses = dto.data;
+    }
+
+    function updateStatusTitle() {
+      const found = state.guestStatuses.find(s => String(s.idStatus) === String(state.formData.idGuestStatus));
+      state.statusTitle = found ? found.title : 'Status not found';
+    }
+
+    async function fetchGuest() {
+      const data = await guests.getPerson(props.idPerson);
+      state.formData = mapFromApi(data.data);
+      updateStatusTitle();
+    }
+
     async function toggleEdit() {
-      if (state.isEditing) {
-        v$.value.$touch();
-        if (!v$.value.$error) {
-          state.formData.idGuestStatus = String(state.formData.idGuestStatus);
-          try {
-            const response = await axios.put(API.GUEST, state.formData, {
-              headers: {
-                'Authorization': `Bearer ${store.getters.getToken}`
-              },
-            });
-            if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
-              state.errors = response.data.errors || {};
-              console.log('Error', response.data.message);
-            } else {
-              console.log('Success:', response.data);
-              state.isEditing = false;
-
-              notify({
-                title: 'Guest Updated',
-                text: 'The guest has been successfully updated.',
-                type: 'success',
-                duration: 4000
-              });
-
-
-              const foundStatus = state.guestStatuses.find(status => status.idStatus == state.formData.idGuestStatus);
-              state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
-            }
-          } catch (error) {
-            if (error.response && error.response.data && error.response.data.errors) {
-              state.errors = error.response.data.errors;
-            }
-            console.log('Error:', error);
-          }
-        }
-      } else {
+      if (!state.isEditing) {
         state.isEditing = true;
+        return;
       }
-    }
+      state.errors = {};
+      v$.value.$touch();
+      if (v$.value.$error) return;
 
-    async function fetchSpecificGuest(idPerson) {
       try {
-        const response = await axios.get(API.GUEST_ID(idPerson), {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.formData = response.data;
+        state.isSubmitting = true;
+        const payload = mapToApi(state.formData);
+        const res = await guests.update(payload);
 
-        const responseStatus = await axios.get(API.GUEST_STATUS,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.guestStatuses = responseStatus.data;
+        if (res?.httpStatusCode && res.httpStatusCode !== 200) {
+          state.errors = res.errors || {};
+          notify({ title: 'Update failed', text: res.message || 'Validation failed', type: 'error' });
+          return;
+        }
 
-        const foundStatus = state.guestStatuses.find(status => status.idStatus === state.formData.idGuestStatus);
-        state.statusTitle = foundStatus ? foundStatus.title : 'Status not found';
-      } catch (error) {
-        console.error(error);
+        notify({ title: 'Guest Updated', text: 'The guest has been successfully updated.', type: 'success', duration: 4000 });
+        state.isEditing = false;
+
+        updateStatusTitle();
+      } catch (err) {
+        const backendErrors = err?.response?.data?.errors || err?.details;
+        if (backendErrors) state.errors = backendErrors;
+        notify({ title: 'Update failed', text: err?.response?.data?.message || err?.message || 'Unexpected error', type: 'error' });
+      } finally {
+        state.isSubmitting = false;
       }
     }
-    return { state, v$, toggleEdit, fetchSpecificGuest};
 
+    onMounted(async () => {
+      await Promise.all([loadDictionaries(), fetchGuest()]);
+    });
+
+    return { state, v$, toggleEdit };
   },
-
-  mounted() {
-    this.fetchSpecificGuest(this.idPerson);
-  }
-}
+};
 </script>
 
 <style scoped>

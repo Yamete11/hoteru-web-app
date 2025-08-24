@@ -8,7 +8,7 @@ namespace hoteru_be.Entities
         [Key]
         public int IdBill { get; set; }
         public DateTime Created { get; set; }
-        public float Sum { get; set; }
+        public decimal Sum { get; set; }
 
 
         [Required]

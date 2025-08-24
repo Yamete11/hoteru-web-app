@@ -1,16 +1,16 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class DepositController : ControllerBase
     {
         private readonly IDepositService _service;
@@ -20,12 +20,14 @@ namespace hoteru_be.Controllers
             _service = service;
         }
 
-    
-
-        [HttpGet("{IdDeposit}")]
-        public async Task<DepositDTO> GetDeposit(int IdDeposit)
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDeposit(int id, CancellationToken ct)
         {
-            return await _service.GetDeposit(IdDeposit);
+            var result = await _service.GetDeposit(id, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
     }
 }

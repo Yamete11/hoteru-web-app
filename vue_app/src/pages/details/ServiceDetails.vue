@@ -77,7 +77,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
-import API from '@/config/api.js';
+import { services } from '@/api';
 
 
 export default {
@@ -94,7 +94,7 @@ export default {
     const state = reactive( {
       isEditing: false,
       formData: {
-        idService: '',
+        idService: 0,
         title: '',
         sum: 0,
         description: ''
@@ -117,32 +117,32 @@ export default {
       if (state.isEditing) {
         v$.value.$touch();
         if (!v$.value.$error) {
+
+          const payload = {
+            idService: state.formData.idService,
+            title: state.formData.title.trim(),
+            sum: Number(state.formData.sum),
+            description: state.formData.description?.trim() || '',
+          };
           try {
-            const response = await axios.put(API.SERVICE, state.formData, {
-              headers: {
-                'Authorization': `Bearer ${store.getters.getToken}`
-              },
+            state.errors = {};
+            const res = await services.update(payload);
+            if (res?.httpStatusCode && res.httpStatusCode !== 200) {
+              state.errors = res.errors || {};
+              notify({ title: 'Validation failed', text: res.message || 'Fix validation errors', type: 'warn' });
+              return;
+            }
+
+            notify({
+              title: 'Service Updated',
+              text: 'The service has been successfully updated.',
+              type: 'success',
+              duration: 3000,
             });
-
-            if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
-              state.errors = response.data.errors || {};
-              console.log('Error', response.data.message);
-            } else {
-              console.log('Success:', response.data);
-              notify({
-                title: 'Service Updated',
-                text: 'The service has been successfully updated.',
-                type: 'success',
-                duration: 4000
-              });
-              state.isEditing = false;
-            }
-
-          } catch (error) {
-            if (error.response && error.response.data && error.response.data.errors) {
-              state.errors = error.response.data.errors;
-            }
-            console.log('Error:', error);
+            state.isEditing = false;
+          } catch (e) {
+            state.errors = e?.details || {};
+            notify({ title: 'Update failed', text: e?.message || 'Unexpected error', type: 'error' });
           }
         }
       } else {
@@ -150,16 +150,22 @@ export default {
       }
     }
 
-    async function fetchSpecificService(idService) {
+    async function fetchSpecificService(id) {
+      state.isLoading = true;
+      state.errors = {};
       try {
-        const response = await axios.get(API.SERVICE_ID(idService),{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
+        const dto = await services.get(id);
+        state.formData = dto.data;
+      } catch (e) {
+        notify({
+          title: 'Error',
+          text: e.message || 'Failed to fetch service details',
+          type: 'error',
+          duration: 3000,
         });
-        state.formData = response.data;
-      } catch (error) {
-        console.error(error);
+        window.history.length > 1 ? history.back() : (location.href = '/services');
+      } finally {
+        state.isLoading = false;
       }
     }
 

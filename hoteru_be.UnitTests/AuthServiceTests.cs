@@ -1,7 +1,6 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
-using hoteru_be.Services.Implementations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using hoteru_be.Services;
 
 namespace hoteru_be.UnitTests
 {

@@ -1,7 +1,6 @@
 ﻿using hoteru_be.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 
 namespace hoteru_be.Context
 {
@@ -71,36 +70,36 @@ namespace hoteru_be.Context
             modelBuilder.Entity<Service>(t =>
             {
                 t.HasData(
-                    new Service { IdService = 1, Title = "Breakfast", Sum = 355.5f, Description = "None", IdUser = 2 },
-                    new Service { IdService = 2, Title = "Spa", Sum = 120.5f, Description = "None", IdUser = 2 },
-                    new Service { IdService = 3, Title = "Assistent", Sum = 248.5f, Description = "None", IdUser = 2 },
-                    new Service { IdService = 4, Title = "Laundry", Sum = 40.0f, Description = "Daily laundry service", IdUser = 2 },
-                    new Service { IdService = 5, Title = "Parking", Sum = 75.0f, Description = "Underground parking", IdUser = 2 },
-                    new Service { IdService = 6, Title = "Room Cleaning", Sum = 30.0f, Description = "Extra room cleaning", IdUser = 2 },
-                    new Service { IdService = 7, Title = "Mini Bar", Sum = 60.0f, Description = "Mini bar refill", IdUser = 2 },
-                    new Service { IdService = 8, Title = "City Tour", Sum = 150.0f, Description = "2-hour guided tour", IdUser = 2 },
-                    new Service { IdService = 9, Title = "Gym Access", Sum = 45.0f, Description = "24/7 access", IdUser = 2 },
-                    new Service { IdService = 10, Title = "Pool Access", Sum = 55.0f, Description = "Outdoor pool", IdUser = 2 },
-                    new Service { IdService = 11, Title = "Sauna", Sum = 65.0f, Description = "Private sauna session", IdUser = 2 },
-                    new Service { IdService = 12, Title = "Massage", Sum = 95.0f, Description = "1-hour massage", IdUser = 2 },
-                    new Service { IdService = 13, Title = "Dinner", Sum = 300.0f, Description = "Buffet dinner", IdUser = 2 },
-                    new Service { IdService = 14, Title = "Late Checkout", Sum = 80.0f, Description = "Until 18:00", IdUser = 2 },
-                    new Service { IdService = 15, Title = "Early Check-in", Sum = 70.0f, Description = "From 6:00 AM", IdUser = 2 },
-                    new Service { IdService = 16, Title = "Pet Stay", Sum = 100.0f, Description = "Pet-friendly room", IdUser = 2 },
-                    new Service { IdService = 17, Title = "Airport Pickup", Sum = 200.0f, Description = "Luxury car", IdUser = 2 },
-                    new Service { IdService = 18, Title = "Baggage Service", Sum = 20.0f, Description = "Porter assistance", IdUser = 2 },
-                    new Service { IdService = 19, Title = "WiFi", Sum = 15.0f, Description = "Premium internet", IdUser = 2 },
-                    new Service { IdService = 20, Title = "Business Center", Sum = 50.0f, Description = "Printing & scanning", IdUser = 2 },
-                    new Service { IdService = 21, Title = "Conference Room", Sum = 250.0f, Description = "Per hour", IdUser = 2 },
-                    new Service { IdService = 22, Title = "Translation", Sum = 180.0f, Description = "On-site translator", IdUser = 2 },
-                    new Service { IdService = 23, Title = "Courier Service", Sum = 90.0f, Description = "Express delivery", IdUser = 2 },
-                    new Service { IdService = 24, Title = "Photo Session", Sum = 300.0f, Description = "In-hotel shoot", IdUser = 15 },
-                    new Service { IdService = 25, Title = "Birthday Package", Sum = 400.0f, Description = "Cake, balloons", IdUser = 15 },
-                    new Service { IdService = 26, Title = "Anniversary Package", Sum = 500.0f, Description = "Romantic setup", IdUser = 15 },
-                    new Service { IdService = 27, Title = "Wine Tasting", Sum = 280.0f, Description = "Local wines", IdUser = 15 },
-                    new Service { IdService = 28, Title = "Babysitter", Sum = 220.0f, Description = "Certified staff", IdUser = 15 },
-                    new Service { IdService = 29, Title = "Car Rental", Sum = 600.0f, Description = "Luxury car", IdUser = 15 },
-                    new Service { IdService = 30, Title = "Bike Rental", Sum = 60.0f, Description = "Per day", IdUser = 15 }
+                    new Service { IdService = 1, Title = "Breakfast", Sum = 355, Description = "None", IdUser = 2 },
+                    new Service { IdService = 2, Title = "Spa", Sum = 120, Description = "None", IdUser = 2 },
+                    new Service { IdService = 3, Title = "Assistent", Sum = 248, Description = "None", IdUser = 2 },
+                    new Service { IdService = 4, Title = "Laundry", Sum = 40, Description = "Daily laundry service", IdUser = 2 },
+                    new Service { IdService = 5, Title = "Parking", Sum = 75, Description = "Underground parking", IdUser = 2 },
+                    new Service { IdService = 6, Title = "Room Cleaning", Sum = 30, Description = "Extra room cleaning", IdUser = 2 },
+                    new Service { IdService = 7, Title = "Mini Bar", Sum = 60, Description = "Mini bar refill", IdUser = 2 },
+                    new Service { IdService = 8, Title = "City Tour", Sum = 150, Description = "2-hour guided tour", IdUser = 2 },
+                    new Service { IdService = 9, Title = "Gym Access", Sum = 45, Description = "24/7 access", IdUser = 2 },
+                    new Service { IdService = 10, Title = "Pool Access", Sum = 55, Description = "Outdoor pool", IdUser = 2 },
+                    new Service { IdService = 11, Title = "Sauna", Sum = 65, Description = "Private sauna session", IdUser = 2 },
+                    new Service { IdService = 12, Title = "Massage", Sum = 95, Description = "1-hour massage", IdUser = 2 },
+                    new Service { IdService = 13, Title = "Dinner", Sum = 300, Description = "Buffet dinner", IdUser = 2 },
+                    new Service { IdService = 14, Title = "Late Checkout", Sum = 80, Description = "Until 18:00", IdUser = 2 },
+                    new Service { IdService = 15, Title = "Early Check-in", Sum = 70, Description = "From 6:00 AM", IdUser = 2 },
+                    new Service { IdService = 16, Title = "Pet Stay", Sum = 100, Description = "Pet-friendly room", IdUser = 2 },
+                    new Service { IdService = 17, Title = "Airport Pickup", Sum = 200, Description = "Luxury car", IdUser = 2 },
+                    new Service { IdService = 18, Title = "Baggage Service", Sum = 20, Description = "Porter assistance", IdUser = 2 },
+                    new Service { IdService = 19, Title = "WiFi", Sum = 15, Description = "Premium internet", IdUser = 2 },
+                    new Service { IdService = 20, Title = "Business Center", Sum = 50, Description = "Printing & scanning", IdUser = 2 },
+                    new Service { IdService = 21, Title = "Conference Room", Sum = 250, Description = "Per hour", IdUser = 2 },
+                    new Service { IdService = 22, Title = "Translation", Sum = 180, Description = "On-site translator", IdUser = 2 },
+                    new Service { IdService = 23, Title = "Courier Service", Sum = 90, Description = "Express delivery", IdUser = 2 },
+                    new Service { IdService = 24, Title = "Photo Session", Sum = 300, Description = "In-hotel shoot", IdUser = 15 },
+                    new Service { IdService = 25, Title = "Birthday Package", Sum = 400, Description = "Cake, balloons", IdUser = 15 },
+                    new Service { IdService = 26, Title = "Anniversary Package", Sum = 500, Description = "Romantic setup", IdUser = 15 },
+                    new Service { IdService = 27, Title = "Wine Tasting", Sum = 280, Description = "Local wines", IdUser = 15 },
+                    new Service { IdService = 28, Title = "Babysitter", Sum = 220, Description = "Certified staff", IdUser = 15 },
+                    new Service { IdService = 29, Title = "Car Rental", Sum = 600, Description = "Luxury car", IdUser = 15 },
+                    new Service { IdService = 30, Title = "Bike Rental", Sum = 60, Description = "Per day", IdUser = 15 }
                 );
             });
 
@@ -194,40 +193,40 @@ namespace hoteru_be.Context
             modelBuilder.Entity<Room>(t =>
             {
                 t.HasData(
-                    new Room { IdRoom = 1, Number = "101", Capacity = 1, Price = 45f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 2, Number = "102", Capacity = 2, Price = 75f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 3, Number = "103", Capacity = 3, Price = 60f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 4, Number = "104", Capacity = 4, Price = 90f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 5, Number = "105", Capacity = 5, Price = 85f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 6, Number = "106", Capacity = 6, Price = 65f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 7, Number = "107", Capacity = 7, Price = 55f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 8, Number = "108", Capacity = 8, Price = 70f, IdRoomType = 1, IdRoomStatus = 1, IdUser = 2 },
-                    new Room { IdRoom = 9, Number = "109", Capacity = 9, Price = 110f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 10, Number = "201", Capacity = 10, Price = 95f, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
-                    new Room { IdRoom = 11, Number = "202", Capacity = 11, Price = 100f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 12, Number = "203", Capacity = 12, Price = 120f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 13, Number = "204", Capacity = 13, Price = 130f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 14, Number = "205", Capacity = 14, Price = 75f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 15, Number = "206", Capacity = 15, Price = 85f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 16, Number = "207", Capacity = 16, Price = 105f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 17, Number = "208", Capacity = 17, Price = 140f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 18, Number = "209", Capacity = 18, Price = 135f, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 19, Number = "301", Capacity = 19, Price = 100f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 20, Number = "302", Capacity = 20, Price = 110f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 2 },
-                    new Room { IdRoom = 21, Number = "303", Capacity = 21, Price = 115f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 22, Number = "304", Capacity = 22, Price = 125f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 23, Number = "305", Capacity = 23, Price = 135f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 24, Number = "306", Capacity = 24, Price = 95f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 25, Number = "307", Capacity = 25, Price = 85f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 26, Number = "308", Capacity = 26, Price = 125f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 27, Number = "309", Capacity = 27, Price = 140f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 28, Number = "401", Capacity = 28, Price = 145f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 29, Number = "402", Capacity = 29, Price = 150f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 30, Number = "403", Capacity = 30, Price = 125f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 31, Number = "404", Capacity = 31, Price = 135f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 32, Number = "405", Capacity = 32, Price = 100f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 33, Number = "406", Capacity = 33, Price = 110f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
-                    new Room { IdRoom = 34, Number = "407", Capacity = 34, Price = 95f, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 }
+                    new Room { IdRoom = 1, Number = "101", Capacity = 1, Price = 45, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 2, Number = "102", Capacity = 2, Price = 75, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 3, Number = "103", Capacity = 3, Price = 60, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 4, Number = "104", Capacity = 4, Price = 90, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 5, Number = "105", Capacity = 5, Price = 85, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 6, Number = "106", Capacity = 6, Price = 65, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 7, Number = "107", Capacity = 7, Price = 55, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 8, Number = "108", Capacity = 8, Price = 70, IdRoomType = 1, IdRoomStatus = 1, IdUser = 2 },
+                    new Room { IdRoom = 9, Number = "109", Capacity = 9, Price = 110, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 10, Number = "201", Capacity = 10, Price = 95, IdRoomType = 1, IdRoomStatus = 2, IdUser = 2 },
+                    new Room { IdRoom = 11, Number = "202", Capacity = 11, Price = 100, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 12, Number = "203", Capacity = 12, Price = 120, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 13, Number = "204", Capacity = 13, Price = 130, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 14, Number = "205", Capacity = 14, Price = 75, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 15, Number = "206", Capacity = 15, Price = 85, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 16, Number = "207", Capacity = 16, Price = 105, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 17, Number = "208", Capacity = 17, Price = 140, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 18, Number = "209", Capacity = 18, Price = 135, IdRoomType = 1, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 19, Number = "301", Capacity = 19, Price = 100, IdRoomType = 2, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 20, Number = "302", Capacity = 20, Price = 110, IdRoomType = 2, IdRoomStatus = 3, IdUser = 2 },
+                    new Room { IdRoom = 21, Number = "303", Capacity = 21, Price = 115, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 22, Number = "304", Capacity = 22, Price = 125, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 23, Number = "305", Capacity = 23, Price = 135, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 24, Number = "306", Capacity = 24, Price = 95, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 25, Number = "307", Capacity = 25, Price = 85, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 26, Number = "308", Capacity = 26, Price = 125, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 27, Number = "309", Capacity = 27, Price = 140, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 28, Number = "401", Capacity = 28, Price = 145, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 29, Number = "402", Capacity = 29, Price = 150, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 30, Number = "403", Capacity = 30, Price = 125, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 31, Number = "404", Capacity = 31, Price = 135, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 32, Number = "405", Capacity = 32, Price = 100, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 33, Number = "406", Capacity = 33, Price = 110, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 },
+                    new Room { IdRoom = 34, Number = "407", Capacity = 34, Price = 95, IdRoomType = 2, IdRoomStatus = 3, IdUser = 15 }
     );
 
             });
@@ -268,7 +267,7 @@ namespace hoteru_be.Context
             modelBuilder.Entity<Bill>(t =>
             {
                 t.HasData(
-                    new Bill { IdBill = 1, Created = new DateTime(2025, 06, 25), Sum = 140f, InDate = new DateTime(2025, 06, 23), OutDate = new DateTime(2025, 06, 25), GuestName = "Noah", GuestSurname = "Wilson", RoomNumber = "108", BookedBy = "zxc"
+                    new Bill { IdBill = 1, Created = new DateTime(2025, 06, 25), Sum = 140, InDate = new DateTime(2025, 06, 23), OutDate = new DateTime(2025, 06, 25), GuestName = "Noah", GuestSurname = "Wilson", RoomNumber = "108", BookedBy = "zxc"
                     }
                 );
             });

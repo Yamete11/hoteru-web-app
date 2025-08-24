@@ -118,19 +118,20 @@
 
 
 <script>
-import { reactive } from 'vue';
+import {onMounted, reactive} from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, numeric, maxLength, maxValue, minValue } from '@vuelidate/validators';
-import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import API from '@/config/api.js';
+import { rooms } from '@/api';
+import {notify} from "@kyvg/vue3-notification";
 
 export default {
   name: "NewRoom",
   setup() {
     const store = useStore();
     const router = useRouter();
+
     const state = reactive({
       roomTypes: [],
       roomStatuses: [],
@@ -158,55 +159,62 @@ export default {
 
     async function fetchRoomTypes() {
       try {
-        const response = await axios.get(API.ROOM_TYPE,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.roomTypes = response.data;
-        const response2 = await axios.get(API.ROOM_STATUS,{
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-        });
-        state.roomStatuses = response2.data;
+        const [typesRes, statusesRes] = await Promise.all([rooms.types(), rooms.statuses()]);
+        state.roomTypes = typesRes.data;
+        state.roomStatuses = statusesRes.data;
       } catch (error) {
+        notify({ title: 'Load failed', text: error?.message || 'Failed to load dictionaries', type: 'error' });
         console.error(error);
       }
     }
 
     async function addRoom() {
+      state.errors = {};
       v$.value.$touch();
-      if (!v$.value.$error) {
-        try {
-          const response = await axios.post(API.ROOM, state.formData, {
-            headers: {
-              'Authorization': `Bearer ${store.getters.getToken}`
-            }
-          });
+      if (v$.value.$error) return;
 
-          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
-            state.errors = response.data.errors || {};
-          } else {
-            await router.push({
-              path: '/rooms',
-              query: { created: 'true' }
-            });
-          }
-        } catch (error) {
-          if (error.response?.data?.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
+      try {
+        state.isSubmitting = true;
+
+        const payload = {
+          number: String(state.formData.Number ?? '').trim(),
+          capacity: Number(state.formData.Capacity),
+          price: Number(state.formData.Price),
+          type: String(state.formData.Type),
+          status: String(state.formData.Status),
+        };
+
+        if (!Number.isFinite(payload.capacity) || !Number.isFinite(payload.price)) {
+          notify({ title: 'Validation', text: 'Capacity and Price must be valid numbers', type: 'error' });
+          return;
         }
+
+        const res = await rooms.create(payload);
+
+        if (res?.httpStatusCode === 201 || res?.httpStatusCode === 200) {
+          notify({ title: 'Room Created', text: 'Room has been created successfully.', type: 'success', duration: 3000 });
+          await router.push({ path: '/rooms', query: { created: 'true' } });
+          return;
+        }
+
+        const errors = res?.errors || res?.data?.errors;
+        if (errors) state.errors = errors;
+
+        notify({ title: 'Create failed', text: res?.message || res?.data?.message || 'Validation failed', type: 'error' });
+      } catch (error) {
+        const backendErrors = error?.response?.data?.errors || error?.details;
+        if (backendErrors) state.errors = backendErrors;
+
+        notify({ title: 'Create failed', text: error?.response?.data?.message || error?.message || 'Unexpected error', type: 'error' });
+      } finally {
+        state.isSubmitting = false;
       }
     }
 
-    return { state, v$, addRoom, fetchRoomTypes};
+    onMounted(fetchRoomTypes);
+
+    return { state, v$, addRoom };
   },
-  mounted() {
-    this.fetchRoomTypes();
-  }
 }
 </script>
 

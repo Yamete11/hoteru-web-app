@@ -43,26 +43,22 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { notify } from "@kyvg/vue3-notification";
-import API from '@/config/api.js';
-
-
+import { rooms } from '@/api';
 
 export default {
   name: "Room",
   data() {
     return {
       isLoading: false,
+      isLoadingMore: false,
       rooms: [],
       searchQuery: '',
       searchField: 'number',
       page: 1,
       limit: 15,
-      roomTypes: [],
-      roomStatuses: [],
       totalRooms: 0,
-      isOccupiedWarningVisible: false
+      isOccupiedWarningVisible: false,
     };
   },
   mounted() {
@@ -75,90 +71,93 @@ export default {
         type: 'success',
         duration: 3000
       });
-
       this.$router.replace({ query: {} });
     }
   },
   watch: {
     searchQuery: 'fetchRooms',
-    searchField: 'fetchRooms'
+    searchField: 'fetchRooms',
   },
   methods: {
     showOccupiedWarning() {
       if (this.isOccupiedWarningVisible) return;
-
       this.isOccupiedWarningVisible = true;
-
       notify({
         title: "Warning",
         text: 'Cannot delete a room with status "Occupied".',
         type: 'warn',
         duration: 3000
       });
+      setTimeout(() => { this.isOccupiedWarningVisible = false; }, 3000);
+    },
 
-      setTimeout(() => {
-        this.isOccupiedWarningVisible = false;
-      }, 3000);
-    }
-    ,
     deleteRoom(idRoom) {
-      this.rooms = this.rooms.filter(room => room.idRoom !== idRoom);
-
+      this.rooms = this.rooms.filter(r => r.idRoom !== idRoom);
       notify({
         title: 'Room Deleted',
-        text: `Room has been deleted.`,
+        text: 'Room has been deleted.',
         type: 'success',
         duration: 3000
       });
     },
+
     async fetchRooms() {
       try {
         this.isLoading = true;
-        const response = await axios.get(API.ROOM, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: 1,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
-        });
         this.page = 1;
-        this.rooms = response.data.list;
-        this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
-      } catch (error) {
-        console.error(error);
+
+        const data = await rooms.list({
+          page: this.page,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
+        });
+        console.log(data);
+        this.rooms = data?.list ?? [];
+        console.log(this.rooms);
+
+        const totalCount = data?.totalCount ?? 0;
+        this.totalRooms = Math.max(1, Math.ceil(totalCount / this.limit));
+      } catch (e) {
+        console.error('rooms.fetchRooms error', e);
+        this.rooms = [];
+        this.totalRooms = 1;
       } finally {
         this.isLoading = false;
       }
-    }
-    ,
+    },
+
     async loadMore() {
+      if (this.isLoading || this.isLoadingMore) return;
+      if (this.page >= this.totalRooms) return;
+
       try {
-        this.page++;
-        const response = await axios.get(API.ROOM, {
-          headers: {
-            'Authorization': `Bearer ${this.$store.getters.getToken}`
-          },
-          params: {
-            page: this.page,
-            limit: this.limit,
-            searchQuery: this.searchQuery,
-            searchField: this.searchField
-          }
+        this.isLoadingMore = true;
+        const next = this.page + 1;
+
+        const data = await rooms.list({
+          page: next,
+          limit: this.limit,
+          searchQuery: this.searchQuery,
+          searchField: this.searchField,
         });
-        this.totalRooms = Math.ceil(response.data.totalCount / this.limit);
-        this.rooms = [...this.rooms, ...response.data.list];
-      } catch (error) {
-        console.error(error);
+
+        const nextChunk = data?.list ?? [];
+        this.rooms = [...this.rooms, ...nextChunk];
+        this.page = next;
+
+        const totalCount = data?.totalCount ?? 0;
+        this.totalRooms = Math.max(1, Math.ceil(totalCount / this.limit));
+      } catch (e) {
+        console.error('rooms.loadMore error', e);
+      } finally {
+        this.isLoadingMore = false;
       }
     }
-
   }
 };
 </script>
+
 
 <style scoped>
 .room-component {

@@ -6,16 +6,27 @@ namespace hoteru_be.DTOs
     {
         public int IdService { get; set; }
 
+        private string? _title;
+        private string? _description;
 
         [Required(ErrorMessage = "Title is required.")]
-        [MaxLength(20, ErrorMessage = "Title can have max 20 symbols.")]
-        public string Title { get; set; }
+        [MaxLength(20, ErrorMessage = "Title can have max 20 characters.")]
+        [RegularExpression(@".*\S.*", ErrorMessage = "Title cannot be only whitespace.")]
+        public string Title
+        {
+            get => _title ?? string.Empty;
+            set => _title = value?.Trim();
+        }
 
         [Required(ErrorMessage = "Price is required.")]
-        [Range(1, 1000000, ErrorMessage = "Price must be a number between 1 and 1 000 000.")]
-        public float? Sum { get; set; }
+        [Range(0, 1_000_000, ErrorMessage = "Price must be between 0 and 1,000,000.")]
+        public decimal? Sum { get; set; }
 
-        [MaxLength(50, ErrorMessage = "Description can have max 50 symbols.")]
-        public string Description { get; set; }
+        [MaxLength(50, ErrorMessage = "Description can have max 50 characters.")]
+        public string? Description
+        {
+            get => _description;
+            set => _description = value?.Trim();
+        }
     }
 }

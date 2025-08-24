@@ -192,7 +192,6 @@ import { required, email, maxLength } from '@vuelidate/validators';
 import axios from 'axios';
 import {useRouter} from "vue-router/dist/vue-router";
 import {useStore} from "vuex";
-import API from '@/config/api.js';
 
 
 export default {

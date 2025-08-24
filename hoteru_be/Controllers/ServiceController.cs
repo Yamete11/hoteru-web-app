@@ -1,16 +1,16 @@
-﻿using hoteru_be.DTOs;
-using hoteru_be.Services.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using hoteru_be.DTOs;
+using hoteru_be.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace hoteru_be.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ServiceController : ControllerBase
     {
         private readonly IServiceService _service;
@@ -20,38 +20,65 @@ namespace hoteru_be.Controllers
             _service = service;
         }
 
+
         [HttpGet]
-        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices([FromQuery] int page = 1, [FromQuery] int limit = 15, [FromQuery] string searchField = null, [FromQuery] string searchQuery = null)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<PaginatedResultDTO<ServiceDTO>>> GetServices(
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 15,
+            [FromQuery] string? searchField = null,
+            [FromQuery] string? searchQuery = null,
+            CancellationToken ct = default)
         {
-            return await _service.GetServices(page, limit, searchField, searchQuery);
+            var result = await _service.GetServices(page, limit, searchField ?? "", searchQuery ?? "", ct);
+            return Ok(result);
         }
 
 
-        [HttpGet("{idService}")]
-        public async Task<ServiceDTO> GetSpecificService(int idService)
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSpecificService(int id, CancellationToken ct)
         {
-            return await _service.GetSpecificService(idService);
-        }
-
-        [HttpDelete("{IdService}")]
-        public async Task<MethodResultDTO> DeleteService(int IdService)
-        {
-            return await _service.DeleteService(IdService);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> PostService([FromBody] ServiceDTO serviceDTO)
-        {
-            var result = await _service.PostService(serviceDTO);
-
+            var result = await _service.GetSpecificService(id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
 
-        [HttpPut]
-        public async Task<MethodResultDTO> UpdateService([FromBody] ServiceDTO serviceDTO)
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> PostService([FromBody] ServiceDTO dto, CancellationToken ct)
         {
-            return await _service.UpdateService(serviceDTO);
+            var result = await _service.PostService(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
+        }
+
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateService(int id, [FromBody] ServiceDTO dto, CancellationToken ct)
+        {
+            dto.IdService = id;
+            var result = await _service.UpdateService(dto, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
+        }
+
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteService(int id, CancellationToken ct)
+        {
+            var result = await _service.DeleteService(id, ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
     }
 }

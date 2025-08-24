@@ -17,9 +17,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import store from "@/store";
-import API from '@/config/api.js';
+import { rooms } from '@/api';
 
 
 export default {
@@ -34,23 +32,14 @@ export default {
     viewRoomDetails(idRoom) {
       this.$router.push({ name: 'RoomDetails', params: { idRoom: idRoom } });
     },
-    deleteRoom(idRoom) {
-      if (this.room.status === 'Occupied') {
-        this.$emit('occupiedDeleteAttempt');
-        return;
+    async deleteRoom(idRoom) {
+      try {
+        await rooms.remove(idRoom);
+        this.$emit('deleteRoom', idRoom);
+        this.$emit('notificationDeleteAttempt');
+      } catch (e) {
+        console.error(e);
       }
-
-      axios.delete(API.ROOM_ID(idRoom), {
-        headers: {
-          'Authorization': `Bearer ${store.getters.getToken}`
-        }
-      })
-          .then(() => {
-            this.$emit('deleteRoom', idRoom);
-          })
-          .catch(error => {
-            console.error(error);
-          });
     }
 
   }

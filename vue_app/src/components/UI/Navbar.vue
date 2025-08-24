@@ -33,12 +33,12 @@ export default {
     };
   },
   methods: {
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userData');
-      this.$store.commit('clearToken');
-      this.$store.commit('clearUserData');
-      this.$router.push('/');
+    async logout() {
+      try {
+        await this.$store.dispatch('logout');
+      } finally {
+        this.$router.replace('/');
+      }
     }
     ,
     goToArrivals() {
@@ -50,8 +50,7 @@ export default {
   },
   computed: {
     companyName() {
-      const user = this.$store.getters.getUserData;
-      return user?.companyTitle || 'No Company';
+      return this.$store.getters.getCompanyName;
     },
     userRole() {
       return this.$store.getters.getUserRole;
