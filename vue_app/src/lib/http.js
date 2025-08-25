@@ -3,6 +3,7 @@ import axios from 'axios';
 const http = axios.create({
     baseURL: (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, ''),
     timeout: 15000,
+    withCredentials: true,
 });
 
 export function setAuthToken(token) {
@@ -12,11 +13,7 @@ export function setAuthToken(token) {
 
 http.interceptors.request.use((config) => {
     const url = String(config.url || '').toLowerCase();
-
-    const isLogin =
-        url.endsWith('/api/login') ||
-        url.includes('/api/login?');
-
+    const isLogin = url.endsWith('/api/login') || url.includes('/api/login?');
     if (!isLogin && !config.headers?.Authorization) {
         const t = localStorage.getItem('token');
         if (t) config.headers.Authorization = `Bearer ${t}`;
@@ -36,9 +33,7 @@ http.interceptors.response.use(
     (res) => res,
     (err) => {
         const norm = normalizeError(err);
-        if (norm.status === 401) {
-            localStorage.removeItem('token');
-        }
+        if (norm.status === 401) localStorage.removeItem('token');
         return Promise.reject(norm);
     }
 );

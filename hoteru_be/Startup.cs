@@ -1,8 +1,10 @@
 using System;
-using System.Text;
+using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using hoteru_be.Context;
-using hoteru_be.Services;
+using hoteru_be.Services.Commands;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,8 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using hoteru_be.Services.Queries;
-using hoteru_be.Services.Commands;
 
 namespace hoteru_be
 {
@@ -81,14 +81,36 @@ namespace hoteru_be
                 o.AddPolicy("Default", p =>
                 {
                     if (allowedOrigins.Length > 0)
-                        p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+                    {
+                        p.WithOrigins(allowedOrigins)
+                         .AllowAnyHeader()
+                         .AllowAnyMethod()
+                         .AllowCredentials();
+                    }
                     else
+                    {
                         p.SetIsOriginAllowed(_ => false);
+                    }
                     p.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
                 });
             });
 
-            var key = Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]);
+            var keys = Configuration.GetSection("Jwt:Keys").Get<string[]>();
+            if (keys == null || keys.Length == 0)
+            {
+                var single = Configuration["Jwt:Key"];
+                if (string.IsNullOrWhiteSpace(single))
+                    throw new InvalidOperationException("Configure either Jwt:Keys[] or Jwt:Key");
+                keys = new[] { single };
+            }
+
+            var signingKeys = keys.Select((k, i) =>
+            {
+                var sk = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(k));
+                sk.KeyId = $"k{i}";
+                return sk;
+            }).ToArray();
+
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -101,7 +123,7 @@ namespace hoteru_be
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKeys = signingKeys,
 
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
@@ -109,22 +131,29 @@ namespace hoteru_be
                     ValidateAudience = true,
                     ValidAudience = Configuration["Jwt:Audience"],
 
-                    RoleClaimType = ClaimTypes.Role,
-                    NameClaimType = ClaimTypes.Name,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
 
-                    ClockSkew = TimeSpan.Zero
+                    RoleClaimType = ClaimTypes.Role,
+                    NameClaimType = ClaimTypes.Name
                 };
             });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.EnvironmentName == "Development")
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "hoteru_be v1"));
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
             app.UseCors("Default");
             app.UseAuthentication();
             app.UseAuthorization();

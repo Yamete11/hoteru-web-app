@@ -33,6 +33,7 @@ export default createStore({
         token: null,
         userData: null,
         userRole: null,
+        refreshTimerId: null,
     },
     getters: {
         isAuthenticated: s => !!s.token,
@@ -70,9 +71,13 @@ export default createStore({
             if (role) localStorage.setItem('userRole', role);
             else localStorage.removeItem('userRole');
         },
+        setRefreshTimerId(state, id) {
+            if (state.refreshTimerId) clearTimeout(state.refreshTimerId);
+            state.refreshTimerId = id || null;
+        }
     },
     actions: {
-        initializeStore({ commit }) {
+        initializeStore({ commit, dispatch  }) {
             const token = localStorage.getItem('token');
 
             if (token && !isExpired(token)) {
@@ -91,6 +96,7 @@ export default createStore({
                         localStorage.setItem('userData', JSON.stringify(enriched));
                     } catch {}
                 }
+                dispatch('scheduleRefresh', { token });
             } else {
                 commit('setToken', null);
                 commit('setUserRole', null);
@@ -103,15 +109,25 @@ export default createStore({
 
         async login({ commit, dispatch }, { login, password }) {
             const res = await auth.login({ login, password });
-            const token = res?.data?.token;
-            if (!token) throw new Error('No token in response');
+
+            const body  = res?.data ?? res;
+            const token = body?.token ?? res?.data?.data?.token;
+            const expiresAtUtc = body?.expiresAtUtc ?? res?.data?.data?.expiresAtUtc;
+
+            if (!token) {
+                console.log('Login response shape:', res);
+                throw new Error('No token in response');
+            }
 
             commit('setToken', token);
             commit('setUserRole', decodeJwtRole(token));
 
+            dispatch('scheduleRefresh', { token, expiresAtUtc });
+
             await dispatch('fetchUserData', login);
             return res;
         },
+
 
         async fetchUserData({ commit }, userName) {
             try {
@@ -130,8 +146,35 @@ export default createStore({
             }
         },
 
+        async refresh({ commit, dispatch }) {
+            const res = await auth.refresh();
+            const body  = res?.data ?? res;
+            const token = body?.token ?? res?.data?.data?.token;
+            const expiresAtUtc = body?.expiresAtUtc ?? res?.data?.data?.expiresAtUtc;
+            if (!token) throw new Error('No token from refresh');
+
+            commit('setToken', token);
+            commit('setUserRole', decodeJwtRole(token));
+            dispatch('scheduleRefresh', { token, expiresAtUtc });
+        },
+
+        scheduleRefresh({ commit, dispatch }, { token, expiresAtUtc }) {
+            let tExpMs = expiresAtUtc ? Date.parse(expiresAtUtc) : (decodeJwt(token)?.exp || 0) * 1000;
+            const skewMs = 60 * 1000;
+            let delay = tExpMs - Date.now() - skewMs;
+            if (!Number.isFinite(delay)) delay = 30 * 1000;
+            delay = Math.max(delay, 5 * 1000);
+
+            const id = setTimeout(() => {
+                dispatch('refresh').catch(console.error);
+            }, delay);
+
+            commit('setRefreshTimerId', id);
+        },
+
 
         logout({ commit }) {
+            commit('setRefreshTimerId', null);
             commit('setToken', null);
             commit('setUserRole', null);
             commit('setUserData', null);

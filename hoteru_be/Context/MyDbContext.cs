@@ -23,6 +23,8 @@ namespace hoteru_be.Context
         public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<ReservationService> ReservationServices { get; set; }
         public virtual DbSet<Bill> Bills { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
 
 
