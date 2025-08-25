@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
-  },
+    "preview": "vite preview",
+    "lint": "eslint --ext .js,.vue src",
+    "lint:fix": "eslint --fix --ext .js,.vue src",
+    "format": "prettier --write \"src/**/*.{js,vue,css,scss,ts}\"",
+    "stylelint": "stylelint \"src/**/*.{css,scss,vue}\" --fix"
+  }
+,
   "dependencies": {
     "@kyvg/vue3-notification": "^3.4.1",
     "@vuelidate/core": "^2.0.3",
