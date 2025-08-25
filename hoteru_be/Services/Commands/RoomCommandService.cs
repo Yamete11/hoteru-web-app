@@ -15,30 +15,16 @@ namespace hoteru_be.Services.Commands
     public class RoomCommandService : IRoomCommandService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<RoomCommandService> _logger;
 
-        public RoomCommandService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<RoomCommandService> logger)
+        public RoomCommandService(MyDbContext context, ILogger<RoomCommandService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO> DeleteRoom(int hotelId, int idRoom, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<MethodResultDTO> DeleteRoom(int idRoom, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("DeleteRoom unauthorized for room {RoomId}", idRoom);
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
 
             var occupiedStatusId = await _context.RoomStatuses
                 .AsNoTracking()
@@ -91,11 +77,8 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> PostRoom(RoomDTO roomDTO, CancellationToken ct = default)
+        public async Task<MethodResultDTO> PostRoom(int hotelId, RoomDTO roomDTO, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
 
             var numberExists = await _context.Rooms
                 .AnyAsync(r => r.Number == roomDTO.Number && r.User.Person.IdHotel == hotelId, ct);
@@ -131,8 +114,10 @@ namespace hoteru_be.Services.Commands
                 .Include(u => u.Person)
                 .FirstOrDefaultAsync(u => u.Person.IdHotel == hotelId, ct);
             if (ownerUser is null)
+            {
                 return MethodResultDTO.Error("No user found for this hotel");
-
+            }
+               
             var room = new Room
             {
                 Number = roomDTO.Number!,
@@ -152,11 +137,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Created("Created");
         }
 
-        public async Task<MethodResultDTO> UpdateRoom(RoomDTO roomDTO, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateRoom(int hotelId, RoomDTO roomDTO, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
 
             var room = await _context.Rooms
                 .Include(r => r.User).ThenInclude(u => u.Person)
@@ -194,15 +176,29 @@ namespace hoteru_be.Services.Commands
 
             var statusExists = await _context.RoomStatuses.AsNoTracking()
                 .AnyAsync(s => s.IdRoomStatus == statusId, ct);
-            if (!statusExists) return MethodResultDTO.NotFound("Room status not found");
+
+            if (!statusExists)
+            {
+                return MethodResultDTO.NotFound("Room status not found");
+            }
 
             var typeExists = await _context.RoomTypes.AsNoTracking()
                 .AnyAsync(t => t.IdRoomType == typeId, ct);
-            if (!typeExists) return MethodResultDTO.NotFound("Room type not found");
+            if (!typeExists)
+            {
+                return MethodResultDTO.NotFound("Room type not found");
+            }
 
             room.Number = roomDTO.Number!;
-            if (roomDTO.Capacity is not null) room.Capacity = roomDTO.Capacity.Value;
-            if (roomDTO.Price is not null) room.Price = roomDTO.Price.Value;
+            if (roomDTO.Capacity is not null)
+            {
+                room.Capacity = roomDTO.Capacity.Value;
+            }
+
+            if (roomDTO.Price is not null)
+            {
+                room.Price = roomDTO.Price.Value;
+            }
             room.IdRoomStatus = statusId;
             room.IdRoomType = typeId;
 

@@ -17,32 +17,17 @@ namespace hoteru_be.Services.Commands
     {
         private readonly MyDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<UserCommandService> _logger;
 
-        public UserCommandService(
-            MyDbContext context,
-            IPasswordHasher<User> passwordHasher,
-            IHttpContextAccessor httpContextAccessor,
-            ILogger<UserCommandService> logger)
+        public UserCommandService(MyDbContext context, IPasswordHasher<User> passwordHasher, ILogger<UserCommandService> logger)
         {
             _context = context;
             _passwordHasher = passwordHasher;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO> PostUser(int hotelId, NewUserDTO dto, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<MethodResultDTO> PostUser(NewUserDTO dto, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
 
             var login = dto.LoginName?.Trim();
             var email = dto.Email?.Trim();
@@ -62,14 +47,16 @@ namespace hoteru_be.Services.Commands
             var userTypeExists = await _context.UserTypes.AsNoTracking()
                 .AnyAsync(t => t.IdUserType == dto.IdUserType, ct);
             if (!userTypeExists)
+            {
                 return MethodResultDTO.NotFound("User type not found");
+            }
 
             var person = new Person
             {
                 Name = dto.Name.Trim(),
                 Surname = dto.Surname.Trim(),
                 Email = email!,
-                IdHotel = hotelId.Value
+                IdHotel = hotelId
             };
 
             var user = new User
@@ -95,14 +82,8 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> UpdateUser(UpdateUserDTO dto, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateUser(int hotelId, UpdateUserDTO dto, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger?.LogWarning("UpdateUser unauthorized for person {PersonId}", dto.IdPerson);
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
 
             var login = (dto.LoginName ?? string.Empty).Trim();
             var email = (dto.Email ?? string.Empty).Trim();
@@ -172,15 +153,8 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> DeleteUser(int idPerson, CancellationToken ct = default)
+        public async Task<MethodResultDTO> DeleteUser(int hotelId, int idPerson, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger?.LogWarning("DeleteUser unauthorized for person {PersonId}", idPerson);
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
-
             var user = await _context.Users
                 .Include(u => u.Person)
                 .Include(u => u.Reservations)

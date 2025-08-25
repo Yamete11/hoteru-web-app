@@ -16,31 +16,16 @@ namespace hoteru_be.Services.Commands
     public class ReservationCommandService : IReservationCommandService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _http;
         private readonly ILogger<ReservationCommandService> _logger;
 
-        public ReservationCommandService(MyDbContext context, IHttpContextAccessor http, ILogger<ReservationCommandService> logger)
+        public ReservationCommandService(MyDbContext context, ILogger<ReservationCommandService> logger)
         {
             _context = context;
-            _http = http;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO> PostReservation(int hotelId, PostReservationDTO reservationDTO, CancellationToken ct = default)
         {
-            var claim = _http.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(claim, out var id) ? id : null;
-        }
-
-        public async Task<MethodResultDTO> PostReservation(PostReservationDTO reservationDTO, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized PostReservation attempt");
-                return MethodResultDTO.Unauthorized("Unauthorized");
-            }
-
             var room = await _context.Rooms
                 .Include(r => r.User).ThenInclude(u => u.Person)
                 .SingleOrDefaultAsync(r => r.IdRoom == reservationDTO.IdRoom && r.User.Person.IdHotel == hotelId, ct);
@@ -109,15 +94,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Created("Created");
         }
 
-        public async Task<MethodResultDTO> UpdateReservation(ArrivalDTO arrivalDTO, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateReservation(int hotelId, ArrivalDTO arrivalDTO, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId == null)
-            {
-                _logger.LogWarning("Unauthorized attempt to update reservation {ReservationId}", arrivalDTO.IdReservation);
-                return MethodResultDTO.Unauthorized("Unauthorized");
-            }
-
             var reservation = await _context.Reservations
                 .Include(r => r.Deposit)
                 .Include(r => r.Guest).ThenInclude(g => g.Person)
@@ -189,19 +167,19 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> DeleteSpecificReservation(int idReservation, CancellationToken ct = default)
+        public async Task<MethodResultDTO> DeleteSpecificReservation(int hotelId, int idReservation, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId == null)
-                return MethodResultDTO.Unauthorized("Unauthorized");
+
 
             var reservation = await _context.Reservations
                 .Include(r => r.Guest).ThenInclude(g => g.Person)
                 .SingleOrDefaultAsync(x => x.IdReservation == idReservation && x.Guest.Person.IdHotel == hotelId, ct);
 
             if (reservation == null)
+            {
                 return MethodResultDTO.NotFound("Reservation not found");
-
+            }
+               
             var reservationServices = await _context.ReservationServices
                 .Where(x => x.IdReservation == idReservation)
                 .ToListAsync(ct);
@@ -216,15 +194,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Ok("Reservation deleted successfully");
         }
 
-        public async Task<MethodResultDTO> ConfirmReservation(int reservationId, CancellationToken ct = default)
+        public async Task<MethodResultDTO> ConfirmReservation(int hotelId, int reservationId, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized attempt to confirm reservation {ReservationId}", reservationId);
-                return MethodResultDTO.Unauthorized("Unauthorized");
-            }
-
             var reservation = await _context.Reservations
                 .Include(r => r.Guest).ThenInclude(g => g.Person)
                 .Include(r => r.Room)

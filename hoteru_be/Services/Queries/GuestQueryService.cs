@@ -13,33 +13,18 @@ namespace hoteru_be.Services.Queries
     public class GuestQueryService : IGuestQueryService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<GuestQueryService> _logger;
 
-        public GuestQueryService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<GuestQueryService> logger)
+        public GuestQueryService(MyDbContext context, ILogger<GuestQueryService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
-        {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests(int page, int limit, string? searchQuery = null, string? searchField = null, CancellationToken ct = default)
+        public async Task<PaginatedResultDTO<GuestDTO>> GetGuests(int hotelId, int page, int limit, string? searchQuery = null, string? searchField = null, CancellationToken ct = default)
         {
             page = page < 1 ? 1 : page;
             limit = limit < 1 ? 10 : limit;
-
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized GetGuests request");
-                return new PaginatedResultDTO<GuestDTO> { List = new List<GuestDTO>(), TotalCount = 0, Page = page, Limit = limit };
-            }
 
             var query = _context.Guests
                 .AsNoTracking()
@@ -81,14 +66,8 @@ namespace hoteru_be.Services.Queries
             return new PaginatedResultDTO<GuestDTO> { List = list, TotalCount = total, Page = page, Limit = limit };
         }
 
-        public async Task<MethodResultDTO<SpecificGuestDTO>> GetSpecificGuest(int idPerson, CancellationToken ct = default)
+        public async Task<MethodResultDTO<SpecificGuestDTO>> GetSpecificGuest(int hotelId, int idPerson, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized GetSpecificGuest request");
-                return MethodResultDTO<SpecificGuestDTO>.Unauthorized("Unauthorized");
-            }
 
             var dto = await _context.Guests
                 .AsNoTracking()

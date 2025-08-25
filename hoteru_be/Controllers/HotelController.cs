@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hoteru_be.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class HotelController : ControllerBase
@@ -21,7 +22,6 @@ namespace hoteru_be.Controllers
 
 
         [HttpPost]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostHotel([FromBody] HotelDTO hotelDTO, CancellationToken ct)
@@ -30,7 +30,7 @@ namespace hoteru_be.Controllers
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
-
+        //designed for ui tests, to delete a hotel after testing its creating
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

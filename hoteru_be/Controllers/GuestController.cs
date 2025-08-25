@@ -1,16 +1,17 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using hoteru_be.DTOs;
+﻿using hoteru_be.DTOs;
 using hoteru_be.Services.Commands;
+using hoteru_be.Services.Common;
 using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Route("api/[controller]")]
     public class GuestController : ControllerBase
@@ -34,7 +35,8 @@ namespace hoteru_be.Controllers
             [FromQuery] string? searchField = null,
             CancellationToken ct = default)
         {
-            var result = await _queries.GetGuests(page, limit, searchQuery, searchField, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetGuests(hotelId, page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
@@ -44,7 +46,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetSpecificGuest([FromRoute] int idPerson, CancellationToken ct = default)
         {
-            var result = await _queries.GetSpecificGuest(idPerson, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetSpecificGuest(hotelId, idPerson, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -54,7 +57,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeleteGuest([FromRoute] int idPerson, CancellationToken ct = default)
         {
-            var result = await _commands.DeleteGuest(idPerson, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.DeleteGuest(hotelId, idPerson, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -77,8 +81,8 @@ namespace hoteru_be.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest,
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
-
-            var result = await _commands.UpdateGuest(dto, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.UpdateGuest(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -101,8 +105,8 @@ namespace hoteru_be.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest,
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
-
-            var result = await _commands.PostGuest(dto, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.PostGuest(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

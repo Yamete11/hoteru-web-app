@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using hoteru_be.DTOs;
+﻿using hoteru_be.DTOs;
 using hoteru_be.Services.Commands;
+using hoteru_be.Services.Common;
 using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -32,7 +33,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<UserDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUser([FromRoute] string login, CancellationToken ct)
         {
-            var result = await _queries.GetUser(login, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetUser(hotelId, login, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -42,7 +44,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<FullUserDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetFullUser([FromRoute] int idUser, CancellationToken ct)
         {
-            var result = await _queries.GetFullUser(idUser, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetFullUser(hotelId, idUser, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -53,7 +56,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<List<ListUserDTO>>), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetUsers(CancellationToken ct)
         {
-            var result = await _queries.GetUsers(ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetUsers(hotelId, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -81,8 +85,8 @@ namespace hoteru_be.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest,
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
-
-            var result = await _commands.PostUser(dto, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.PostUser(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -110,8 +114,8 @@ namespace hoteru_be.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest,
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
-
-            var result = await _commands.UpdateUser(dto, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.UpdateUser(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -123,7 +127,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser([FromRoute] int idPerson, CancellationToken ct)
         {
-            var result = await _commands.DeleteUser(idPerson, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.DeleteUser(hotelId, idPerson, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

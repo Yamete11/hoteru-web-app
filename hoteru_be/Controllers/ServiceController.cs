@@ -1,15 +1,16 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using hoteru_be.DTOs;
-using hoteru_be.Services.Queries;
+﻿using hoteru_be.DTOs;
 using hoteru_be.Services.Commands;
+using hoteru_be.Services.Common;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -35,7 +36,8 @@ namespace hoteru_be.Controllers
             [FromQuery] string? searchQuery = null,
             CancellationToken ct = default)
         {
-            var result = await _queries.GetServices(page, limit, searchField ?? "", searchQuery ?? "", ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetServices(hotelId, page, limit, searchField ?? "", searchQuery ?? "", ct);
             return Ok(result);
         }
 
@@ -45,7 +47,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<ServiceDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSpecificService([FromRoute] int id, CancellationToken ct)
         {
-            var result = await _queries.GetSpecificService(id, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetSpecificService(hotelId, id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -58,7 +61,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> PostService([FromBody] ServiceDTO dto, CancellationToken ct)
         {
-            var result = await _commands.PostService(dto, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.PostService(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -71,8 +75,9 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> UpdateService([FromRoute] int id, [FromBody] ServiceDTO dto, CancellationToken ct)
         {
+            var hotelId = User.GetHotelId();
             dto.IdService = id;
-            var result = await _commands.UpdateService(dto, ct);
+            var result = await _commands.UpdateService(hotelId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -82,7 +87,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteService([FromRoute] int id, CancellationToken ct)
         {
-            var result = await _commands.DeleteService(id, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.DeleteService(hotelId, id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

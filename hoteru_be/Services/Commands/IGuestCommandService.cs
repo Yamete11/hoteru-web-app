@@ -6,8 +6,8 @@ namespace hoteru_be.Services.Commands
 {
     public interface IGuestCommandService
     {
-        Task<MethodResultDTO> PostGuest(GuestDTO guestDTO, CancellationToken ct = default);
-        Task<MethodResultDTO> UpdateGuest(GuestDTO guestDTO, CancellationToken ct = default);
-        Task<MethodResultDTO> DeleteGuest(int idPerson, CancellationToken ct = default);
+        Task<MethodResultDTO> PostGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default);
+        Task<MethodResultDTO> UpdateGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default);
+        Task<MethodResultDTO> DeleteGuest(int hotelId, int idPerson, CancellationToken ct = default);
     }
 }

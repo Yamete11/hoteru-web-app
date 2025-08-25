@@ -52,6 +52,13 @@ namespace hoteru_be
 
             services.AddControllers();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("HasHotelId", policy =>
+                    policy.RequireAuthenticatedUser()
+                          .RequireClaim("hotelId"));
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "hoteru_be", Version = "v1" });

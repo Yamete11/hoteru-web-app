@@ -13,30 +13,16 @@ namespace hoteru_be.Services.Queries
     public class UserQueryService : IUserQueryService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<UserQueryService> _logger;
 
-        public UserQueryService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<UserQueryService> logger)
+        public UserQueryService(MyDbContext context, ILogger<UserQueryService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO<FullUserDTO>> GetFullUser(int hotelId, int idUser, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<MethodResultDTO<FullUserDTO>> GetFullUser(int idUser, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger?.LogWarning("GetFullUser unauthorized for user {UserId}", idUser);
-                return MethodResultDTO<FullUserDTO>.Unauthorized("HotelId claim missing");
-            }
 
             var dto = await _context.Users
                 .AsNoTracking()
@@ -61,14 +47,8 @@ namespace hoteru_be.Services.Queries
             return MethodResultDTO<FullUserDTO>.Ok(dto, "Fetched");
         }
 
-        public async Task<MethodResultDTO<UserDTO>> GetUser(string userName, CancellationToken ct = default)
+        public async Task<MethodResultDTO<UserDTO>> GetUser(int hotelId, string userName, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger?.LogWarning("GetUser unauthorized for login {UserName}", userName);
-                return MethodResultDTO<UserDTO>.Unauthorized("HotelId claim missing");
-            }
 
             if (string.IsNullOrWhiteSpace(userName))
             {
@@ -98,15 +78,8 @@ namespace hoteru_be.Services.Queries
             return MethodResultDTO<UserDTO>.Ok(dto, "Fetched");
         }
 
-        public async Task<MethodResultDTO<List<ListUserDTO>>> GetUsers(CancellationToken ct = default)
+        public async Task<MethodResultDTO<List<ListUserDTO>>> GetUsers(int hotelId, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger?.LogWarning("User unauthorized");
-                return MethodResultDTO<List<ListUserDTO>>.Unauthorized("User unauthorized");
-            }
-
             var users = await _context.Users
                 .AsNoTracking()
                 .Where(u => u.Person.IdHotel == hotelId)

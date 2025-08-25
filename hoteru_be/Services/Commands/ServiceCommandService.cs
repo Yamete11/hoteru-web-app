@@ -15,30 +15,16 @@ namespace hoteru_be.Services.Commands
     public class ServiceCommandService : IServiceCommandService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<ServiceCommandService> _logger;
 
-        public ServiceCommandService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<ServiceCommandService> logger)
+        public ServiceCommandService(MyDbContext context, ILogger<ServiceCommandService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO> PostService(int hotelId, ServiceDTO serviceDTO, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out int hotelId) ? hotelId : null;
-        }
-
-        public async Task<MethodResultDTO> PostService(ServiceDTO serviceDTO, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("PostService unauthorized");
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
 
             var title = serviceDTO.Title?.Trim() ?? string.Empty;
             var exists = await _context.Services
@@ -77,15 +63,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Created("Created");
         }
 
-        public async Task<MethodResultDTO> UpdateService(ServiceDTO serviceDTO, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateService(int hotelId, ServiceDTO serviceDTO, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("UpdateService unauthorized for service {ServiceId}", serviceDTO.IdService);
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
-
             var service = await _context.Services
                 .Where(s => s.IdService == serviceDTO.IdService && s.User.Person.IdHotel == hotelId)
                 .FirstOrDefaultAsync(ct);
@@ -106,15 +85,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Ok("Updated");
         }
 
-        public async Task<MethodResultDTO> DeleteService(int idService, CancellationToken ct = default)
+        public async Task<MethodResultDTO> DeleteService(int hotelId, int idService, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("DeleteService unauthorized for service {ServiceId}", idService);
-                return MethodResultDTO.Unauthorized("HotelId claim missing");
-            }
-
             var svc = await _context.Services
                 .AsNoTracking()
                 .Where(s => s.IdService == idService && s.User.Person.IdHotel == hotelId)

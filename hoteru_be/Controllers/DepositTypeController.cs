@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using hoteru_be.DTOs;
+﻿using hoteru_be.DTOs;
+using hoteru_be.Services.Common;
 using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Route("api/[controller]")]
     public class DepositTypeController : ControllerBase

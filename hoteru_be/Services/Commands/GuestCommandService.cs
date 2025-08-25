@@ -14,27 +14,16 @@ namespace hoteru_be.Services.Commands
     public class GuestCommandService : IGuestCommandService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<GuestCommandService> _logger;
 
-        public GuestCommandService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<GuestCommandService> logger)
+        public GuestCommandService(MyDbContext context, ILogger<GuestCommandService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<MethodResultDTO> PostGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<MethodResultDTO> PostGuest(GuestDTO guestDTO, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null) return MethodResultDTO.Unauthorized("Unauthorized");
-
             var errors = new Dictionary<string, List<string>>();
 
             var emailLower = guestDTO.Email.Trim().ToLowerInvariant();
@@ -63,7 +52,7 @@ namespace hoteru_be.Services.Commands
                 Name = guestDTO.Name.Trim(),
                 Surname = guestDTO.Surname.Trim(),
                 Email = emailLower,
-                IdHotel = hotelId.Value
+                IdHotel = hotelId
             };
 
             var guest = new Guest
@@ -81,11 +70,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Created("Created");
         }
 
-        public async Task<MethodResultDTO> UpdateGuest(GuestDTO guestDTO, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null) return MethodResultDTO.Unauthorized("Unauthorized");
-
             var guest = await _context.Guests.Include(g => g.Person)
                 .FirstOrDefaultAsync(g => g.IdPerson == guestDTO.IdPerson && g.Person.IdHotel == hotelId, ct);
 
@@ -126,11 +112,8 @@ namespace hoteru_be.Services.Commands
             return MethodResultDTO.Ok("Updated");
         }
 
-        public async Task<MethodResultDTO> DeleteGuest(int idPerson, CancellationToken ct = default)
+        public async Task<MethodResultDTO> DeleteGuest(int hotelId, int idPerson, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null) return MethodResultDTO.Unauthorized("Unauthorized");
-
             var guest = await _context.Guests.Include(g => g.Person)
                 .SingleOrDefaultAsync(g => g.IdPerson == idPerson && g.Person.IdHotel == hotelId, ct);
 

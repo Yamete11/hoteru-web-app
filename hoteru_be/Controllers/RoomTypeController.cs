@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoomTypeController : ControllerBase

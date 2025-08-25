@@ -6,8 +6,8 @@ namespace hoteru_be.Services.Commands
 {
     public interface IServiceCommandService
     {
-        Task<MethodResultDTO> PostService(ServiceDTO serviceDTO, CancellationToken ct);
-        Task<MethodResultDTO> UpdateService(ServiceDTO serviceDTO, CancellationToken ct);
-        Task<MethodResultDTO> DeleteService(int idService, CancellationToken ct);
+        Task<MethodResultDTO> PostService(int hotelId, ServiceDTO serviceDTO, CancellationToken ct);
+        Task<MethodResultDTO> UpdateService(int hotelId, ServiceDTO serviceDTO, CancellationToken ct);
+        Task<MethodResultDTO> DeleteService(int hotelId, int idService, CancellationToken ct);
     }
 }

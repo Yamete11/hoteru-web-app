@@ -6,7 +6,7 @@ namespace hoteru_be.Services.Queries
 {
     public interface IServiceQueryService
     {
-        Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit, string searchField, string searchQuery, CancellationToken ct = default);
-        Task<MethodResultDTO<ServiceDTO>> GetSpecificService(int idService, CancellationToken ct);
+        Task<PaginatedResultDTO<ServiceDTO>> GetServices(int hotelId, int page, int limit, string searchField, string searchQuery, CancellationToken ct = default);
+        Task<MethodResultDTO<ServiceDTO>> GetSpecificService(int hotelId, int idService, CancellationToken ct);
     }
 }

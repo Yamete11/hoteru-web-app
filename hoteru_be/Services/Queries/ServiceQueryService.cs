@@ -15,33 +15,18 @@ namespace hoteru_be.Services.Queries
     public class ServiceQueryService : IServiceQueryService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<IServiceQueryService> _logger;
 
-        public ServiceQueryService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<ServiceQueryService> logger)
+        public ServiceQueryService(MyDbContext context, ILogger<ServiceQueryService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
-        {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out int hotelId) ? hotelId : null;
-        }
-
-        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int page, int limit, string searchField, string searchQuery, CancellationToken ct = default)
+        public async Task<PaginatedResultDTO<ServiceDTO>> GetServices(int hotelId, int page, int limit, string searchField, string searchQuery, CancellationToken ct = default)
         {
             page = page < 1 ? 1 : page;
             limit = limit < 1 ? 10 : limit;
-
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized GetServices request");
-                return new PaginatedResultDTO<ServiceDTO> { List = new List<ServiceDTO>(), TotalCount = 0, Page = page, Limit = limit };
-            }
 
             var query = _context.Services
                 .AsNoTracking()
@@ -102,15 +87,8 @@ namespace hoteru_be.Services.Queries
             return new PaginatedResultDTO<ServiceDTO> { List = list, TotalCount = total, Page = page, Limit = limit };
         }
 
-        public async Task<MethodResultDTO<ServiceDTO>> GetSpecificService(int idService, CancellationToken ct = default)
+        public async Task<MethodResultDTO<ServiceDTO>> GetSpecificService(int hotelId, int idService, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("GetSpecificService unauthorized for service {ServiceId}", idService);
-                return MethodResultDTO<ServiceDTO>.Unauthorized("HotelId claim missing");
-            }
-
             var dto = await _context.Services
                 .AsNoTracking()
                 .Where(s => s.IdService == idService && s.User.Person.IdHotel == hotelId)

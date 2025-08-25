@@ -1,15 +1,16 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using hoteru_be.DTOs;
+﻿using hoteru_be.DTOs;
 using hoteru_be.Services.Commands;
+using hoteru_be.Services.Common;
 using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace hoteru_be.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "HasHotelId")]
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -35,7 +36,8 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _queries.GetReservations(page, limit, searchQuery, searchField, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetReservations(hotelId, page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
@@ -49,7 +51,8 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _queries.GetHistory(page, limit, searchQuery, searchField, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetHistory(hotelId, page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
@@ -63,7 +66,8 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _queries.GetArrivals(page, limit, searchQuery, searchField, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetArrivals(hotelId, page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
@@ -73,7 +77,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<FullReservationDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSpecificHistory([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _queries.GetSpecificHistory(idReservation, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetSpecificHistory(hotelId, idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -83,7 +88,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO<ArrivalDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSpecificArrival([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _queries.GetSpecificArrival(idReservation, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _queries.GetSpecificArrival(hotelId, idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -94,7 +100,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteSpecificReservation([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _commands.DeleteSpecificReservation(idReservation, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.DeleteSpecificReservation(hotelId, idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -105,7 +112,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PostReservation([FromBody] PostReservationDTO reservationDTO, CancellationToken ct)
         {
-            var result = await _commands.PostReservation(reservationDTO, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.PostReservation(hotelId, reservationDTO, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -117,7 +125,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateReservation([FromBody] ArrivalDTO arrivalDTO, CancellationToken ct)
         {
-            var result = await _commands.UpdateReservation(arrivalDTO, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.UpdateReservation(hotelId, arrivalDTO, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -127,7 +136,8 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ConfirmReservation([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _commands.ConfirmReservation(idReservation, ct);
+            var hotelId = User.GetHotelId();
+            var result = await _commands.ConfirmReservation(hotelId, idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

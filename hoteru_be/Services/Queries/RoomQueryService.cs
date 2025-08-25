@@ -13,31 +13,16 @@ namespace hoteru_be.Services.Queries
     public class RoomQueryService : IRoomQueryService
     {
         private readonly MyDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<RoomQueryService> _logger;
 
-        public RoomQueryService(MyDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<RoomQueryService> logger)
+        public RoomQueryService(MyDbContext context, ILogger<RoomQueryService> logger)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
-        private int? GetHotelIdFromToken()
+        public async Task<List<RoomDTO>> GetFreeRooms(int hotelId, int idRoom, CancellationToken ct = default)
         {
-            var hotelIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("hotelId")?.Value;
-            return int.TryParse(hotelIdClaim, out var hotelId) ? hotelId : null;
-        }
-
-        public async Task<List<RoomDTO>> GetFreeRooms(int idRoom, CancellationToken ct = default)
-        {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized GetFreeRooms request");
-                return new List<RoomDTO>();
-            }
-
             var readyStatusId = await _context.RoomStatuses
                 .AsNoTracking()
                 .Where(s => s.Title == "Ready")
@@ -71,17 +56,10 @@ namespace hoteru_be.Services.Queries
             return list;
         }
 
-        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int page, int limit, string searchQuery = "", string searchField = "number", CancellationToken ct = default)
+        public async Task<PaginatedResultDTO<RoomDTO>> GetRooms(int hotelId, int page, int limit, string searchQuery = "", string searchField = "number", CancellationToken ct = default)
         {
             page = page < 1 ? 1 : page;
             limit = limit < 1 ? 10 : limit;
-
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("Unauthorized GetRooms request");
-                return new PaginatedResultDTO<RoomDTO> { List = new List<RoomDTO>(), TotalCount = 0, Page = page, Limit = limit };
-            }
 
             var query = _context.Rooms
                 .AsNoTracking()
@@ -125,14 +103,8 @@ namespace hoteru_be.Services.Queries
             return new PaginatedResultDTO<RoomDTO> { List = list, TotalCount = total, Page = page, Limit = limit };
         }
 
-        public async Task<MethodResultDTO<SpecificRoomDTO>> GetSpecificRoom(int idRoom, CancellationToken ct = default)
+        public async Task<MethodResultDTO<SpecificRoomDTO>> GetSpecificRoom(int hotelId, int idRoom, CancellationToken ct = default)
         {
-            var hotelId = GetHotelIdFromToken();
-            if (hotelId is null)
-            {
-                _logger.LogWarning("GetSpecificRoom unauthorized for room {RoomId}", idRoom);
-                return MethodResultDTO<SpecificRoomDTO>.Unauthorized("HotelId claim missing");
-            }
 
             var dto = await _context.Rooms
                 .AsNoTracking()
