@@ -7,14 +7,14 @@ using hoteru_be.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Queries
 {
-    public class RoomStatusService : IRoomStatusService
+    public class RoomStatusQueryService : IRoomStatusQueryService
     {
         private readonly MyDbContext _context;
-        private readonly ILogger<RoomStatusService> _logger;
+        private readonly ILogger<RoomStatusQueryService> _logger;
 
-        public RoomStatusService(MyDbContext context, ILogger<RoomStatusService> logger)
+        public RoomStatusQueryService(MyDbContext context, ILogger<RoomStatusQueryService> logger)
         {
             _context = context;
             _logger = logger;

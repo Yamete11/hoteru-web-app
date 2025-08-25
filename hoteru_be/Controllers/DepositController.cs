@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +13,9 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class DepositController : ControllerBase
     {
-        private readonly IDepositService _service;
+        private readonly IDepositQueryService _service;
 
-        public DepositController(IDepositService service)
+        public DepositController(IDepositQueryService service)
         {
             _service = service;
         }

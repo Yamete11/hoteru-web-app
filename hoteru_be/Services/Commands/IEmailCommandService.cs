@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public interface IEmailService
+    public interface IEmailCommandService
     {
         Task SendEmailAsync(string email, string subject, string message, CancellationToken ct);
     }

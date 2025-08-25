@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class HotelController : ControllerBase
     {
-        private readonly IHotelService _service;
+        private readonly IHotelCommandService _service;
 
-        public HotelController(IHotelService service)
+        public HotelController(IHotelCommandService service)
         {
             _service = service;
         }

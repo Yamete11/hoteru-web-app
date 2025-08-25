@@ -14,16 +14,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public class AuthService : IAuthService
+    public class AuthCommandService : IAuthCommandService
     {
         private readonly MyDbContext _context;
         private readonly IConfiguration _config;
         private readonly IPasswordHasher<User> _hasher;
-        private readonly ILogger<AuthService> _logger;
+        private readonly ILogger<AuthCommandService> _logger;
 
-        public AuthService(MyDbContext context, IConfiguration config, IPasswordHasher<User> hasher, ILogger<AuthService> logger)
+        public AuthCommandService(MyDbContext context, IConfiguration config, IPasswordHasher<User> hasher, ILogger<AuthCommandService> logger)
         {
             _context = context;
             _config = config;

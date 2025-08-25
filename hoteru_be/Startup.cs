@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using hoteru_be.Services.Queries;
+using hoteru_be.Services.Commands;
 
 namespace hoteru_be
 {
@@ -27,20 +29,20 @@ namespace hoteru_be
 
             services.AddHttpContextAccessor();
 
-            services.AddScoped<IHotelService, HotelService>();
+            services.AddScoped<IHotelCommandService, HotelCommandService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IGuestService, GuestService>();
-            services.AddScoped<IRoomTypeService, RoomTypeService>();
-            services.AddScoped<IRoomStatusService, RoomStatusService>();
-            services.AddTransient<IEmailService, EmailService>();
+            services.AddScoped<IRoomTypeQueryService, RoomTypeQueryService>();
+            services.AddScoped<IRoomStatusQueryService, RoomStatusQueryService>();
+            services.AddTransient<IEmailCommandService, EmailCommandService>();
             services.AddScoped<IReservationService, ReservationService>();
-            services.AddScoped<IGuestStatusService, GuestStatusService>();
-            services.AddScoped<IDepositTypeService, DepositTypeService>();
+            services.AddScoped<IGuestStatusQueryService, GuestStatusQueryService>();
+            services.AddScoped<IDepositTypeQueryService, DepositTypeQueryService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserTypeService, UserTypeService>();
-            services.AddScoped<IDepositService, DepositService>();
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserTypeQueryService, UserTypeQueryService>();
+            services.AddScoped<IDepositQueryService, DepositQueryService>();
+            services.AddScoped<IAuthCommandService, AuthCommandService>();
             services.AddScoped<IPasswordHasher<Entities.User>, PasswordHasher<Entities.User>>();
 
             services.AddControllers();

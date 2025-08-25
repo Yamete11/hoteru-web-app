@@ -1,18 +1,17 @@
-﻿using hoteru_be.Services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public class EmailService : IEmailService
+    public class EmailCommandService : IEmailCommandService
     {
         private readonly IConfiguration _configuration;
 
-        public EmailService(IConfiguration configuration)
+        public EmailCommandService(IConfiguration configuration)
         {
             _configuration = configuration;
         }

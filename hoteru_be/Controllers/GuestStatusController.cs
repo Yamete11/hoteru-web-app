@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +14,9 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class GuestStatusController : ControllerBase
     {
-        private readonly IGuestStatusService _service;
+        private readonly IGuestStatusQueryService _service;
 
-        public GuestStatusController(IGuestStatusService service)
+        public GuestStatusController(IGuestStatusQueryService service)
         {
             _service = service;
         }

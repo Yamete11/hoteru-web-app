@@ -4,35 +4,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.Context;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Queries
 {
-    public class DepositTypeService : IDepositTypeService
+    public class UserTypeQueryService : IUserTypeQueryService
     {
         private readonly MyDbContext _context;
-        private readonly ILogger<DepositTypeService> _logger;
+        private readonly ILogger<UserTypeQueryService> _logger;
 
-        public DepositTypeService(MyDbContext context, ILogger<DepositTypeService> logger)
+        public UserTypeQueryService(MyDbContext context, ILogger<UserTypeQueryService> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task<MethodResultDTO<List<TypeDTO>>> GetDepositTypes(CancellationToken ct)
+        public async Task<MethodResultDTO<List<TypeDTO>>> GetUserTypes(CancellationToken ct)
         {
-            var list = await _context.DepositTypes
+            var list = await _context.UserTypes
                 .AsNoTracking()
                 .Select(x => new TypeDTO
                 {
-                    IdType = x.IdDepositType,
-                    Title = x.Title
+                    IdType = x.IdUserType,
+                    Title = x.Title,
                 })
                 .ToListAsync(ct);
 
-            _logger.LogInformation("Fetched {Count} deposit types", list.Count);
+            _logger.LogInformation("Fetched {Count} user types", list.Count);
             return MethodResultDTO<List<TypeDTO>>.Ok(list, "Fetched");
         }
     }

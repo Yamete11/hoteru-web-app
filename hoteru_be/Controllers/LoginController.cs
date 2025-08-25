@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +13,9 @@ namespace hoteru_be.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IAuthCommandService _authService;
 
-        public LoginController(IAuthService authService)
+        public LoginController(IAuthCommandService authService)
         {
             _authService = authService;
         }

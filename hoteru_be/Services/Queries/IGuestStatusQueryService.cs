@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Queries
 {
-    public interface IGuestStatusService
+    public interface IGuestStatusQueryService
     {
         Task<MethodResultDTO<List<StatusDTO>>> GetGuestStatuses(CancellationToken ct);
     }

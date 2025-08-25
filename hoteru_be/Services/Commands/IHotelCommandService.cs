@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public interface IHotelService
+    public interface IHotelCommandService
     {
         Task<MethodResultDTO> PostHotel(HotelDTO hotelDTO, CancellationToken ct);
 

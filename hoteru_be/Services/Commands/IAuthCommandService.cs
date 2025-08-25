@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public interface IAuthService
+    public interface IAuthCommandService
     {
         Task<MethodResultDTO<AuthResponseDTO>> AuthenticateAsync(LoginDTO dto, CancellationToken ct = default);
     }

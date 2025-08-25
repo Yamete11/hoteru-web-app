@@ -4,18 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.Context;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Queries
 {
-    public class GuestStatusService : IGuestStatusService
+    public class GuestStatusQueryService : IGuestStatusQueryService
     {
         private readonly MyDbContext _context;
-        private readonly ILogger<GuestStatusService> _logger;
+        private readonly ILogger<GuestStatusQueryService> _logger;
 
-        public GuestStatusService(MyDbContext context, ILogger<GuestStatusService> logger)
+        public GuestStatusQueryService(MyDbContext context, ILogger<GuestStatusQueryService> logger)
         {
             _context = context;
             _logger = logger;

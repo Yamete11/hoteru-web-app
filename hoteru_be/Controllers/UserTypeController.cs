@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +14,9 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class UserTypeController : ControllerBase
     {
-        private readonly IUserTypeService _service;
+        private readonly IUserTypeQueryService _service;
 
-        public UserTypeController(IUserTypeService service)
+        public UserTypeController(IUserTypeQueryService service)
         {
             _service = service;
         }

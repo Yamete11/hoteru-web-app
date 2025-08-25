@@ -1,7 +1,6 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
-using hoteru_be.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,15 +11,15 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Commands
 {
-    public class HotelService : IHotelService
+    public class HotelCommandService : IHotelCommandService
     {
         private readonly MyDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly ILogger<HotelService> _logger;
+        private readonly IEmailCommandService _emailService;
+        private readonly ILogger<HotelCommandService> _logger;
 
-        public HotelService(MyDbContext context, IEmailService emailService, ILogger<HotelService> logger)
+        public HotelCommandService(MyDbContext context, IEmailCommandService emailService, ILogger<HotelCommandService> logger)
         {
             _context = context;
             _emailService = emailService;

@@ -1,20 +1,19 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace hoteru_be.Services
+namespace hoteru_be.Services.Queries
 {
-    public class DepositService : IDepositService
+    public class DepositQueryService : IDepositQueryService
     {
         private readonly MyDbContext _context;
-        private readonly ILogger<DepositService> _logger;
+        private readonly ILogger<DepositQueryService> _logger;
 
-        public DepositService(MyDbContext context, ILogger<DepositService> logger)
+        public DepositQueryService(MyDbContext context, ILogger<DepositQueryService> logger)
         {
             _context = context;
             _logger = logger;
