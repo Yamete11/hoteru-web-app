@@ -6575,23 +6575,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\Glebasher\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+      "projectUniqueName": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
       "projectName": "hoteru_be",
-      "projectPath": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\obj\\",
+      "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+      "packagesPath": "C:\\Users\\Glebasher\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Glebasher\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

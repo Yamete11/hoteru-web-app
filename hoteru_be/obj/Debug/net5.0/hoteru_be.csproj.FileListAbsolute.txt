@@ -20,7 +20,6 @@ C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.M
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\scopedcss\bundle\hoteru_be.styles.css
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\hoteru_be.StaticWebAssets.Manifest.cache
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.RazorTargetAssemblyInfo.cache
-C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.csproj.CopyComplete
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\refint\hoteru_be.dll
 C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.pdb
@@ -152,3 +151,10 @@ C:\Users\user\Desktop\hoteru\hoteru-web-app\hoteru_be\obj\Debug\net5.0\refint\ho
 C:\Users\user\Desktop\hoteru\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.pdb
 C:\Users\user\Desktop\hoteru\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.genruntimeconfig.cache
 C:\Users\user\Desktop\hoteru\hoteru-web-app\hoteru_be\obj\Debug\net5.0\ref\hoteru_be.dll
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.sourcelink.json
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\hoteru_be.StaticWebAssets.Pack.cache
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\msbuild.hoteru_be.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\msbuild.build.hoteru_be.props
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\msbuild.buildMultiTargeting.hoteru_be.props
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\staticwebassets\msbuild.buildTransitive.hoteru_be.props
+C:\Users\Glebasher\Desktop\hoteru-web-app\hoteru_be\obj\Debug\net5.0\hoteru_be.csproj.Up2Date

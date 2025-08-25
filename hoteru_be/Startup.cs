@@ -29,17 +29,22 @@ namespace hoteru_be
 
             services.AddHttpContextAccessor();
 
+            services.AddScoped<IReservationQueryService, ReservationQueryService>();
+            services.AddScoped<IReservationCommandService, ReservationCommandService>();
             services.AddScoped<IHotelCommandService, HotelCommandService>();
-            services.AddScoped<IRoomService, RoomService>();
-            services.AddScoped<IServiceService, ServiceService>();
-            services.AddScoped<IGuestService, GuestService>();
+            services.AddScoped<IRoomQueryService, RoomQueryService>();
+            services.AddScoped<IRoomCommandService, RoomCommandService>();
+            services.AddScoped<IServiceCommandService, ServiceCommandService>();
+            services.AddScoped<IServiceQueryService, ServiceQueryService>();
+            services.AddScoped<IUserQueryService, UserQueryService>();
+            services.AddScoped<IUserCommandService, UserCommandService>();
+            services.AddScoped<IGuestCommandService, GuestCommandService>();
+            services.AddScoped<IGuestQueryService, GuestQueryService>();
             services.AddScoped<IRoomTypeQueryService, RoomTypeQueryService>();
             services.AddScoped<IRoomStatusQueryService, RoomStatusQueryService>();
             services.AddTransient<IEmailCommandService, EmailCommandService>();
-            services.AddScoped<IReservationService, ReservationService>();
             services.AddScoped<IGuestStatusQueryService, GuestStatusQueryService>();
             services.AddScoped<IDepositTypeQueryService, DepositTypeQueryService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserTypeQueryService, UserTypeQueryService>();
             services.AddScoped<IDepositQueryService, DepositQueryService>();
             services.AddScoped<IAuthCommandService, AuthCommandService>();

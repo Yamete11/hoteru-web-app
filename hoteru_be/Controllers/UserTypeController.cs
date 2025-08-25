@@ -14,11 +14,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class UserTypeController : ControllerBase
     {
-        private readonly IUserTypeQueryService _service;
+        private readonly IUserTypeQueryService _queries;
 
-        public UserTypeController(IUserTypeQueryService service)
+        public UserTypeController(IUserTypeQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<TypeDTO>>> GetUserTypes(CancellationToken ct)
         {
-            var list = await _service.GetUserTypes(ct);
+            var list = await _queries.GetUserTypes(ct);
             return Ok(list);
         }
     }

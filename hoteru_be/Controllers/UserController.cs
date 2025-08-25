@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Commands;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,42 +17,44 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _service;
+        private readonly IUserQueryService _queries;
+        private readonly IUserCommandService _commands;
 
-        public UserController(IUserService service)
+        public UserController(IUserQueryService queries, IUserCommandService commands)
         {
-            _service = service;
+            _queries = queries;
+            _commands = commands;
         }
 
         [HttpGet("{login}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MethodResultDTO<UserDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<UserDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<UserDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUser([FromRoute] string login, CancellationToken ct)
         {
-            var result = await _service.GetUser(login, ct);
+            var result = await _queries.GetUser(login, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpGet("fullUser/{idUser:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MethodResultDTO<FullUserDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<FullUserDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<FullUserDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetFullUser([FromRoute] int idUser, CancellationToken ct)
         {
-            var result = await _service.GetFullUser(idUser, ct);
+            var result = await _queries.GetFullUser(idUser, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin,Superadmin")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<List<ListUserDTO>>> GetUsers(CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO<List<ListUserDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<List<ListUserDTO>>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<List<ListUserDTO>>), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetUsers(CancellationToken ct)
         {
-            var users = await _service.GetUsers(ct);
-            return Ok(users);
+            var result = await _queries.GetUsers(ct);
+            return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPost]
@@ -79,20 +82,20 @@ namespace hoteru_be.Controllers
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
 
-            var result = await _service.PostUser(dto, ct);
+            var result = await _commands.PostUser(dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPut]
         [Authorize]
         [Consumes("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto, CancellationToken ct)
         {
             if (!ModelState.IsValid)
@@ -108,7 +111,7 @@ namespace hoteru_be.Controllers
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
 
-            var result = await _service.UpdateUser(dto, ct);
+            var result = await _commands.UpdateUser(dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -120,7 +123,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser([FromRoute] int idPerson, CancellationToken ct)
         {
-            var result = await _service.DeleteUser(idPerson, ct);
+            var result = await _commands.DeleteUser(idPerson, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

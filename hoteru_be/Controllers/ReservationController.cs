@@ -1,7 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Commands;
+using hoteru_be.Services.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,17 +12,21 @@ namespace hoteru_be.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ReservationController : ControllerBase
     {
-        private readonly IReservationService _service;
+        private readonly IReservationQueryService _queries;
+        private readonly IReservationCommandService _commands;
 
-        public ReservationController(IReservationService service)
+        public ReservationController(IReservationQueryService queries, IReservationCommandService commands)
         {
-            _service = service;
+            _queries = queries;
+            _commands = commands;
         }
 
+
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResultDTO<ReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<PaginatedResultDTO<ReservationDTO>>> GetReservations(
             [FromQuery] int page = 1,
@@ -30,12 +35,12 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _service.GetReservations(page, limit, searchQuery, searchField, ct);
+            var result = await _queries.GetReservations(page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
         [HttpGet("history")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResultDTO<ReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<PaginatedResultDTO<ReservationDTO>>> GetHistory(
             [FromQuery] int page = 1,
@@ -44,13 +49,12 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _service.GetHistory(page, limit, searchQuery, searchField, ct);
+            var result = await _queries.GetHistory(page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
-
         [HttpGet("arrivals")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResultDTO<ReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<PaginatedResultDTO<ReservationDTO>>> GetArrivals(
             [FromQuery] int page = 1,
@@ -59,72 +63,71 @@ namespace hoteru_be.Controllers
             [FromQuery] string searchField = "",
             CancellationToken ct = default)
         {
-            var result = await _service.GetArrivals(page, limit, searchQuery, searchField, ct);
+            var result = await _queries.GetArrivals(page, limit, searchQuery, searchField, ct);
             return Ok(result);
         }
 
-
         [HttpGet("history/{idReservation:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetSpecificHistory(int idReservation, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO<FullReservationDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<FullReservationDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<FullReservationDTO>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSpecificHistory([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _service.GetSpecificHistory(idReservation, ct);
+            var result = await _queries.GetSpecificHistory(idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpGet("arrival/{idReservation:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetSpecificArrival(int idReservation, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO<ArrivalDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<ArrivalDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<ArrivalDTO>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSpecificArrival([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _service.GetSpecificArrival(idReservation, ct);
+            var result = await _queries.GetSpecificArrival(idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
 
         [HttpDelete("{idReservation:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteSpecificReservation(int idReservation, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteSpecificReservation([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _service.DeleteSpecificReservation(idReservation, ct);
+            var result = await _commands.DeleteSpecificReservation(idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PostReservation([FromBody] PostReservationDTO reservationDTO, CancellationToken ct)
         {
-            var result = await _service.PostReservation(reservationDTO, ct);
+            var result = await _commands.PostReservation(reservationDTO, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
-
 
         [HttpPut]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateReservation([FromBody] ArrivalDTO arrivalDTO, CancellationToken ct)
         {
-            var result = await _service.UpdateReservation(arrivalDTO, ct);
+            var result = await _commands.UpdateReservation(arrivalDTO, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
-
         [HttpPut("confirm/{idReservation:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ConfirmReservation(int idReservation, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ConfirmReservation([FromRoute] int idReservation, CancellationToken ct)
         {
-            var result = await _service.ConfirmReservation(idReservation, ct);
+            var result = await _commands.ConfirmReservation(idReservation, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

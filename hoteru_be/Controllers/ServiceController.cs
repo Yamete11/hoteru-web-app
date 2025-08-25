@@ -1,7 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using hoteru_be.DTOs;
-using hoteru_be.Services;
+using hoteru_be.Services.Queries;
+using hoteru_be.Services.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,18 +12,21 @@ namespace hoteru_be.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ServiceController : ControllerBase
     {
-        private readonly IServiceService _service;
+        private readonly IServiceQueryService _queries;
+        private readonly IServiceCommandService _commands;
 
-        public ServiceController(IServiceService service)
+        public ServiceController(IServiceQueryService queries, IServiceCommandService commands)
         {
-            _service = service;
+            _queries = queries;
+            _commands = commands;
         }
 
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResultDTO<ServiceDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<PaginatedResultDTO<ServiceDTO>>> GetServices(
             [FromQuery] int page = 1,
@@ -31,53 +35,54 @@ namespace hoteru_be.Controllers
             [FromQuery] string? searchQuery = null,
             CancellationToken ct = default)
         {
-            var result = await _service.GetServices(page, limit, searchField ?? "", searchQuery ?? "", ct);
+            var result = await _queries.GetServices(page, limit, searchField ?? "", searchQuery ?? "", ct);
             return Ok(result);
         }
 
-
         [HttpGet("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetSpecificService(int id, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO<ServiceDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO<ServiceDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO<ServiceDTO>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSpecificService([FromRoute] int id, CancellationToken ct)
         {
-            var result = await _service.GetSpecificService(id, ct);
+            var result = await _queries.GetSpecificService(id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> PostService([FromBody] ServiceDTO dto, CancellationToken ct)
         {
-            var result = await _service.PostService(dto, ct);
+            var result = await _commands.PostService(dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
-
 
         [HttpPut("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateService(int id, [FromBody] ServiceDTO dto, CancellationToken ct)
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> UpdateService([FromRoute] int id, [FromBody] ServiceDTO dto, CancellationToken ct)
         {
             dto.IdService = id;
-            var result = await _service.UpdateService(dto, ct);
+            var result = await _commands.UpdateService(dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
-
         [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteService(int id, CancellationToken ct)
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MethodResultDTO), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteService([FromRoute] int id, CancellationToken ct)
         {
-            var result = await _service.DeleteService(id, ct);
+            var result = await _commands.DeleteService(id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

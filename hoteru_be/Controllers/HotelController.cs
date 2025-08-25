@@ -12,11 +12,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class HotelController : ControllerBase
     {
-        private readonly IHotelCommandService _service;
+        private readonly IHotelCommandService _commands;
 
-        public HotelController(IHotelCommandService service)
+        public HotelController(IHotelCommandService commands)
         {
-            _service = service;
+            _commands = commands;
         }
 
 
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostHotel([FromBody] HotelDTO hotelDTO, CancellationToken ct)
         {
-            var result = await _service.PostHotel(hotelDTO, ct);
+            var result = await _commands.PostHotel(hotelDTO, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
@@ -37,7 +37,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteHotel([FromBody] DeleteHotelRequestDTO request, CancellationToken ct)
         {
-            var result = await _service.DeleteHotel(request.HotelTitle, ct);
+            var result = await _commands.DeleteHotel(request.HotelTitle, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

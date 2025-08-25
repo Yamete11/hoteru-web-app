@@ -13,11 +13,11 @@ namespace hoteru_be.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IAuthCommandService _authService;
+        private readonly IAuthCommandService _commands;
 
-        public LoginController(IAuthCommandService authService)
+        public LoginController(IAuthCommandService commands)
         {
-            _authService = authService;
+            _commands = commands;
         }
 
         [HttpPost]
@@ -25,7 +25,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Post([FromBody] LoginDTO dto, CancellationToken ct)
         {
-            var result = await _authService.AuthenticateAsync(dto, ct);
+            var result = await _commands.AuthenticateAsync(dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

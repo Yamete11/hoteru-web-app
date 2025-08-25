@@ -14,11 +14,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class GuestStatusController : ControllerBase
     {
-        private readonly IGuestStatusQueryService _service;
+        private readonly IGuestStatusQueryService _queries;
 
-        public GuestStatusController(IGuestStatusQueryService service)
+        public GuestStatusController(IGuestStatusQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<StatusDTO>>> GetGuestStatuses(CancellationToken ct)
         {
-            var list = await _service.GetGuestStatuses(ct);
+            var list = await _queries.GetGuestStatuses(ct);
             return Ok(list);
         }
     }

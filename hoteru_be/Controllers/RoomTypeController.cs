@@ -14,11 +14,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class RoomTypeController : ControllerBase
     {
-        private readonly IRoomTypeQueryService _service;
+        private readonly IRoomTypeQueryService _queries;
 
-        public RoomTypeController(IRoomTypeQueryService service)
+        public RoomTypeController(IRoomTypeQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<TypeDTO>>> GetRoomTypes(CancellationToken ct)
         {
-            var list = await _service.GetRoomTypes(ct);
+            var list = await _queries.GetRoomTypes(ct);
             return Ok(list);
         }
     }

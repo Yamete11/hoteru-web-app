@@ -14,11 +14,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class RoomStatusController : ControllerBase
     {
-        private readonly IRoomStatusQueryService _service;
+        private readonly IRoomStatusQueryService _queries;
 
-        public RoomStatusController(IRoomStatusQueryService service)
+        public RoomStatusController(IRoomStatusQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<StatusDTO>>> GetRoomStatuses(CancellationToken ct)
         {
-            var list = await _service.GetRoomStatuses(ct);
+            var list = await _queries.GetRoomStatuses(ct);
             return Ok(list);
         }
     }

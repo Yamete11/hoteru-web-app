@@ -13,11 +13,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class DepositController : ControllerBase
     {
-        private readonly IDepositQueryService _service;
+        private readonly IDepositQueryService _queries;
 
-        public DepositController(IDepositQueryService service)
+        public DepositController(IDepositQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet("{id:int}")]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDeposit(int id, CancellationToken ct)
         {
-            var result = await _service.GetDeposit(id, ct);
+            var result = await _queries.GetDeposit(id, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
     }

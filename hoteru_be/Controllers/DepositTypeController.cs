@@ -14,11 +14,11 @@ namespace hoteru_be.Controllers
     [Route("api/[controller]")]
     public class DepositTypeController : ControllerBase
     {
-        private readonly IDepositTypeQueryService _service;
+        private readonly IDepositTypeQueryService _queries;
 
-        public DepositTypeController(IDepositTypeQueryService service)
+        public DepositTypeController(IDepositTypeQueryService queries)
         {
-            _service = service;
+            _queries = queries;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace hoteru_be.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<TypeDTO>>> GetDepositTypes(CancellationToken ct)
         {
-            var list = await _service.GetDepositTypes(ct);
+            var list = await _queries.GetDepositTypes(ct);
             return Ok(list);
         }
     }
