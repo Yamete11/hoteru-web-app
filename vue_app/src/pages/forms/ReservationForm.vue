@@ -140,33 +140,65 @@
         <div class="guest">
           <label>Guest personal information</label>
           <div class="input-form">
-            <label>Guest Selection: </label>
-            <template v-if="!state.isEditing && !state.isCreate">
-              <input class="input" type="text" :value="selectedGuestLabel" readonly />
-            </template>
-            <template v-else>
-              <select
-                  v-model.number="uiForm.idGuest"
-                  class="input"
-                  @change="touchField('idGuest')"
-                  data-testid="guest-select"
-              >
-                <option disabled :value="0">Select a guest</option>
-                <option
-                    v-for="guest in state.guests"
-                    :key="guest.idPerson"
-                    :value="Number(guest.idPerson)"
-                    data-testid="guest-option"
+            <template v-if="state.isEditing || state.isCreate">
+              <template v-if="!state.guestAttached">
+                <label>Guest Selection:</label>
+                <select
+                    v-model.number="uiForm.idGuest"
+                    class="input"
+                    @change="touchField('idGuest')"
+                    data-testid="guest-select"
                 >
-                  {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
-                </option>
-              </select>
+                  <option disabled :value="0">Select a guest</option>
+                  <option
+                      v-for="guest in state.guests"
+                      :key="guest.idPerson"
+                      :value="Number(guest.idPerson)"
+                      data-testid="guest-option"
+                  >
+                    {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
+                  </option>
+                </select>
+                <span class="error-message" v-if="v$.uiForm.idGuest.$error">
+                  {{ v$.uiForm.idGuest.$errors[0]?.$message || 'The field is required*' }}
+                </span>
+                <span class="error-message" v-if="state.errors.IdGuest">{{ state.errors.IdGuest[0] }}</span>
+
+                <button
+                    class="form-btn"
+                    type="button"
+                    @click.prevent="addGuest"
+                    :disabled="!uiForm.idGuest"
+                >
+                  Add guest
+                </button>
+              </template>
+
+              <template v-else>
+                <div class="card guest-card">
+                  <div class="guest-row">
+                    <span class="guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
+                    <span class="guest-passport">{{ selectedGuest?.passport }}</span>
+                  </div>
+                  <div class="guest-row muted">
+                    <span v-if="selectedGuest?.email">✉️ {{ selectedGuest.email }}</span>
+                  </div>
+                </div>
+                <button class="form-btn danger" type="button" @click.prevent="removeGuest">Remove guest</button>
+              </template>
             </template>
-            <span class="error-message" v-if="v$.uiForm.idGuest.$error">
-              {{ v$.uiForm.idGuest.$errors[0]?.$message || 'The field is required*' }}
-            </span>
-            <span class="error-message" v-if="state.errors.IdGuest">{{ state.errors.IdGuest[0] }}</span>
-            <router-link v-if="state.isEditing || state.isCreate" class="form-btn" to="/new-guest">Add new guest</router-link>
+
+            <template v-else>
+              <div class="card guest-card">
+                <div class="guest-row">
+                  <span class="guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
+                  <span class="guest-passport">{{ selectedGuest?.passport }}</span>
+                </div>
+                <div class="guest-row muted">
+                  <span v-if="selectedGuest?.email">✉️ {{ selectedGuest.email }}</span>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -228,10 +260,11 @@
             <button
                 v-if="state.isEditing || state.isCreate"
                 @click.prevent="toggleDeposit"
-                class="form-btn"
+                :class="state.hasDeposit ? 'form-btn danger' : 'form-btn'"
                 data-testid="add-deposit-btn"
+                type="button"
             >
-              {{ state.hasDeposit ? 'Delete deposit' : 'Add deposit' }}
+              {{ state.hasDeposit ? 'Remove deposit' : 'Add deposit' }}
             </button>
           </div>
         </div>
@@ -249,7 +282,7 @@
                 class="input"
                 data-testid="service-select"
             >
-              <option disabled value="" selected>Select a service</option>
+              <option disabled value="0">Select a service</option>
               <option
                   v-for="service in state.services"
                   :key="service.idService"
@@ -259,13 +292,20 @@
                 {{ service.title }}: {{ service.sum }}
               </option>
             </select>
-            <button v-if="state.isEditing || state.isCreate" @click.prevent="addService" class="form-btn">Add</button>
+            <button
+                v-if="state.isEditing || state.isCreate"
+                @click.prevent="addService"
+                class="form-btn"
+                type="button"
+            >
+              Add
+            </button>
 
             <div class="service-list" v-if="uiForm.services.length > 0">
               <ul class="added-services-list">
                 <li class="element" v-for="(service, index) in uiForm.services" :key="index">
                   <span>{{ service.title }}: {{ service.sum }}</span>
-                  <button class="btn" v-if="state.isEditing || state.isCreate" @click.prevent="removeService(index)">Remove</button>
+                  <button class="btn" v-if="state.isEditing || state.isCreate" @click.prevent="removeService(index)" type="button">Remove</button>
                 </li>
               </ul>
             </div>
@@ -351,13 +391,15 @@ export default {
       guests: [],
       depositTypes: [],
       services: [],
-      selectedService: null,
+      selectedService: 0,
       errors: {},
       hasDeposit: false,
+      guestAttached: false, // <— управляет карточкой гостя
     });
 
     const uiForm = state.uiForm;
 
+    // ---- Validation helpers
     const afterInMessage = helpers.withMessage(
         'The out date must be after the in date*',
         (val) => !!val && new Date(val) > new Date(uiForm.in)
@@ -397,6 +439,7 @@ export default {
     };
     const v$ = useVuelidate(rules, state);
 
+    // ---- Data fetching
     async function fetchCommon() {
       const [roomTypes, guestList, depositTypes, serviceList] = await Promise.all([
         roomsApi.types(),
@@ -430,6 +473,7 @@ export default {
       uiForm.services = Array.isArray(r.services) ? r.services : [];
 
       state.hasDeposit = Number(uiForm.idDepositType) > 0 || Number(uiForm.depositSum) > 0;
+      state.guestAttached = uiForm.idGuest > 0;
 
       state.rooms = toArray(await roomsApi.free(uiForm.idRoom));
 
@@ -437,6 +481,7 @@ export default {
       recalcPrice();
     }
 
+    // ---- Computed
     const selectedRoomTypeTitle = computed(() => {
       const item = (state.roomTypes || []).find((t) => String(t.idType) === String(uiForm.idRoomType));
       return item?.title ?? '';
@@ -452,8 +497,12 @@ export default {
       return r ? `${r.number} - Capacity: ${r.capacity}` : '';
     });
 
+    const selectedGuest = computed(() => {
+      return (state.guests || []).find((x) => String(x.idPerson) === String(uiForm.idGuest)) || null;
+    });
+
     const selectedGuestLabel = computed(() => {
-      const g = (state.guests || []).find((x) => String(x.idPerson) === String(uiForm.idGuest));
+      const g = selectedGuest.value;
       return g ? `${g.name} ${g.surname}, ${g.passport}` : '';
     });
 
@@ -478,6 +527,7 @@ export default {
       return '';
     });
 
+    // ---- Watchers
     watch(
         () => uiForm.in,
         (newIn) => {
@@ -504,6 +554,7 @@ export default {
     }
     watch(() => [uiForm.in, uiForm.out, uiForm.idRoom], recalcPrice, { deep: true });
 
+    // ---- UI helpers
     function touchField(name) {
       const node = v$.value?.uiForm?.[name];
       if (node && typeof node.$touch === 'function') node.$touch();
@@ -531,9 +582,23 @@ export default {
       nextTick().then(resetDepositValidation);
     }
 
+    // ---- Guest attach/detach
+    function addGuest() {
+      touchField('idGuest');
+      if (v$.value?.uiForm?.idGuest?.$invalid) return;
+      state.guestAttached = true;
+    }
+    function removeGuest() {
+      state.guestAttached = false;
+      uiForm.idGuest = 0;
+      delete state.errors.IdGuest;
+      v$.value?.uiForm?.idGuest?.$reset?.();
+    }
+
+    // ---- Services
     function addService() {
       const s = state.selectedService;
-      if (!s) return;
+      if (!s || s === 0) return;
       const exists = uiForm.services.some((x) => String(x.idService) === String(s.idService));
       if (!exists) uiForm.services.push(s);
     }
@@ -567,6 +632,7 @@ export default {
             IdUser: Number(store.getters.getUserData?.idUser),
             Services: rawServices.map((s) => ({ IdService: Number(s.idService ?? s.IdService) })),
           };
+          console.log(payload);
 
           const res = await reservations.create(payload);
           const body = res?.data ?? res ?? {};
@@ -645,6 +711,7 @@ export default {
       Object.assign(state.uiForm, defaultUiForm());
       state.errors = {};
       state.hasDeposit = false;
+      state.guestAttached = false;
       v$.value.$reset();
     }
 
@@ -689,6 +756,7 @@ export default {
       selectedDepositTypeTitle,
       selectedRoomLabel,
       selectedGuestLabel,
+      selectedGuest,
       sortedFilteredRooms,
       toggleDeposit,
       addService,
@@ -697,6 +765,8 @@ export default {
       toggleEdit,
       confirmReservation,
       touchField,
+      addGuest,
+      removeGuest,
     };
   },
 };
@@ -792,6 +862,9 @@ h1 {
   height: 44px;
   box-sizing: border-box;
 }
+.form-btn.danger {
+  background-color: #b35252;
+}
 .error-message {
   color: red;
   margin: 10px 0;
@@ -861,6 +934,35 @@ h1 {
   color: #fff;
   cursor: pointer;
   transition: background-color .3s ease;
+}
+
+/* guest summary card */
+.card.guest-card {
+  background: #C8B6A6;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 8px 0 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.guest-row {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.guest-name {
+  font-weight: 700;
+}
+.guest-passport {
+  font-weight: 600;
+}
+.muted {
+  opacity: .85;
+  font-size: .95rem;
 }
 
 @media (max-width: 768px) {
