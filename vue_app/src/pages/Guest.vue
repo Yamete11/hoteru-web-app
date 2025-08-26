@@ -1,6 +1,5 @@
 <template>
   <div class="guest-component">
-    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -31,7 +30,7 @@
           </div>
           <div v-if="!isLoading">
             <guest-list :guests="guests" @deleteGuest="deleteGuest" @notificationDeleteAttempt="showGuestDeletedNotification"/>
-            <div v-intersection="loadMore" class="observer"></div>
+            <div :key="`${searchField}:${searchQuery}`" v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
             <div>The list is loading...</div>
@@ -45,6 +44,7 @@
 <script>
 import { notify } from "@kyvg/vue3-notification";
 import { guests } from "@/api";
+import debounce from "lodash.debounce";
 
 export default {
   name: "Guest",
@@ -53,53 +53,71 @@ export default {
       isLoading: false,
       isLoadingMore: false,
       guests: [],
-      searchQuery: '',
-      searchField: 'name',
+      searchQuery: "",
+      searchField: "name",
       page: 1,
       limit: 15,
       totalGuests: 0,
-      isGuestDeletedNotificationVisible: false
+      isGuestDeletedNotificationVisible: false,
+
+      _debouncedFetch: null,
+      _requestId: 0,
     };
   },
+
+  created() {
+    this._debouncedFetch = debounce(() => this.fetchGuests(), 350);
+  },
+
   mounted() {
     this.fetchGuests();
 
-    if (this.$route.query.created === 'true') {
+    if (this.$route.query.created === "true") {
       notify({
         title: "Guest Created",
         text: "The new guest has been successfully created.",
         type: "success",
         duration: 3000,
       });
-
       this.$router.replace({ query: {} });
     }
   },
-  watch: {
-    searchQuery: 'fetchGuests',
-    searchField: 'fetchGuests',
+
+  beforeUnmount() {
+    this._debouncedFetch?.cancel?.();
   },
+
+  watch: {
+    searchQuery() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
+    searchField() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
+  },
+
   methods: {
     showGuestDeletedNotification() {
       if (this.isGuestDeletedNotificationVisible) return;
 
       this.isGuestDeletedNotificationVisible = true;
-
       notify({
         title: "Guest Deleted",
         text: "Guest has been deleted. All associated reservations were also removed.",
         type: "success",
         duration: 3000,
       });
+      setTimeout(() => { this.isGuestDeletedNotificationVisible = false; }, 3000);
+    },
 
-      setTimeout(() => {
-        this.isGuestDeletedNotificationVisible = false;
-      }, 3000);
-    },
     deleteGuest(idPerson) {
-      this.guests = this.guests.filter(guest => guest.idPerson !== idPerson);
+      this.guests = this.guests.filter(g => g.idPerson !== idPerson);
     },
+
     async fetchGuests() {
+      const rid = ++this._requestId;
       try {
         this.isLoading = true;
         this.page = 1;
@@ -107,25 +125,26 @@ export default {
         const data = await guests.list({
           page: this.page,
           limit: this.limit,
-          searchQuery: this.searchQuery,
+          searchQuery: this.searchQuery?.trim(),
           searchField: this.searchField,
         });
-        console.log(data);
+
+        if (rid !== this._requestId) return;
+
         this.guests = data?.list ?? [];
-        console.log(this.guests);
         const totalCount = data?.totalCount ?? 0;
         this.totalGuests = Math.max(1, Math.ceil(totalCount / this.limit));
       } catch (e) {
-        console.error(e);
+        console.error("guests.fetchGuests error", e);
         this.guests = [];
         this.totalGuests = 1;
       } finally {
-        this.isLoading = false;
+        if (rid === this._requestId) this.isLoading = false;
       }
     },
 
     async loadMore() {
-      if (this.isLoadingMore) return;
+      if (this.isLoading || this.isLoadingMore) return;
       if (this.page >= this.totalGuests) return;
 
       try {
@@ -135,15 +154,20 @@ export default {
         const data = await guests.list({
           page: nextPage,
           limit: this.limit,
-          searchQuery: this.searchQuery,
+          searchQuery: this.searchQuery?.trim(),
           searchField: this.searchField,
         });
 
         const nextChunk = data?.list ?? [];
         this.guests = [...(this.guests || []), ...nextChunk];
         this.page = nextPage;
+
+        const totalCount = data?.totalCount;
+        if (typeof totalCount === "number") {
+          this.totalGuests = Math.max(1, Math.ceil(totalCount / this.limit));
+        }
       } catch (e) {
-        console.error(e);
+        console.error("guests.loadMore error", e);
       } finally {
         this.isLoadingMore = false;
       }
@@ -151,6 +175,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style scoped>

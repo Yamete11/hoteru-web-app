@@ -11,8 +11,8 @@
           <button class="navbar-btn" data-testid="settings-button">Settings</button>
           <div class="dropdown-content" v-show="showDropdown">
             <router-link to="/my-account" data-testid="my-account-link">My Account</router-link>
-            <router-link v-if="isAdminOrSuperAdmin()" to="/employees" data-testid="employees-link">List of Employees</router-link>
-
+            <router-link v-if="isAdminOrSuperAdmin()" to="/employees" data-testid="employees-link">Employees</router-link>
+            <router-link v-if="isSuperAdmin()" to="/hotel-settings" data-testid="hotel-settings-link">Hotel</router-link>
           </div>
         </div>
         <button class="navbar-btn" @click="logout" data-testid="log-out">Log out</button>
@@ -46,7 +46,10 @@ export default {
     },
     isAdminOrSuperAdmin() {
       return ['Superadmin', 'Admin'].includes(this.userRole);
-    }
+    },
+    isSuperAdmin() {
+      return this.userRole === 'Superadmin';
+    },
   },
   computed: {
     companyName() {
@@ -146,7 +149,4 @@ export default {
 .dropdown-content a:hover {
   background-color: #8d745b;
 }
-
-
-
 </style>

@@ -34,13 +34,17 @@ export default createStore({
         userData: null,
         userRole: null,
         refreshTimerId: null,
+        companyName: '',
     },
     getters: {
         isAuthenticated: s => !!s.token,
         getToken: s => s.token,
         getUserData: s => s.userData,
         getUserRole: s => s.userRole,
-        getCompanyName: s => extractCompanyName(s.userData) || 'No Company',
+        getCompanyName: (s) =>
+            (s.companyName && s.companyName.trim()) ||
+            extractCompanyName(s.userData) ||
+            'No Company',
         getPersonId: s => {
             const t = s.token || localStorage.getItem('token');
             if (!t) return null;
@@ -62,9 +66,15 @@ export default createStore({
             }
         },
         setUserData(state, val) {
-            state.userData = val;
-            if (val) localStorage.setItem('userData', JSON.stringify(val));
-            else localStorage.removeItem('userData');
+            state.userData = val
+            if (val) {
+                localStorage.setItem('userData', JSON.stringify(val))
+                const name = extractCompanyName(val)
+                if (name) state.companyName = name
+            } else {
+                localStorage.removeItem('userData')
+                state.companyName = ''
+            }
         },
         setUserRole(state, role) {
             state.userRole = role || null;
@@ -74,7 +84,10 @@ export default createStore({
         setRefreshTimerId(state, id) {
             if (state.refreshTimerId) clearTimeout(state.refreshTimerId);
             state.refreshTimerId = id || null;
-        }
+        },
+        setCompanyName(state, name) {
+            state.companyName = String(name || '')
+        },
     },
     actions: {
         initializeStore({ commit, dispatch  }) {
@@ -104,6 +117,10 @@ export default createStore({
                 localStorage.removeItem('userData');
                 localStorage.removeItem('userRole');
             }
+        },
+
+        setCompanyName({ commit }, name) {
+            commit('setCompanyName', name)
         },
 
 

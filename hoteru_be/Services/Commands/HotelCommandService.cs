@@ -57,7 +57,7 @@ namespace hoteru_be.Services.Commands
 
 
 
-        public async Task<MethodResultDTO> PostHotel(HotelDTO hotelDTO, CancellationToken ct)
+        public async Task<MethodResultDTO> PostHotel(NewHotelDTO hotelDTO, CancellationToken ct)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -152,6 +152,77 @@ namespace hoteru_be.Services.Commands
             }
         }
 
+        public async Task<MethodResultDTO> UpdateHotel(int hotelId, HotelDTO hotelDTO, CancellationToken ct)
+        {
+            if (hotelDTO is null)
+                return MethodResultDTO.BadRequest("Payload is required.");
+
+            try
+            {
+                var hotel = await _context.Hotels
+                    .Include(h => h.Address)
+                    .FirstOrDefaultAsync(h => h.IdHotel == hotelId, ct);
+
+                if (hotel is null)
+                    return MethodResultDTO.NotFound("Hotel not found.");
+
+                var title = (hotelDTO.Title ?? string.Empty).Trim();
+                var city = (hotelDTO.City ?? string.Empty).Trim();
+                var country = (hotelDTO.Country ?? string.Empty).Trim();
+                var street = (hotelDTO.Street ?? string.Empty).Trim();
+                var postcode = (hotelDTO.Postcode ?? string.Empty).Trim();
+
+                if (!string.IsNullOrWhiteSpace(title))
+                {
+                    var exists = await _context.Hotels
+                        .AnyAsync(h => h.IdHotel != hotelId && h.Title == title, ct);
+
+                    if (exists)
+                    {
+                        var errors = new Dictionary<string, List<string>>
+                        {
+                            ["Title"] = new() { "Another hotel with this title already exists." }
+                        };
+                        return MethodResultDTO.BadRequest("Validation failed", errors);
+                    }
+                }
+
+                hotel.Title = title;
+
+                if (hotel.Address is null)
+                {
+                    hotel.Address = new Address
+                    {
+                        City = city,
+                        Country = country,
+                        Street = street,
+                        Postcode = postcode
+                    };
+                }
+                else
+                {
+                    hotel.Address.City = city;
+                    hotel.Address.Country = country;
+                    hotel.Address.Street = street;
+                    hotel.Address.Postcode = postcode;
+                }
+
+                await _context.SaveChangesAsync(ct);
+
+                _logger?.LogInformation("Hotel {HotelId} updated", hotelId);
+                return MethodResultDTO.Ok("Updated");
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger?.LogWarning(ex, "Concurrency update failed for hotel {HotelId}", hotelId);
+                return MethodResultDTO.Error("Conflict while updating the hotel. Please retry.");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Unexpected error updating hotel {HotelId}", hotelId);
+                return MethodResultDTO.Error("Unexpected error while updating hotel.");
+            }
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <notifications position="top right" />
     <router-view></router-view>
   </div>
 </template>

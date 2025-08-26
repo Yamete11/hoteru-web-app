@@ -1,6 +1,5 @@
 <template>
   <div class="room-component">
-    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -47,7 +46,7 @@
           </div>
           <div v-if="!isLoading">
             <history-list :reservations="filteredReservations" @deleteReservation="deleteReservation"/>
-            <div v-intersection="loadMore" class="observer"></div>
+            <div :key="`${searchField}:${searchQuery}:${dateFrom}:${dateTo}`" v-intersection="loadMore" class="observer"></div>
           </div>
           <div v-else>
             <div>The list is loading...</div>
@@ -59,28 +58,45 @@
 </template>
 
 <script>
-import {notify} from "@kyvg/vue3-notification";
-import { reservations } from '@/api';
-
+import { notify } from "@kyvg/vue3-notification";
+import { reservations } from "@/api";
+import debounce from "lodash.debounce";
 
 export default {
   name: "History",
   data() {
     return {
       isLoading: false,
+      isLoadingMore: false,
       reservations: [],
       page: 1,
       limit: 15,
       totalReservations: 0,
-      searchQuery: '',
-      searchField: 'name',
-      dateFrom: '',
-      dateTo: ''
+      searchQuery: "",
+      searchField: "name",
+      dateFrom: "",
+      dateTo: "",
+
+      _debouncedFetch: null,
+      _requestId: 0,
     };
   },
+
+  created() {
+    this._debouncedFetch = debounce(() => this.fetchReservations(), 350);
+  },
+
+  mounted() {
+    this.fetchReservations();
+  },
+
+  beforeUnmount() {
+    this._debouncedFetch?.cancel?.();
+  },
+
   computed: {
     filteredReservations() {
-      if (this.searchField === 'date') {
+      if (this.searchField === "date") {
         return this.reservations.filter(res => {
           const dateIn = new Date(res.dateIn);
           const from = this.dateFrom ? new Date(this.dateFrom) : null;
@@ -90,46 +106,54 @@ export default {
       }
       return this.reservations.filter(res => {
         const rawValue = res[this.searchField];
-        const fieldValue = String(rawValue ?? '').toLowerCase();
+        const fieldValue = String(rawValue ?? "").toLowerCase();
         return fieldValue.startsWith(this.searchQuery.toLowerCase());
       });
-    }
+    },
   },
+
   watch: {
-    searchQuery: 'fetchReservations',
-    searchField: 'fetchReservations',
+    searchQuery() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
+    searchField() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
   },
-  mounted() {
-    this.fetchReservations();
-  },
+
   methods: {
     deleteReservation(idReservation) {
-      this.reservations = this.reservations.filter(reservation => reservation.idReservation !== idReservation);
-
-      notify({
-        title: 'History Deleted',
-        text: `History has been deleted.`,
-        type: 'success',
-        duration: 3000
-      });
+      this.reservations = this.reservations.filter(r => r.idReservation !== idReservation);
+      notify({ title: "History Deleted", text: "History has been deleted.", type: "success", duration: 3000 });
     },
+
     async fetchReservations() {
-      this.isLoading = true;
-      this.isLoadingMore = false;
-      this.page = 1;
+      const rid = ++this._requestId;
       try {
-        const data = await reservations.history({
-          page: this.page,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField
-        });
+        this.isLoading = true;
+        this.page = 1;
+
+        const params = { page: this.page, limit: this.limit };
+        if (this.searchField !== "date") {
+          params.searchQuery = this.searchQuery?.trim();
+          params.searchField = this.searchField;
+        }
+
+        const data = await reservations.history(params);
+
+        if (rid !== this._requestId) return;
+
         this.reservations = data?.list ?? [];
-        this.totalReservations = Math.ceil((data?.totalCount ?? 0) / this.limit); // totalPages
+        const totalCount = data?.totalCount ?? 0;
+        this.totalReservations = Math.max(1, Math.ceil(totalCount / this.limit));
       } catch (err) {
-        console.error('history.fetchReservations error', err);
+        console.error("history.fetchReservations error", err);
+        this.reservations = [];
+        this.totalReservations = 1;
       } finally {
-        this.isLoading = false;
+        if (rid === this._requestId) this.isLoading = false;
       }
     },
 
@@ -140,24 +164,31 @@ export default {
       this.isLoadingMore = true;
       const next = this.page + 1;
       try {
-        const data = await reservations.history({
-          page: next,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField
-        });
-        this.reservations = [...this.reservations, ...(data?.list ?? [])];
+        const params = { page: next, limit: this.limit };
+        if (this.searchField !== "date") {
+          params.searchQuery = this.searchQuery?.trim();
+          params.searchField = this.searchField;
+        }
+
+        const data = await reservations.history(params);
+        const chunk = data?.list ?? [];
+        this.reservations = [...this.reservations, ...chunk];
         this.page = next;
-        this.totalReservations = Math.ceil((data?.totalCount ?? 0) / this.limit);
+
+        const totalCount = data?.totalCount;
+        if (typeof totalCount === "number") {
+          this.totalReservations = Math.max(1, Math.ceil(totalCount / this.limit));
+        }
       } catch (err) {
-        console.error('history.loadMore error', err);
+        console.error("history.loadMore error", err);
       } finally {
         this.isLoadingMore = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
 
 <style scoped>
 .room-component {

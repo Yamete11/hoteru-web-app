@@ -47,5 +47,5 @@ export async function types() {
 
 export async function statuses() {
     const { data } = await http.get(ENDPOINTS.ROOM.STATUS);
-    return data; // StatusDTO[]
+    return data;
 }

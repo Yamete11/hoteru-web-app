@@ -1,6 +1,5 @@
 <template>
   <div class="service-component">
-    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -11,17 +10,20 @@
             <option value="sum">Sum</option>
             <option value="description">Description</option>
           </select>
+
           <input
               type="text"
               class="search-input"
               v-model="searchQuery"
-              :placeholder="`Search by ${searchField}...`"
+              :placeholder="searchField === 'sum' ? 'Min sum…' : `Search by ${searchField}...`"
               data-testid="search-input"
           />
+
           <router-link to="/new-service" class="new-service-button" data-testid="new-service-button">
             New Service
           </router-link>
         </div>
+
         <div class="main-bot">
           <div class="table-headers">
             <span class="header title">Title</span>
@@ -29,9 +31,18 @@
             <span class="header description">Description</span>
             <span class="header action">Action</span>
           </div>
+
           <div v-if="!isLoading">
-            <service-list :services="services" @deleteService="deleteService" @notificationDeleteAttempt="showServiceDeletedNotification"/>
-            <div v-intersection="loadMore" class="observer"></div>
+            <service-list
+                :services="services"
+                @deleteService="deleteService"
+                @notificationDeleteAttempt="showServiceDeletedNotification"
+            />
+            <div
+                :key="`${searchField}:${searchQuery}`"
+                v-intersection="loadMore"
+                class="observer"
+            ></div>
           </div>
           <div v-else>
             <div>The list is loading...</div>
@@ -44,8 +55,8 @@
 
 <script>
 import { notify } from "@kyvg/vue3-notification";
-import { services } from '@/api';
-
+import { services } from "@/api";
+import debounce from "lodash.debounce";
 
 export default {
   name: "Service",
@@ -54,102 +65,163 @@ export default {
       isLoading: false,
       isLoadingMore: false,
       services: [],
-      searchQuery: '',
-      searchField: 'title',
-      totalServices: 0,
+      searchQuery: "",
+      searchField: "title",
+      totalPages: 0,
       page: 1,
       limit: 15,
-      isServiceDeletedNotificationVisible: false
+      isServiceDeletedNotificationVisible: false,
+
+      _debouncedFetch: null,
+      _requestId: 0,
     };
   },
+
+  created() {
+    this._debouncedFetch = debounce(() => this.fetchServices(), 350);
+  },
+
   mounted() {
     this.fetchServices();
-
-    if (this.$route.query.created === 'true') {
+    if (this.$route.query.created === "true") {
       notify({
-        title: 'Service Created',
-        text: 'The service has been successfully created.',
-        type: 'success',
-        duration: 3000
+        title: "Service Created",
+        text: "The service has been successfully created.",
+        type: "success",
+        duration: 3000,
       });
-
       this.$router.replace({ query: {} });
     }
   },
-  watch: {
-    searchQuery: 'fetchServices',
-    searchField: 'fetchServices'
+
+  beforeUnmount() {
+    this._debouncedFetch?.cancel?.();
   },
+
+  watch: {
+    searchQuery() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
+    searchField() {
+      this.page = 1;
+      this._debouncedFetch();
+    },
+  },
+
   methods: {
+    sumThreshold() {
+      const text = String(this.searchQuery ?? "").trim();
+      if (!text) return null;
+      const normalized = text.replace(/\s+/g, "").replace(",", ".");
+      const m = normalized.match(/-?\d+(?:\.\d+)?/);
+      if (!m) return null;
+      const n = parseFloat(m[0]);
+      return Number.isFinite(n) ? n : null;
+    },
+
+    sumValue(val) {
+      if (typeof val === "number") return val;
+      const s = String(val ?? "");
+      const normalized = s.replace(/\s+/g, "").replace(",", ".");
+      const m = normalized.match(/-?\d+(?:\.\d+)?/);
+      return m ? parseFloat(m[0]) : NaN;
+    },
+
     showServiceDeletedNotification() {
       if (this.isServiceDeletedNotificationVisible) return;
-
       this.isServiceDeletedNotificationVisible = true;
-
       notify({
         title: "Service Deleted",
         text: "Service has been successfully deleted.",
         type: "success",
         duration: 4000,
       });
-
       setTimeout(() => {
         this.isServiceDeletedNotificationVisible = false;
       }, 4000);
     },
+
     deleteService(idService) {
-      this.services = this.services.filter(service => service.idService !== idService);
+      this.services = this.services.filter((s) => s.idService !== idService);
     },
+
     async fetchServices() {
+      const rid = ++this._requestId;
       try {
         this.isLoading = true;
         this.page = 1;
 
-        const data = await services.list({
-          page: this.page,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField
-        });
-        console.log(data);
-        this.services = data?.list ?? [];
+        const params = { page: this.page, limit: this.limit };
+
+        if (this.searchField !== "sum") {
+          params.searchField = this.searchField;
+          params.searchQuery = this.searchQuery?.trim();
+        }
+
+        const data = await services.list(params);
+        if (rid !== this._requestId) return;
+
+        let list = data?.list ?? [];
+
+        if (this.searchField === "sum") {
+          const thr = this.sumThreshold();
+          if (thr != null) {
+            list = list.filter((s) => this.sumValue(s?.sum) >= thr);
+          }
+        }
+
+        this.services = list;
         const totalCount = data?.totalCount ?? 0;
-        this.totalServices = Math.max(1, Math.ceil(totalCount / this.limit));
+        this.totalPages = Math.max(1, Math.ceil(totalCount / this.limit));
       } catch (e) {
-        console.error(e);
+        console.error("services.fetchServices error", e);
         this.services = [];
-        this.totalServices = 1;
+        this.totalPages = 1;
       } finally {
-        this.isLoading = false;
+        if (rid === this._requestId) this.isLoading = false;
       }
     },
 
     async loadMore() {
-      if (this.isLoadingMore) return;
-      if (this.page >= this.totalServices) return;
+      if (this.isLoading || this.isLoadingMore) return;
+      if (this.page >= this.totalPages) return;
 
       try {
         this.isLoadingMore = true;
         const nextPage = this.page + 1;
 
-        const data = await services.list({
-          page: nextPage,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField
-        });
+        const params = { page: nextPage, limit: this.limit };
+        if (this.searchField !== "sum") {
+          params.searchField = this.searchField;
+          params.searchQuery = this.searchQuery?.trim();
+        }
 
-        const nextChunk = data?.list ?? [];
+        const data = await services.list(params);
+
+        let nextChunk = data?.list ?? [];
+        if (this.searchField === "sum") {
+          const thr = this.sumThreshold();
+          if (thr != null) {
+            nextChunk = nextChunk.filter((s) => this.sumValue(s?.sum) >= thr);
+          }
+        }
+
         this.services = [...(this.services || []), ...nextChunk];
         this.page = nextPage;
+
+        const totalCount = data?.totalCount;
+        if (typeof totalCount === "number") {
+          this.totalPages = Math.max(1, Math.ceil(totalCount / this.limit));
+        }
       } catch (e) {
-        console.error(e);
+        console.error("services.loadMore error", e);
       } finally {
         this.isLoadingMore = false;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -2,8 +2,30 @@
 
 namespace hoteru_be.DTOs
 {
-    public class HotelDTO
+    public class NewHotelDTO
     {
+        [Required]
+        [StringLength(20, ErrorMessage = "Name must be less than 20 characters")]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "Name must contain only letters")]
+        public string Name { get; set; }
+
+        [Required]
+        [StringLength(20, ErrorMessage = "Surname must be less than 20 characters")]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "Surname must contain only letters")]
+        public string Surname { get; set; }
+
+        [Required]
+        [EmailAddress(ErrorMessage = "Email is not properly written")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(20, ErrorMessage = "Login name must be less than 20 characters")]
+        public string LoginName { get; set; }
+
+        [Required]
+        [StringLength(20, ErrorMessage = "Password must be less than 20 characters")]
+        public string Password { get; set; }
+
         [Required]
         [StringLength(20, ErrorMessage = "Title must be less than 20 characters")]
         [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "Title must contain only letters")]

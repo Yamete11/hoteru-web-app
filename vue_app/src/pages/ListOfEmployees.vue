@@ -1,9 +1,7 @@
 <template>
   <div class="newRoom-component">
-    <notifications position="top right" />
     <navbar />
     <sidebar />
-
     <div class="main">
       <div class="newUser-section">
         <form @submit.prevent="addUser" class="creating-form">
@@ -77,7 +75,6 @@
               <span v-else-if="!v$.newUser.loginName.maxLength.$response">Login must be less than 15 characters*</span>
               <span v-else-if="!v$.newUser.loginName.loginValid.$response">Only letters, numbers, dot, dash and underscore*</span>
             </span>
-            <!-- ВАЖНО: ключ ошибки с бэка — LoginName -->
             <span class="error-message" v-if="state.errors.LoginName">{{ state.errors.LoginName?.[0] }}</span>
           </div>
 
@@ -208,14 +205,12 @@ export default {
     }
 
     async function fetchUsers() {
-      console.log("hello")
       const { data } = await http.get(ENDPOINTS.USER.ROOT);
-      console.log(data)
       const rows = data?.data ?? data ?? [];
       state.users = rows.map(u => ({
         idPerson: u.idPerson ?? u.idUser ?? 0,
         loginName: u.loginName ?? u.login ?? '',
-        userType: u.userType?.title ?? u.userTypeTitle ?? u.userType ?? '',
+        userType:  u.userType ?? '',
       }));
     }
 
@@ -315,8 +310,15 @@ export default {
 }
 
 .creating-form {
-  width: 100%;
-  max-width: 300px;
+  width: 50%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px 20px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .user-list {

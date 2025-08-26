@@ -6,6 +6,10 @@ export const ENDPOINTS = {
 
     REGISTRATION: { HOTEL: withBase("/api/Hotel") },
 
+    HOTEL: {
+        ROOT: withBase("/api/Hotel"),
+    },
+
     RESERVATION: {
         ROOT: withBase("/api/Reservation"),
         BY_ID: (id) => withBase(`/api/Reservation/${id}`),

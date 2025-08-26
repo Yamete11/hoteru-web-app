@@ -1,6 +1,5 @@
 <template>
   <div class="room-component">
-    <notifications position="top right" />
     <navbar></navbar>
     <div class="content">
       <sidebar></sidebar>
@@ -47,7 +46,9 @@
           </div>
           <div v-if="!isLoading">
             <reservation-list :reservations="filteredReservations" @deleteReservation="deleteReservation"/>
-            <div v-intersection="loadMore" class="observer"></div>
+            <div :key="`${searchField}:${searchQuery}:${dateFrom}:${dateTo}`"  v-intersection="loadMore"  class="observer"
+            />
+
           </div>
           <div v-else>
             <div>The list is loading...</div>
@@ -61,27 +62,53 @@
 <script>
 import { notify } from "@kyvg/vue3-notification";
 import { reservations } from "@/api";
-
-
+import debounce from "lodash.debounce";
 
 export default {
   name: "Reservation",
   data() {
     return {
       isLoading: false,
+      isLoadingMore: false,
       reservations: [],
-      searchQuery: '',
-      searchField: 'name',
-      dateFrom: '',
-      dateTo: '',
+      searchQuery: "",
+      searchField: "name",
+      dateFrom: "",
+      dateTo: "",
       page: 1,
       limit: 15,
-      totalReservations: 0
+      totalReservations: 0,
+
+      _debouncedFetch: null,
+      _requestId: 0,
     };
   },
+
+  created() {
+    this._debouncedFetch = debounce(() => this.fetchReservations(), 350);
+  },
+
+  mounted() {
+    this.fetchReservations();
+
+    if (this.$route.query.confirmed === "true") {
+      notify({
+        title: "Reservation Confirmed",
+        text: "Reservation has been successfully closed.",
+        type: "success",
+        duration: 3000
+      });
+      this.$router.replace({ query: {} });
+    }
+  },
+
+  beforeUnmount() {
+    this._debouncedFetch?.cancel?.();
+  },
+
   computed: {
     filteredReservations() {
-      if (this.searchField === 'date') {
+      if (this.searchField === "date") {
         return this.reservations.filter(res => {
           const dateIn = new Date(res.in);
           const dateOut = new Date(res.out);
@@ -95,87 +122,98 @@ export default {
         });
       }
 
+      const q = this.searchQuery.toLowerCase();
       return this.reservations.filter(res => {
-        const value = res[this.searchField];
-        const fieldValue = String(value ?? '').toLowerCase();
-        return fieldValue.startsWith(this.searchQuery.toLowerCase());
+        const value = res?.[this.searchField];
+        return String(value ?? "").toLowerCase().startsWith(q);
       });
     }
   },
-  watch: {
-    searchQuery: 'fetchReservations',
-    searchField: 'fetchReservations',
-  },
-  mounted() {
-    this.fetchReservations();
 
-    if (this.$route.query.confirmed === 'true') {
-      notify({
-        title: 'Reservation Confirmed',
-        text: 'Reservation has been successfully closed.',
-        type: 'success',
-        duration: 3000
-      });
-      this.$router.replace({ query: {} });
-    }
+  watch: {
+    searchQuery() {
+      if (this.searchField === "date") return;
+      this.page = 1;
+      this._debouncedFetch();
+    },
+    searchField(newVal) {
+      this.page = 1;
+      if (newVal === "date") {
+        this.searchQuery = "";
+        this._debouncedFetch?.cancel?.();
+        this.fetchReservations();
+      } else {
+        this._debouncedFetch();
+      }
+    },
   },
+
   methods: {
     deleteReservation(idReservation) {
       this.reservations = this.reservations.filter(res => res.idReservation !== idReservation);
-      notify({
-        title: 'Reservation Deleted',
-        text: `Reservation has been deleted.`,
-        type: 'success',
-        duration: 3000
-      });
+      notify({ title: "Reservation Deleted", text: "Reservation has been deleted.", type: "success", duration: 3000 });
     },
+
     async fetchReservations() {
+      const rid = ++this._requestId;
       try {
         this.isLoading = true;
         this.page = 1;
 
-        const data = await reservations.list({
-          page: this.page,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField,
-        });
+        const params = { page: this.page, limit: this.limit };
+        if (this.searchField !== "date") {
+          params.searchField = this.searchField;
+          params.searchQuery = this.searchQuery?.trim();
+        }
 
-        this.reservations = data.list;
-        this.totalReservations = Math.ceil(data.totalCount / this.limit);
+        const data = await reservations.list(params);
+
+        if (rid !== this._requestId) return;
+
+        this.reservations = data?.list ?? [];
+        const totalCount = data?.totalCount ?? 0;
+        this.totalReservations = Math.max(1, Math.ceil(totalCount / this.limit));
       } catch (e) {
-        console.error(e);
+        console.error("reservations.fetchReservations error", e);
+        this.reservations = [];
+        this.totalReservations = 1;
       } finally {
-        this.isLoading = false;
+        if (rid === this._requestId) this.isLoading = false;
       }
     },
+
     async loadMore() {
       if (this.isLoading || this.isLoadingMore) return;
       if (this.page >= this.totalReservations) return;
 
       this.isLoadingMore = true;
+      const nextPage = this.page + 1;
       try {
-        const nextPage = this.page + 1;
+        const params = { page: nextPage, limit: this.limit };
+        if (this.searchField !== "date") {
+          params.searchField = this.searchField;
+          params.searchQuery = this.searchQuery?.trim();
+        }
 
-        const data = await reservations.list({
-          page: nextPage,
-          limit: this.limit,
-          searchQuery: this.searchQuery,
-          searchField: this.searchField,
-        });
-
+        const data = await reservations.list(params);
+        const chunk = data?.list ?? [];
+        this.reservations = [...this.reservations, ...chunk];
         this.page = nextPage;
-        this.reservations = [...this.reservations, ...data.list];
-        this.totalReservations = Math.ceil(data.totalCount / this.limit);
+
+        const totalCount = data?.totalCount;
+        if (typeof totalCount === "number") {
+          this.totalReservations = Math.max(1, Math.ceil(totalCount / this.limit));
+        }
       } catch (e) {
-        console.error(e);
+        console.error("reservations.loadMore error", e);
       } finally {
         this.isLoadingMore = false;
       }
     }
   }
-}
+};
 </script>
+
 
 <style scoped>
 .room-component {

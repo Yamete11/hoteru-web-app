@@ -32,6 +32,7 @@ namespace hoteru_be
             services.AddScoped<IReservationQueryService, ReservationQueryService>();
             services.AddScoped<IReservationCommandService, ReservationCommandService>();
             services.AddScoped<IHotelCommandService, HotelCommandService>();
+            services.AddScoped<IHotelQueryService, HotelQueryService>();
             services.AddScoped<IRoomQueryService, RoomQueryService>();
             services.AddScoped<IRoomCommandService, RoomCommandService>();
             services.AddScoped<IServiceCommandService, ServiceCommandService>();

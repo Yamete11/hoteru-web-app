@@ -1,63 +1,147 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '@/pages/Login.vue';
-import Reservation from '@/pages/Reservation.vue';
-import Arrival from '@/pages/Arrival.vue';
-import Guest from '@/pages/Guest.vue';
-import Room from '@/pages/Room.vue';
-import Service from '@/pages/Service.vue';
-import History from '@/pages/History.vue';
-import Registration from '@/pages/Registration.vue';
-import NewRoom from '@/pages/new/NewRoom.vue';
-import NewService from '@/pages/new/NewService.vue';
-import RoomDetails from '@/pages/details/RoomDetails.vue';
-import ServiceDetails from '@/pages/details/ServiceDetails.vue';
-import GuestDetails from '@/pages/details/GuestDetails.vue';
-import NewGuest from '@/pages/new/NewGuest.vue';
-import HistoryDetails from '@/pages/details/HistoryDetails.vue';
-import ListOfEmployees from '@/pages/ListOfEmployees.vue';
-import ArrivalDetails from '@/pages/details/ArrivalDetails.vue';
-import NewReservation from '@/pages/new/NewReservation.vue';
-import MyAccount from '@/pages/MyAccount.vue';
-
 import store from '@/store';
 import { parseJwt } from '@/utils/jwt';
 
+const Login = () => import('@/pages/Login.vue');
+const Reservation = () => import('@/pages/Reservation.vue');
+const Arrival = () => import('@/pages/Arrival.vue');
+const Guest = () => import('@/pages/Guest.vue');
+const Room = () => import('@/pages/Room.vue');
+const Service = () => import('@/pages/Service.vue');
+const History = () => import('@/pages/History.vue');
+const Registration = () => import('@/pages/Registration.vue');
+const HistoryDetails = () => import('@/pages/forms/HistoryDetails.vue');
+const ListOfEmployees = () => import('@/pages/ListOfEmployees.vue');
+const MyAccount = () => import('@/pages/MyAccount.vue');
+const ServiceForm = () => import('@/pages/forms/ServiceForm.vue');
+const RoomForm = () => import('@/pages/forms/RoomForm.vue');
+const GuestForm = () => import('@/pages/forms/GuestForm.vue');
+const ReservationForm = () => import('@/pages/forms/ReservationForm.vue');
+const HotelSettings = () => import('@/pages/HotelSettings.vue');
+
+
 const routes = [
-    { path: '/', component: Login, meta: { requiresAuth: false } },
-    { path: '/registration', component: Registration, meta: { requiresAuth: false } },
+    {
+        path: '/', component: Login,
+        meta: { requiresAuth: false } },
+    {
+        path: '/registration',
+        component: Registration,
+        meta: { requiresAuth: false } },
 
-    { path: '/reservations/:idReservation', component: ArrivalDetails, name: 'ReservationDetails',
-        meta: { requiresAuth: true }, props: r => ({ idReservation: Number(r.params.idReservation), detailsType: 'Reservation' }) },
-    { path: '/reservations', component: Reservation, meta: { requiresAuth: true } },
-    { path: '/new-reservation', component: NewReservation, meta: { requiresAuth: true } },
+    {
+        path: '/reservations/:idReservation',
+        component: ReservationForm,
+        name: 'ReservationDetails',
+        meta: { requiresAuth: true },
+        props: r => ({ idReservation: Number(r.params.idReservation), detailsType: 'Reservation' }),
+    },
+    {
+        path: '/reservations',
+        component: Reservation,
+        meta: { requiresAuth: true } },
 
-    { path: '/arrivals/:idReservation', component: ArrivalDetails, name: 'ArrivalDetails',
-        meta: { requiresAuth: true }, props: r => ({ idReservation: Number(r.params.idReservation), detailsType: 'Arrival' }) },
-    { path: '/arrivals', component: Arrival, meta: { requiresAuth: true } },
+    {
+        path: '/new-reservation',
+        component: ReservationForm,
+        name: 'NewReservation',
+        meta: { requiresAuth: true } },
 
-    { path: '/guests/:idPerson', component: GuestDetails, name: 'GuestDetails',
-        meta: { requiresAuth: true }, props: route => ({ idPerson: Number(route.params.idPerson) }) },
-    { path: '/guests', component: Guest, meta: { requiresAuth: true } },
-    { path: '/new-guest', component: NewGuest, meta: { requiresAuth: true } },
+    {
+        path: '/arrivals/:idReservation',
+        component: ReservationForm,
+        name: 'ArrivalDetails',
+        meta: { requiresAuth: true },
+        props: r => ({ idReservation: Number(r.params.idReservation), detailsType: 'Arrival' }),
+    },
+    {
+        path: '/arrivals',
+        component: Arrival,
+        meta: { requiresAuth: true } },
 
-    { path: '/rooms/:idRoom', component: RoomDetails, name: 'RoomDetails',
-        meta: { requiresAuth: true }, props: route => ({ idRoom: Number(route.params.idRoom) }) },
-    { path: '/rooms', component: Room, name: 'Rooms', meta: { requiresAuth: true } },
-    { path: '/new-room', component: NewRoom, meta: { requiresAuth: true } },
+    {
+        path: '/guests/:idPerson',
+        component: GuestForm,
+        name: 'GuestDetails',
+        meta: { requiresAuth: true },
+        props: route => ({ idPerson: Number(route.params.idPerson) }),
+    },
+    {
+        path: '/guests',
+        component: Guest,
+        name: 'Guests',
+        meta: { requiresAuth: true } },
+    {
+        path: '/new-guest',
+        component: GuestForm,
+        name: 'NewGuest',
+        meta: { requiresAuth: true } },
 
-    { path: '/services/:idService', component: ServiceDetails, name: 'ServiceDetails',
-        meta: { requiresAuth: true }, props: route => ({ idService: Number(route.params.idService) })},
-    { path: '/services', component: Service, name: 'Services', meta: { requiresAuth: true } },
-    { path: '/new-service', component: NewService, meta: { requiresAuth: true } },
+    {
+        path: '/rooms/:idRoom',
+        component: RoomForm,
+        name: 'RoomDetails',
+        meta: { requiresAuth: true },
+        props: route => ({ idRoom: Number(route.params.idRoom) }),
+    },
+    {
+        path: '/rooms',
+        component: Room,
+        name: 'Rooms',
+        meta: { requiresAuth: true } },
+    {
+        path: '/new-room',
+        component: RoomForm,
+        name: 'NewRoom',
+        meta: { requiresAuth: true } },
 
-    { path: '/history/:idReservation', component: HistoryDetails, name: 'HistoryDetails',
-        meta: { requiresAuth: true }, props: true },
-    { path: '/history', component: History, meta: { requiresAuth: true } },
+    {
+        path: '/services/:idService',
+        component: ServiceForm,
+        name: 'ServiceDetails',
+        meta: { requiresAuth: true },
+        props: route => ({ idService: Number(route.params.idService) }),
+    },
+    {
+        path: '/services',
+        component: Service,
+        name: 'Services',
+        meta: { requiresAuth: true } },
+    {
+        path: '/new-service',
+        component: ServiceForm,
+        name: 'NewService',
+        meta: { requiresAuth: true } },
 
-    { path: '/my-account', component: MyAccount, meta: { requiresAuth: true } },
+    {
+        path: '/history/:idReservation',
+        component: HistoryDetails,
+        name: 'HistoryDetails',
+        meta: { requiresAuth: true },
+        props: true
+    },
+    {
+        path: '/history',
+        component: History,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/my-account',
+        component: MyAccount,
+        meta: { requiresAuth: true }
+    },
 
-    { path: '/employees', component: ListOfEmployees,
-        meta: { requiresAuth: true, roles: ['Admin', 'Superadmin'] } },
+    {
+        path: '/employees',
+        component: ListOfEmployees,
+        meta: { requiresAuth: true, roles: ['Admin', 'Superadmin'] }
+    },
+    {
+        path: '/hotel-settings',
+        name: 'HotelSettings',
+        component: HotelSettings,
+        meta: { roles: ['Superadmin'] },
+    },
 ];
 
 const router = createRouter({
@@ -68,7 +152,6 @@ const router = createRouter({
 function getToken() {
     return store.getters.getToken || localStorage.getItem('token') || null;
 }
-
 function isTokenExpired(token) {
     try {
         const payload = parseJwt(token);
@@ -78,7 +161,6 @@ function isTokenExpired(token) {
         return true;
     }
 }
-
 function getUserRole(token) {
     try {
         const payload = parseJwt(token);

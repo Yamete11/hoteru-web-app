@@ -1,6 +1,5 @@
 <template>
   <div class="newRoom-component">
-    <notifications position="top right" />
     <navbar />
     <sidebar />
 
@@ -8,7 +7,6 @@
       <form @submit.prevent="toggleEdit" class="creating-form">
         <h1>Account Details</h1>
 
-        <!-- Name -->
         <div class="input-form">
           <label>Name: </label>
           <input
@@ -28,7 +26,6 @@
           <span class="error-message" v-if="state.errors.Name">{{ state.errors.Name?.[0] }}</span>
         </div>
 
-        <!-- Surname -->
         <div class="input-form">
           <label>Surname: </label>
           <input
@@ -48,7 +45,6 @@
           <span class="error-message" v-if="state.errors.Surname">{{ state.errors.Surname?.[0] }}</span>
         </div>
 
-        <!-- Email -->
         <div class="input-form">
           <label>Email: </label>
           <input
@@ -67,7 +63,6 @@
           <span class="error-message" v-if="state.errors.Email">{{ state.errors.Email?.[0] }}</span>
         </div>
 
-        <!-- Login -->
         <div class="input-form">
           <label>Login: </label>
           <input
@@ -87,7 +82,6 @@
           <span class="error-message" v-if="state.errors.LoginName">{{ state.errors.LoginName?.[0] }}</span>
         </div>
 
-        <!-- Type -->
         <div class="input-form">
           <label>Type: </label>
           <input
@@ -288,12 +282,24 @@ export default {
 }
 
 .creating-form {
-  width: 100%;
-  max-width: 300px;
+  width: 20%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px 20px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .user-list{
   min-width: 50%;
+}
+
+.input[readonly] {
+  background: #f3f3f3;
+  color: #666;
 }
 
 .registration-btn{

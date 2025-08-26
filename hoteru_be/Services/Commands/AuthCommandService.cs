@@ -119,14 +119,18 @@ namespace hoteru_be.Services.Commands
         public async Task<MethodResultDTO<AuthResponseDTO>> RefreshAsync(string rawRefresh, string? ip, string? userAgent, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(rawRefresh))
+            {
                 return MethodResultDTO<AuthResponseDTO>.Unauthorized("Missing refresh token");
+            }
 
             var hash = Hash(rawRefresh);
             var now = DateTime.UtcNow;
 
             var rt = await _context.RefreshTokens.SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
             if (rt == null || !rt.IsActive)
+            {
                 return MethodResultDTO<AuthResponseDTO>.Unauthorized("Invalid refresh token");
+            }
 
             rt.RevokedUtc = now;
 
