@@ -142,6 +142,13 @@ const routes = [
         component: HotelSettings,
         meta: { roles: ['Superadmin'] },
     },
+    {
+        path: '/user/:id',
+        name: 'UserDetails',
+        component: () => import('@/pages/MyAccount.vue'),
+        props: true
+    }
+
 ];
 
 const router = createRouter({

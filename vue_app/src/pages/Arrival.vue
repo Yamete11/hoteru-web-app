@@ -197,25 +197,27 @@ export default {
   flex-direction: column;
   background-color: #F1DEC9;
 }
-.header.in,
-.header.out,
-.header.name,
-.header.room,
-.header.bookedBy,
-.header.action {
-  display: flex;
-  justify-content: center;
-  flex-basis: 10%;
+
+.table-headers {
+  display: grid;
+  grid-template-columns: 130px 130px 1.6fr 110px 1.2fr 240px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin: 8px 16px 0;
+  color: #3b3b3b;
+  font-weight: 700;
 }
 
-.observer {
-  height: 10px;
-  margin-bottom: 20px;
-}
+.header { display: flex; align-items: center; justify-content: center; }
+.header.name   { justify-content: flex-start; }
+.header.action { justify-content: flex-end; }
 
-.date-range-container {
-  display: flex;
-  gap: 1rem;
-}
+.observer { height: 10px; margin-bottom: 20px; }
 
+.date-range-container { display: flex; gap: 1rem; }
+.search-select, .search-input { margin-right: 10px; }
+
+.main-bot { margin-top: 8px; }
 </style>
+

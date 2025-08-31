@@ -34,7 +34,7 @@ namespace hoteru_be.DTOs
         [Range(0, int.MaxValue, ErrorMessage = "IdDepositType must be 0 or a positive integer")]
         public int IdDepositType { get; set; }
 
-        public List<ServiceDTO> Services { get; set; } = new();
+        public List<ServiceHistoryDTO> Services { get; set; } = new();
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "IdPerson must be a positive integer")]

@@ -84,24 +84,17 @@
 
         <div class="input-form">
           <label>Type: </label>
-          <input
-              v-if="!state.isEditing"
-              class="input"
-              type="text"
-              :value="state.typeTitle"
-              data-testid="input-type-readonly"
-              readonly
-          />
+
           <select
-              v-else
+              v-if="canChangeType"
               v-model="state.formData.idUserType"
               class="input"
-              @change="v$.formData.idUserType.$touch()"
+              @change="v$.formData.idUserType.$touch(); refreshTypeTitle()"
               data-testid="select-user-type"
           >
             <option disabled value="">Select type</option>
             <option
-                v-for="type in state.userTypes"
+                v-for="type in filteredUserTypes"
                 :key="type.idType"
                 :value="String(type.idType)"
                 :data-testid="'option-type-' + type.idType"
@@ -109,10 +102,21 @@
               {{ type.title }}
             </option>
           </select>
+
+          <input
+              v-else
+              class="input"
+              type="text"
+              :value="state.typeTitle"
+              data-testid="input-type-readonly"
+              readonly
+          />
+
           <span class="error-message" v-if="v$.formData.idUserType.$error">
             <span v-if="!v$.formData.idUserType.required.$response">Type is required*</span>
           </span>
           <span class="error-message" v-if="state.errors.IdUserType">{{ state.errors.IdUserType?.[0] }}</span>
+          <span class="error-message" v-if="state.errors.Permission">{{ state.errors.Permission }}</span>
         </div>
 
         <div class="registration-class">
@@ -127,10 +131,11 @@
 </template>
 
 <script>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, computed, watch } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, maxLength, email as emailV } from '@vuelidate/validators';
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 import { notify } from '@kyvg/vue3-notification';
 import http from '@/lib/http';
 import { ENDPOINTS } from '@/config/api';
@@ -139,11 +144,13 @@ export default {
   name: 'Settings',
   setup() {
     const store = useStore();
+    const route = useRoute();
 
     const state = reactive({
       isEditing: false,
       isSubmitting: false,
       formData: {
+        idPerson: 0,
         idUser: 0,
         name: '',
         surname: '',
@@ -156,8 +163,19 @@ export default {
       errors: {},
     });
 
+    const currentRole = computed(() => String(store.getters.getUserRole || store.getters.getUserData?.userType || ''));
+    const isSuperadmin = computed(() => currentRole.value.trim().toLowerCase() === 'superadmin');
+
+    const targetId = computed(() => {
+      const fromRoute = route.params.id ? Number(route.params.id) : null;
+      return fromRoute ?? store.getters.getPersonId ?? null;
+    });
+
+    const myPersonId = computed(() => Number(store.getters.getPersonId || store.getters.getUserData?.idPerson || 0));
+    const isEditingOwn = computed(() => Number(targetId.value) === Number(myPersonId.value));
+
     const onlyLetters = (v) => typeof v === 'string' && /^[\p{L}]+$/u.test(v);
-    const loginValid = (v) => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v);
+    const loginValid  = (v) => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v);
 
     const rules = {
       formData: {
@@ -171,9 +189,10 @@ export default {
     const v$ = useVuelidate(rules, state);
 
     const mapFromApi = (api) => {
-      const d = api.data ?? api;
+      const d = api.data ?? api ?? {};
       return {
-        idUser: d?.idUser ?? 0,
+        idPerson: Number(d?.idPerson ?? d?.idUser ?? 0),
+        idUser: Number(d?.idUser ?? d?.idPerson ?? 0),
         name: String(d?.name ?? '').trim(),
         surname: String(d?.surname ?? '').trim(),
         email: String(d?.email ?? '').trim(),
@@ -183,7 +202,7 @@ export default {
     };
 
     const mapToApi = (ui) => ({
-      IdPerson: Number(ui.idPerson ?? store.getters.getPersonId),
+      IdPerson: Number(ui.idPerson || targetId.value),
       Name: String(ui.name ?? '').trim(),
       Surname: String(ui.surname ?? '').trim(),
       Email: String(ui.email ?? '').trim(),
@@ -193,18 +212,32 @@ export default {
 
     async function loadUserTypes() {
       const { data } = await http.get(ENDPOINTS.USER_TYPE);
-      state.userTypes = data.data ?? [];
+      state.userTypes = data?.data ?? data ?? [];
     }
 
+    const findTypeById = (id) => state.userTypes.find(t => String(t.idType) === String(id));
+    const isTypeSuperadmin = (typeId) => (findTypeById(typeId)?.title || '').trim().toLowerCase() === 'superadmin';
+
+    const isTargetSuperadmin = computed(() => isTypeSuperadmin(state.formData.idUserType));
+    const canChangeType = computed(() =>
+        state.isEditing && isSuperadmin.value && !isEditingOwn.value && !isTargetSuperadmin.value
+    );
+
+    const filteredUserTypes = computed(() =>
+        state.userTypes.filter(t => String(t.title).trim().toLowerCase() !== 'superadmin')
+    );
+
     function refreshTypeTitle() {
-      const found = state.userTypes.find(t => String(t.idType) === String(state.formData.idUserType));
-      state.typeTitle = found ? found.title : '';
+      state.typeTitle = findTypeById(state.formData.idUserType)?.title || '';
     }
 
     async function fetchUserFull() {
-      const idUser = store.getters.getUserData?.idUser;
-      if (!idUser) return;
-      const { data } = await http.get(ENDPOINTS.USER.FULL(idUser));
+      const id = targetId.value;
+      if (!id) {
+        notify({ title: 'No user', text: 'User id is missing', type: 'warn' });
+        return;
+      }
+      const { data } = await http.get(ENDPOINTS.USER.FULL(id));
       state.formData = mapFromApi(data);
       refreshTypeTitle();
     }
@@ -214,14 +247,21 @@ export default {
         state.isEditing = true;
         return;
       }
+
       state.errors = {};
       v$.value.$touch();
       if (v$.value.$error) return;
 
+      if (isSuperadmin.value && !isEditingOwn.value && isTypeSuperadmin(state.formData.idUserType)) {
+        state.errors.Permission = 'You are not allowed to assign Superadmin role.';
+        notify({ title: 'Permission denied', text: 'Cannot assign Superadmin.', type: 'error' });
+        return;
+      }
+
+
       try {
         state.isSubmitting = true;
         const payload = mapToApi(state.formData);
-        console.log(payload);
         const { data } = await http.put(ENDPOINTS.USER.ROOT, payload);
 
         if (data?.httpStatusCode && data.httpStatusCode !== 200) {
@@ -237,20 +277,28 @@ export default {
         const current = store.getters.getUserData || {};
         store.commit('setUserData', { ...current, loginName: state.formData.loginName });
       } catch (err) {
-        const errors = err?.response?.data?.errors || err?.details;
-        if (errors) state.errors = errors;
+        state.errors = err?.response?.data?.errors || err?.details || {};
         notify({ title: 'Update failed', text: err?.response?.data?.message || err?.message || 'Unexpected error', type: 'error' });
       } finally {
         state.isSubmitting = false;
       }
     }
 
+    watch(() => state.formData.idUserType, refreshTypeTitle);
     onMounted(async () => {
       await loadUserTypes();
       await fetchUserFull();
     });
 
-    return { state, v$, toggleEdit };
+    return {
+      state,
+      v$,
+      toggleEdit,
+      refreshTypeTitle,
+      isSuperadmin,
+      canChangeType,
+      filteredUserTypes,
+    };
   },
 };
 </script>
@@ -262,6 +310,7 @@ export default {
   background-color: #F1DEC9;
   height: 100vh;
 }
+
 .main {
   display: flex;
   align-items: flex-start;
@@ -271,14 +320,6 @@ export default {
   flex-grow: 1;
   padding-top: 8vh;
   margin: 5%;
-}
-
-.newUser-section{
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: space-around;
-  min-width: 40%;
 }
 
 .creating-form {
@@ -291,10 +332,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.user-list{
-  min-width: 50%;
 }
 
 .input[readonly] {
@@ -334,7 +371,7 @@ export default {
 }
 
 .input-form input[type="text"],
-.input-form input[type="password"]{
+.input-form select{
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -347,67 +384,8 @@ h1 {
   color: black;
 }
 
-.input-form select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: white;
-  color: black;
-}
-
 .error-message {
   color: red;
   margin: 10px 0;
 }
-
-.element {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #C8B6A6;
-  border-radius: 5px;
-  font-weight: bold;
-  font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.service-list ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  max-width: 800px;
-}
-
-.service-list {
-  max-height: 200px;
-  overflow-y: auto;
-  width: 100%;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-.service-label {
-  font-weight: bold;
-  color: black;
-  align-self: flex-start;
-  margin-bottom: 5px;
-}
-
-.btn {
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-  border-radius: 10px;
-  border: 1px solid #D3C1AC;
-  background-color: #444444;
-  color: #FFFFFF;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
 </style>

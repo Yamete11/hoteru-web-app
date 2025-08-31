@@ -57,84 +57,120 @@
         <div class="guest">
           <label>Room information</label>
 
-          <div class="date-inputs">
-            <div class="input-form">
-              <label>Capacity: </label>
-              <input
-                  v-model.number="uiForm.capacity"
-                  class="input"
-                  type="number"
-                  placeholder="Enter room capacity"
-                  :readonly="!state.isEditing && !state.isCreate"
-                  @input="touchField('capacity')"
-                  data-testid="capacity-input"
-              />
-              <span class="error-message" v-if="v$.uiForm.capacity.$error">
-                {{ v$.uiForm.capacity.$errors[0]?.$message || 'The capacity must be from 1 to 40*' }}
-              </span>
-              <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
+          <template v-if="!state.roomAttached && (state.isEditing || state.isCreate)">
+            <div class="date-inputs">
+              <div class="input-form">
+                <label>Capacity: </label>
+                <input
+                    v-model.number="uiForm.capacity"
+                    class="input"
+                    type="number"
+                    placeholder="Enter room capacity"
+                    :readonly="!state.isEditing && !state.isCreate"
+                    @input="touchField('capacity')"
+                    data-testid="capacity-input"
+                />
+                <span class="error-message" v-if="v$.uiForm.capacity.$error">
+                  {{ v$.uiForm.capacity.$errors[0]?.$message || 'The capacity must be from 1 to 40*' }}
+                </span>
+                <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
+              </div>
+
+              <div class="input-form">
+                <label>Type: </label>
+                <template v-if="!state.isEditing && !state.isCreate">
+                  <input class="input" type="text" :value="selectedRoomTypeTitle" readonly />
+                </template>
+                <template v-else>
+                  <select
+                      v-model.number="uiForm.idRoomType"
+                      class="input"
+                      @change="touchField('idRoomType')"
+                      data-testid="room-type-select"
+                  >
+                    <option disabled :value="0">Select type</option>
+                    <option
+                        v-for="roomType in state.roomTypes"
+                        :key="roomType.idType"
+                        :value="Number(roomType.idType)"
+                        data-testid="room-type-option"
+                    >
+                      {{ roomType.title }}
+                    </option>
+                  </select>
+                </template>
+                <span class="error-message" v-if="v$.uiForm.idRoomType.$error">
+                  {{ v$.uiForm.idRoomType.$errors[0]?.$message || 'The field is required*' }}
+                </span>
+                <span class="error-message" v-if="state.errors.IdRoomType">{{ state.errors.IdRoomType[0] }}</span>
+              </div>
             </div>
 
-            <div class="input-form">
-              <label>Type: </label>
-              <template v-if="!state.isEditing && !state.isCreate">
-                <input class="input" type="text" :value="selectedRoomTypeTitle" readonly />
-              </template>
-              <template v-else>
+            <div class="input-form" v-if="(state.isEditing || state.isCreate) && !state.roomAttached">
+              <label>Room Selection: </label>
+
+              <template v-if="canPickRoom">
                 <select
-                    v-model.number="uiForm.idRoomType"
+                    v-model.number="state.tempRoomId"
                     class="input"
-                    @change="touchField('idRoomType')"
-                    data-testid="room-type-select"
+                    data-testid="room-select"
                 >
-                  <option disabled :value="0">Select type</option>
+                  <option disabled :value="0">Select a room</option>
                   <option
-                      v-for="roomType in state.roomTypes"
-                      :key="roomType.idType"
-                      :value="Number(roomType.idType)"
-                      data-testid="room-type-option"
+                      v-for="room in sortedFilteredRooms"
+                      :key="room.idRoom"
+                      :value="Number(room.idRoom)"
+                      data-testid="room-option"
                   >
-                    {{ roomType.title }}
+                    {{ room.number }} - Capacity: {{ room.capacity }}
                   </option>
                 </select>
-              </template>
-              <span class="error-message" v-if="v$.uiForm.idRoomType.$error">
-                {{ v$.uiForm.idRoomType.$errors[0]?.$message || 'The field is required*' }}
-              </span>
-              <span class="error-message" v-if="state.errors.IdRoomType">{{ state.errors.IdRoomType[0] }}</span>
-            </div>
-          </div>
 
-          <div class="input-form">
-            <label>Room Selection: </label>
-            <template v-if="!state.isEditing && !state.isCreate">
-              <input class="input" type="text" :value="selectedRoomLabel" readonly />
-            </template>
-            <template v-else>
-              <select
-                  v-model.number="uiForm.idRoom"
-                  class="input"
-                  @change="touchField('idRoom')"
-                  data-testid="room-select"
-              >
-                <option disabled :value="0">Select a room</option>
-                <option
-                    v-for="room in sortedFilteredRooms"
-                    :key="room.idRoom"
-                    :value="Number(room.idRoom)"
-                    data-testid="room-option"
+                <span class="error-message" v-if="v$.uiForm.idRoom.$error && canPickRoom">
+                  {{ v$.uiForm.idRoom.$errors[0]?.$message || 'The field is required*' }}
+                </span>
+                <span class="error-message" v-if="state.errors.IdRoom">{{ state.errors.IdRoom[0] }}</span>
+
+                <button
+                    class="form-btn"
+                    type="button"
+                    @click.prevent="addRoom"
+                    :disabled="!state.tempRoomId || !canPickRoom"
+                    data-testid="add-room-btn"
                 >
-                  {{ room.number }} - Capacity: {{ room.capacity }}
-                </option>
-              </select>
-            </template>
-            <span class="error-message" v-if="v$.uiForm.idRoom.$error">
-              {{ v$.uiForm.idRoom.$errors[0]?.$message || 'The field is required*' }}
-            </span>
-            <span class="error-message" v-if="state.errors.IdRoom">{{ state.errors.IdRoom[0] }}</span>
+                  Add room
+                </button>
+              </template>
 
-            <label>Price: {{ uiForm.price }}</label>
-          </div>
+              <template v-else>
+                <div class="muted">Enter capacity and choose a room type to see available rooms.</div>
+              </template>
+            </div>
+
+          </template>
+
+          <template v-else>
+            <div class="card guest-card">
+              <div class="guest-row">
+                <span class="guest-name">Room #{{ selectedRoom?.number }}</span>
+                <span class="guest-passport">Capacity: {{ selectedRoom?.capacity }}</span>
+              </div>
+              <div class="guest-row muted">
+                <span v-if="selectedRoom?.type">Type: {{ selectedRoom.type }}</span>
+                <span v-if="selectedRoom?.price">Price/night: {{ selectedRoom.price }}</span>
+              </div>
+            </div>
+
+            <button
+                v-if="state.isEditing || state.isCreate"
+                class="form-btn danger"
+                type="button"
+                @click.prevent="removeRoom"
+                data-testid="remove-room-btn"
+            >
+              Remove room
+            </button>
+          </template>
         </div>
 
         <div class="guest">
@@ -144,9 +180,8 @@
               <template v-if="!state.guestAttached">
                 <label>Guest Selection:</label>
                 <select
-                    v-model.number="uiForm.idGuest"
+                    v-model.number="state.tempGuestId"
                     class="input"
-                    @change="touchField('idGuest')"
                     data-testid="guest-select"
                 >
                   <option disabled :value="0">Select a guest</option>
@@ -159,6 +194,7 @@
                     {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
                   </option>
                 </select>
+
                 <span class="error-message" v-if="v$.uiForm.idGuest.$error">
                   {{ v$.uiForm.idGuest.$errors[0]?.$message || 'The field is required*' }}
                 </span>
@@ -168,7 +204,7 @@
                     class="form-btn"
                     type="button"
                     @click.prevent="addGuest"
-                    :disabled="!uiForm.idGuest"
+                    :disabled="!state.tempGuestId"
                 >
                   Add guest
                 </button>
@@ -304,10 +340,39 @@
             <div class="service-list" v-if="uiForm.services.length > 0">
               <ul class="added-services-list">
                 <li class="element" v-for="(service, index) in uiForm.services" :key="index">
-                  <span>{{ service.title }}: {{ service.sum }}</span>
-                  <button class="btn" v-if="state.isEditing || state.isCreate" @click.prevent="removeService(index)" type="button">Remove</button>
+                  <span class="service-title">{{ service.title }}: {{ service.sum }}</span>
+                  <div class="service-actions">
+                    <button
+                        class="btn"
+                        v-if="state.isEditing || state.isCreate"
+                        @click.prevent="removeService(index)"
+                        type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </li>
               </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="guest">
+          <label>Summary</label>
+          <div class="input-form">
+            <div class="summary-row">
+              <span>Room:</span>
+              <strong data-testid="summary-room">{{ roomTotal }}</strong>
+            </div>
+            <div class="summary-row">
+              <span>Services:</span>
+              <strong data-testid="summary-services">{{ servicesTotal }}</strong>
+            </div>
+            <hr class="summary-sep" />
+            <div class="summary-row total">
+              <span>Total:</span>
+              <strong data-testid="summary-total">{{ grandTotal }}</strong>
             </div>
           </div>
         </div>
@@ -327,6 +392,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import { reactive, computed, watch, onMounted, nextTick, toRaw } from 'vue';
@@ -352,7 +418,6 @@ export default {
   setup(props) {
     const store = useStore();
     const router = useRouter();
-    const route = useRoute();
 
     const toArray = (x) => {
       if (Array.isArray(x)) return x;
@@ -394,15 +459,22 @@ export default {
       selectedService: 0,
       errors: {},
       hasDeposit: false,
-      guestAttached: false, // <— управляет карточкой гостя
+      guestAttached: false,
+      tempGuestId: 0,
+      roomAttached: false,
+      tempRoomId: 0,
     });
 
     const uiForm = state.uiForm;
 
-    // ---- Validation helpers
     const afterInMessage = helpers.withMessage(
         'The out date must be after the in date*',
         (val) => !!val && new Date(val) > new Date(uiForm.in)
+    );
+
+    const selectedGtZero = helpers.withMessage(
+        'The field is required*',
+        (v) => Number(v) > 0
     );
 
     const capMin = helpers.withMessage('The capacity must be greater than 0*', (v) => Number(v) > 0);
@@ -430,16 +502,16 @@ export default {
         in: { required: helpers.withMessage('The field is required*', required) },
         out: { required: helpers.withMessage('The field is required*', required), afterInMessage },
         capacity: { required: helpers.withMessage('The field is required*', required), numeric, capMin, capMax },
-        idRoomType: { required: helpers.withMessage('The field is required*', required) },
-        idRoom: { required: helpers.withMessage('The field is required*', required) },
-        idGuest: { required: helpers.withMessage('The field is required*', required) },
+        idRoomType: { selectedGtZero },
+        idRoom: { selectedGtZero },
+        idGuest: { selectedGtZero },
         depositSum: { required: requiredIfHasDeposit, numeric: numericIfHasDeposit, depositPositive },
         idDepositType: { depositTypeRequired },
       },
     };
+
     const v$ = useVuelidate(rules, state);
 
-    // ---- Data fetching
     async function fetchCommon() {
       const [roomTypes, guestList, depositTypes, serviceList] = await Promise.all([
         roomsApi.types(),
@@ -456,6 +528,15 @@ export default {
     async function fetchForCreate() {
       state.rooms = toArray(await roomsApi.free());
     }
+
+    const canPickRoom = computed(() => Number(uiForm.capacity) > 0 && Number(uiForm.idRoomType) > 0);
+    watch([() => uiForm.capacity, () => uiForm.idRoomType], () => {
+      if (!state.roomAttached) {
+        state.tempRoomId = 0;
+        delete state.errors.IdRoom;
+        v$.value?.uiForm?.idRoom?.$reset?.();
+      }
+    });
 
     async function fetchForDetails(id) {
       const dto = await reservations.getArrival(id);
@@ -474,6 +555,10 @@ export default {
 
       state.hasDeposit = Number(uiForm.idDepositType) > 0 || Number(uiForm.depositSum) > 0;
       state.guestAttached = uiForm.idGuest > 0;
+      state.tempGuestId = 0;
+
+      state.roomAttached = uiForm.idRoom > 0;
+      state.tempRoomId = 0;
 
       state.rooms = toArray(await roomsApi.free(uiForm.idRoom));
 
@@ -481,7 +566,6 @@ export default {
       recalcPrice();
     }
 
-    // ---- Computed
     const selectedRoomTypeTitle = computed(() => {
       const item = (state.roomTypes || []).find((t) => String(t.idType) === String(uiForm.idRoomType));
       return item?.title ?? '';
@@ -506,6 +590,10 @@ export default {
       return g ? `${g.name} ${g.surname}, ${g.passport}` : '';
     });
 
+    const selectedRoom = computed(() => {
+      return (state.rooms || []).find((x) => String(x.idRoom) === String(uiForm.idRoom)) || null;
+    });
+
     const sortedFilteredRooms = computed(() => {
       let filtered = [...(state.rooms || [])];
       if (uiForm.idRoomType) {
@@ -527,7 +615,6 @@ export default {
       return '';
     });
 
-    // ---- Watchers
     watch(
         () => uiForm.in,
         (newIn) => {
@@ -554,7 +641,15 @@ export default {
     }
     watch(() => [uiForm.in, uiForm.out, uiForm.idRoom], recalcPrice, { deep: true });
 
-    // ---- UI helpers
+    const roomTotal = computed(() => Number(uiForm.price) || 0);
+    const servicesTotal = computed(() =>
+        (Array.isArray(uiForm.services) ? uiForm.services : []).reduce(
+            (acc, s) => acc + Number(s.sum ?? s.Sum ?? 0),
+            0
+        )
+    );
+    const grandTotal = computed(() => roomTotal.value + servicesTotal.value);
+
     function touchField(name) {
       const node = v$.value?.uiForm?.[name];
       if (node && typeof node.$touch === 'function') node.$touch();
@@ -582,20 +677,41 @@ export default {
       nextTick().then(resetDepositValidation);
     }
 
-    // ---- Guest attach/detach
     function addGuest() {
-      touchField('idGuest');
-      if (v$.value?.uiForm?.idGuest?.$invalid) return;
+      if (!Number(state.tempGuestId)) {
+        v$.value?.uiForm?.idGuest?.$touch?.();
+        return;
+      }
+      uiForm.idGuest = Number(state.tempGuestId);
       state.guestAttached = true;
+      state.tempGuestId = 0;
     }
     function removeGuest() {
       state.guestAttached = false;
       uiForm.idGuest = 0;
+      state.tempGuestId = 0;
       delete state.errors.IdGuest;
       v$.value?.uiForm?.idGuest?.$reset?.();
     }
 
-    // ---- Services
+    function addRoom() {
+      if (!Number(state.tempRoomId)) {
+        v$.value?.uiForm?.idRoom?.$touch?.();
+        return;
+      }
+      uiForm.idRoom = Number(state.tempRoomId);
+      state.roomAttached = true;
+      state.tempRoomId = 0;
+      delete state.errors.IdRoom;
+    }
+    function removeRoom() {
+      state.roomAttached = false;
+      uiForm.idRoom = 0;
+      state.tempRoomId = 0;
+      delete state.errors.IdRoom;
+      v$.value?.uiForm?.idRoom?.$reset?.();
+    }
+
     function addService() {
       const s = state.selectedService;
       if (!s || s === 0) return;
@@ -623,16 +739,15 @@ export default {
             In: uiForm.in,
             Out: uiForm.out,
             Capacity: Number(uiForm.capacity),
-            Price: Number(uiForm.price),
+            Price: Number(grandTotal.value),
             IdRoom: Number(uiForm.idRoom),
             Confirmed: !!uiForm.confirmed,
             Sum: state.hasDeposit ? Number(uiForm.depositSum) : 0,
             IdDepositType: state.hasDeposit ? Number(uiForm.idDepositType) : 0,
-            IdPerson: Number(uiForm.idGuest),
+            IdPerson: Number(state.guestAttached ? uiForm.idGuest : 0),
             IdUser: Number(store.getters.getUserData?.idUser),
             Services: rawServices.map((s) => ({ IdService: Number(s.idService ?? s.IdService) })),
           };
-          console.log(payload);
 
           const res = await reservations.create(payload);
           const body = res?.data ?? res ?? {};
@@ -670,7 +785,7 @@ export default {
           idRoom: uiForm.idRoom,
           idRoomType: uiForm.idRoomType,
           idGuest: uiForm.idGuest,
-          price: Number(uiForm.price),
+          price: Number(grandTotal.value),
           confirmed: !!uiForm.confirmed,
           depositSum: state.hasDeposit ? Number(uiForm.depositSum) : 0,
           idDepositType: state.hasDeposit ? uiForm.idDepositType : 0,
@@ -711,7 +826,13 @@ export default {
       Object.assign(state.uiForm, defaultUiForm());
       state.errors = {};
       state.hasDeposit = false;
+
       state.guestAttached = false;
+      state.tempGuestId = 0;
+
+      state.roomAttached = false;
+      state.tempRoomId = 0;
+
       v$.value.$reset();
     }
 
@@ -757,6 +878,7 @@ export default {
       selectedRoomLabel,
       selectedGuestLabel,
       selectedGuest,
+      selectedRoom,
       sortedFilteredRooms,
       toggleDeposit,
       addService,
@@ -767,6 +889,12 @@ export default {
       touchField,
       addGuest,
       removeGuest,
+      addRoom,
+      removeRoom,
+      canPickRoom,
+      roomTotal,
+      servicesTotal,
+      grandTotal,
     };
   },
 };
@@ -788,6 +916,7 @@ export default {
   padding-top: 2vh;
   margin: 5%;
 }
+
 .creating-form {
   width: 100%;
   max-width: 720px;
@@ -799,12 +928,14 @@ export default {
   flex-direction: column;
   gap: 14px;
 }
+
 .page-title,
 h1 {
   margin: 0 0 8px;
   color: #000;
   text-align: center;
 }
+
 .registration-class {
   display: flex;
   justify-content: space-between;
@@ -814,28 +945,28 @@ h1 {
 
 .date-inputs {
   display: flex;
-  justify-content: space-between;
+  gap: 12px;
   width: 100%;
 }
+
 .input-form {
   display: flex;
   flex-direction: column;
   position: relative;
   flex: 1;
-  margin-right: 10px;
 }
-.input[readonly] {
-  background: #f3f3f3;
-  color: #666;
-}
-.input-form:last-child {
-  margin-right: 0;
-}
+
 .input-form label {
   margin-bottom: 5px;
   font-weight: bold;
   color: black;
 }
+
+.input[readonly] {
+  background: #f3f3f3;
+  color: #666;
+}
+
 .input-form input[type="text"],
 .input-form input[type="date"],
 .input-form input[type="number"],
@@ -845,6 +976,7 @@ h1 {
   border-radius: 5px;
   margin-bottom: 10px;
 }
+
 .registration-btn,
 .form-btn {
   display: inline-flex;
@@ -862,18 +994,16 @@ h1 {
   height: 44px;
   box-sizing: border-box;
 }
+
 .form-btn.danger {
   background-color: #b35252;
 }
+
 .error-message {
   color: red;
   margin: 10px 0;
 }
-h1 {
-  display: flex;
-  justify-content: center;
-  color: black;
-}
+
 .guest {
   display: flex;
   flex-direction: column;
@@ -882,6 +1012,7 @@ h1 {
   padding: 10px;
   margin-top: 20px;
 }
+
 .tab-switcher {
   display: flex;
   justify-content: center;
@@ -899,44 +1030,77 @@ h1 {
   font-size: 20px;
 }
 
-.element {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #C8B6A6;
-  border-radius: 5px;
-  font-weight: 700;
-  font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
-}
 .service-list {
   overflow-y: auto;
-  border: 1px solid #000;
-  border-radius: 5px;
-  padding: 10px;
-  margin: 10px 0;
+  border: 1px solid #D3C1AC;
+  background: #F7EFE7;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 12px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
 }
+
 .service-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 800px;
 }
+
+.element {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  background-color: #C8B6A6;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.service-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
 .btn {
-  padding: 8px 12px;
-  font-size: .85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 0.85rem;
   font-weight: 700;
   border-radius: 10px;
   border: 1px solid #D3C1AC;
-  background-color: #444;
-  color: #fff;
+  background-color: #444444;
+  color: #FFFFFF;
   cursor: pointer;
-  transition: background-color .3s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.05s ease;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-/* guest summary card */
+.btn:hover  { background-color: #3a3a3a; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled {
+  background-color: #9a9a9a;
+  border-color: #bdbdbd;
+  color: #ececec;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
 .card.guest-card {
   background: #C8B6A6;
   border-radius: 8px;
@@ -947,6 +1111,7 @@ h1 {
   flex-direction: column;
   gap: 6px;
 }
+
 .guest-row {
   display: flex;
   gap: 12px;
@@ -954,6 +1119,7 @@ h1 {
   align-items: center;
   flex-wrap: wrap;
 }
+
 .guest-name {
   font-weight: 700;
 }
@@ -965,10 +1131,27 @@ h1 {
   font-size: .95rem;
 }
 
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 15px;
+}
+.summary-row.total {
+  font-size: 18px;
+}
+.summary-sep {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 6px 0;
+}
+
 @media (max-width: 768px) {
   .creating-form { max-width: 100%; padding: 20px 16px; }
-  .date-inputs { grid-template-columns: 1fr; }
-  .registration-class { justify-content: stretch; }
-  .registration-btn, .form-btn { flex: 1; }
+  .date-inputs { flex-direction: column; }
+  .registration-class { gap: 10px; }
+  .registration-btn, .form-btn { flex: 1; min-width: 0; }
+  .element { grid-template-columns: 1fr; }
 }
 </style>

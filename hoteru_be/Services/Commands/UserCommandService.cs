@@ -82,76 +82,108 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> UpdateUser(int hotelId, UpdateUserDTO dto, CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateUser(
+    int hotelId,
+    string currentRole,
+    int currentPersonId,
+    UpdateUserDTO dto,
+    CancellationToken ct = default)
         {
-
             var login = (dto.LoginName ?? string.Empty).Trim();
             var email = (dto.Email ?? string.Empty).Trim();
             var name = (dto.Name ?? string.Empty).Trim();
             var surname = (dto.Surname ?? string.Empty).Trim();
 
-            var user = await _context.Users
+            var target = await _context.Users
                 .Include(u => u.Person)
+                .Include(u => u.UserType)
                 .SingleOrDefaultAsync(u => u.IdPerson == dto.IdPerson && u.Person.IdHotel == hotelId, ct);
-
-            if (user is null)
-            {
-                _logger?.LogWarning("UpdateUser not found: person {PersonId}, hotel {HotelId}", dto.IdPerson, hotelId);
+            if (target is null)
                 return MethodResultDTO.NotFound("User not found");
+
+            var targetRole = target.UserType?.Title ?? string.Empty;
+
+            var requestedRole = await _context.UserTypes
+                .AsNoTracking()
+                .Where(t => t.IdUserType == dto.IdUserType)
+                .Select(t => t.Title)
+                .SingleOrDefaultAsync(ct);
+            if (requestedRole is null)
+                return MethodResultDTO.NotFound("User type not found");
+
+            bool isSelf = currentPersonId == dto.IdPerson;
+            bool isSuperadmin = currentRole.Equals("Superadmin", StringComparison.OrdinalIgnoreCase);
+            bool isAdmin = currentRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+            bool isEmployee = currentRole.Equals("Employee", StringComparison.OrdinalIgnoreCase);
+            bool roleChanged = dto.IdUserType != target.IdUserType;
+
+            if (isEmployee)
+            {
+                if (!isSelf) return MethodResultDTO.Forbidden("Employees can update only their own profile.");
+                if (roleChanged) { dto.IdUserType = target.IdUserType; roleChanged = false; }
+            }
+            else if (isAdmin)
+            {
+                if (!(targetRole.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                      targetRole.Equals("Employee", StringComparison.OrdinalIgnoreCase)))
+                    return MethodResultDTO.Forbidden("Admins can update only Admin/Employee users.");
+
+                if (roleChanged)
+                {
+                    if (!requestedRole.Equals("Admin", StringComparison.OrdinalIgnoreCase) &&
+                        !requestedRole.Equals("Employee", StringComparison.OrdinalIgnoreCase))
+                        return MethodResultDTO.Forbidden("Admins cannot assign this role.");
+                }
+            }
+            else if (isSuperadmin)
+            {
+                if (roleChanged && requestedRole.Equals("Superadmin", StringComparison.OrdinalIgnoreCase) &&
+                    !targetRole.Equals("Superadmin", StringComparison.OrdinalIgnoreCase))
+                    return MethodResultDTO.Forbidden("Cannot assign Superadmin role to another user.");
+
+                if (isSelf && roleChanged)
+                    return MethodResultDTO.Forbidden("Superadmin cannot change their own role.");
+            }
+            else
+            {
+                return MethodResultDTO.Forbidden("Unknown role.");
             }
 
             var loginExists = await _context.Users
                 .AsNoTracking()
                 .AnyAsync(u => u.LoginName == login && u.IdPerson != dto.IdPerson, ct);
             if (loginExists)
-            {
-                return MethodResultDTO.BadRequest(
-                    "Validation failed",
-                    new Dictionary<string, List<string>> { { "LoginName", new() { "Another user with this login already exists." } } });
-            }
+                return MethodResultDTO.BadRequest("Validation failed",
+                    new() { { "LoginName", new() { "Another user with this login already exists." } } });
 
             var emailExists = await _context.Persons
                 .AsNoTracking()
                 .AnyAsync(p => p.Email == email && p.IdHotel == hotelId && p.IdPerson != dto.IdPerson, ct);
             if (emailExists)
-            {
-                return MethodResultDTO.BadRequest(
-                    "Validation failed",
-                    new Dictionary<string, List<string>> { { "Email", new() { "Another person with this email already exists." } } });
-            }
-
-            var userTypeExists = await _context.UserTypes
-                .AsNoTracking()
-                .AnyAsync(t => t.IdUserType == dto.IdUserType, ct);
-            if (!userTypeExists)
-            {
-                return MethodResultDTO.NotFound("User type not found");
-            }
+                return MethodResultDTO.BadRequest("Validation failed",
+                    new() { { "Email", new() { "Another person with this email already exists." } } });
 
             try
             {
-                user.LoginName = login;
-                user.IdUserType = dto.IdUserType;
-                user.Person.Name = name;
-                user.Person.Surname = surname;
-                user.Person.Email = email;
+                target.LoginName = login;
+                target.Person.Name = name;
+                target.Person.Surname = surname;
+                target.Person.Email = email;
+                if (roleChanged)
+                    target.IdUserType = dto.IdUserType;
 
                 await _context.SaveChangesAsync(ct);
-
-                _logger?.LogInformation("User {PersonId} updated in hotel {HotelId}", user.IdPerson, hotelId);
+                _logger?.LogInformation("User {PersonId} updated in hotel {HotelId}", target.IdPerson, hotelId);
                 return MethodResultDTO.Ok("Updated");
             }
-            catch (OperationCanceledException)
-            {
-                _logger?.LogWarning("UpdateUser canceled for person {PersonId}", dto.IdPerson);
-                throw;
-            }
+            catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error updating user {PersonId}", dto.IdPerson);
                 return MethodResultDTO.Error("An error occurred while updating user.");
             }
         }
+
 
         public async Task<MethodResultDTO> DeleteUser(int hotelId, int idPerson, CancellationToken ct = default)
         {

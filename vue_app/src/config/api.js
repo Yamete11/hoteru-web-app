@@ -24,6 +24,7 @@ export const ENDPOINTS = {
 
     USER: {
         ROOT: withBase("/api/User"),
+        BY_ID: (id) => withBase(`/api/User/${id}`),
         BY_NAME: (userName) => withBase(`/api/User/${encodeURIComponent(userName)}`),
         FULL: (id) => withBase(`/api/User/fullUser/${id}`),
     },

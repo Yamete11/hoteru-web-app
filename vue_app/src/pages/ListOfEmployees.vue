@@ -2,6 +2,7 @@
   <div class="newRoom-component">
     <navbar />
     <sidebar />
+
     <div class="main">
       <div class="newUser-section">
         <form @submit.prevent="addUser" class="creating-form">
@@ -72,8 +73,9 @@
             />
             <span class="error-message" v-if="v$.newUser.loginName.$error">
               <span v-if="!v$.newUser.loginName.required.$response">Login is required*</span>
+              <span v-else-if="!v$.newUser.loginName.minLength.$response">Login must be at least 3 characters*</span>
               <span v-else-if="!v$.newUser.loginName.maxLength.$response">Login must be less than 15 characters*</span>
-              <span v-else-if="!v$.newUser.loginName.loginValid.$response">Only letters, numbers, dot, dash and underscore*</span>
+              <span v-else-if="!v$.newUser.loginName.loginValid.$response">Only letters, digits, dot, dash and underscore*</span>
             </span>
             <span class="error-message" v-if="state.errors.LoginName">{{ state.errors.LoginName?.[0] }}</span>
           </div>
@@ -90,6 +92,7 @@
             />
             <span class="error-message" v-if="v$.newUser.password.$error">
               <span v-if="!v$.newUser.password.required.$response">Password is required*</span>
+              <span v-else-if="!v$.newUser.password.minLength.$response">Password must be at least 3 characters*</span>
             </span>
             <span class="error-message" v-if="state.errors.Password">{{ state.errors.Password?.[0] }}</span>
           </div>
@@ -124,27 +127,62 @@
         </form>
 
         <div class="user-list">
-          <h1>List of employees: </h1>
-          <div class="service-list">
-            <ul class="added-services-list">
+          <h1>List of employees:</h1>
+
+          <div class="users-card">
+            <ul class="users">
               <li
                   class="element"
                   v-for="user in state.users"
                   :key="user.idPerson"
                   :data-testid="'user-item-' + user.loginName"
               >
-                <span>Login: {{ user.loginName }} - Type: {{ user.userType }}</span>
-                <button
-                    v-if="user.userType !== 'Superadmin'"
-                    class="btn"
-                    @click.prevent="deleteUser(user.idPerson)"
-                    :data-testid="'delete-user-' + user.loginName"
-                >
-                  Remove
-                </button>
+                <div class="info">
+                  <div class="line">
+                    <span class="label">Login</span>
+                    <span class="value">{{ user.loginName }}</span>
+                  </div>
+                  <div class="line">
+                    <span class="label">Type</span>
+                    <span class="badge" :class="'badge--' + (user.userType || '').toLowerCase()">
+                      {{ user.userType }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <router-link
+                      v-if="canViewDetails(user)"
+                      class="btn"
+                      :to="`/user/${user.idPerson}`"
+                      :data-testid="'details-user-' + user.loginName"
+                  >
+                    Details
+                  </router-link>
+                  <button
+                      v-else
+                      class="btn btn--disabled"
+                      disabled
+                      :title="'Only Superadmin can view Superadmin details'"
+                      :data-testid="'details-user-disabled-' + user.loginName"
+                  >
+                    Details
+                  </button>
+
+                  <button
+                      class="btn"
+                      :class="{ 'btn--disabled': !canDelete(user) }"
+                      :disabled="!canDelete(user)"
+                      @click.prevent="canDelete(user) && deleteUser(user)"
+                      :data-testid="'delete-user-' + user.loginName"
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             </ul>
           </div>
+
         </div>
       </div>
     </div>
@@ -154,7 +192,7 @@
 <script>
 import { reactive, computed, onMounted } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, maxLength, email as emailV } from '@vuelidate/validators';
+import { required, maxLength, email as emailV, minLength } from '@vuelidate/validators';
 import { useStore } from 'vuex';
 import { notify } from '@kyvg/vue3-notification';
 import http from '@/lib/http';
@@ -179,25 +217,29 @@ export default {
       users: [],
     });
 
-    const onlyLetters = (v) => typeof v === 'string' && /^[\p{L}]+$/u.test(v);
-    const loginValid  = (v) => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v);
+    const currentRole = computed(() => String(store.getters.getUserRole || store.getters.getUserData?.userType || ''));
+    const isSuperadmin = computed(() => currentRole.value.trim().toLowerCase() === 'superadmin');
+
+    const onlyLetters = (v) => typeof v === 'string' && /^\p{L}+(?:[ '-]\p{L}+)*$/u.test(v);
+    const loginValid  = (v) => typeof v === 'string' && /^[A-Za-z0-9._-]{3,15}$/.test(v);
 
     const rules = {
       newUser: {
         name: { required, maxLength: maxLength(20), onlyLetters },
         surname: { required, maxLength: maxLength(20), onlyLetters },
         email: { required, email: emailV },
-        loginName: { required, maxLength: maxLength(15), loginValid },
-        password: { required },
+        loginName: { required, minLength: minLength(3), maxLength: maxLength(15), loginValid },
+        password: { required, minLength: minLength(3) },
         idUserType: { required },
       },
     };
     const v$ = useVuelidate(rules, state);
 
     const filteredUserTypes = computed(() =>
-        (state.userTypes || []).filter(t => t.title !== 'Superadmin')
+        (state.userTypes || []).filter(t => (t.title || '').toLowerCase() !== 'superadmin')
     );
 
+    const currentUserId = computed(() => store.getters.getPersonId);
 
     async function loadUserTypes() {
       const { data } = await http.get(ENDPOINTS.USER_TYPE);
@@ -213,6 +255,18 @@ export default {
         userType:  u.userType ?? '',
       }));
     }
+
+    const canDelete = (user) => {
+      const isTargetSuperadmin = (user.userType || '').toLowerCase() === 'superadmin';
+      const isSelf = user.idPerson === currentUserId.value;
+      return !isTargetSuperadmin && !isSelf;
+    };
+
+    const canViewDetails = (user) => {
+      const isTargetSuperadmin = (user.userType || '').toLowerCase() === 'superadmin';
+      if (!isSuperadmin.value && isTargetSuperadmin) return false;
+      return true;
+    };
 
     async function addUser() {
       state.errors = {};
@@ -231,7 +285,7 @@ export default {
       try {
         const { data } = await http.post(ENDPOINTS.USER.ROOT, payload);
 
-        if (data?.httpStatusCode && data.httpStatusCode !== 200 && data.httpStatusCode !== 201) {
+        if (data?.httpStatusCode && ![200, 201].includes(data.httpStatusCode)) {
           state.errors = data.errors || {};
           notify({ title: 'Create failed', text: data?.message || 'Validation failed', type: 'error' });
           return;
@@ -246,14 +300,18 @@ export default {
       }
     }
 
-    async function deleteUser(idPerson) {
+    async function deleteUser(user) {
+      if (!canDelete(user)) {
+        notify({ title: 'Not allowed', text: 'You cannot delete yourself or a Superadmin.', type: 'warn' });
+        return;
+      }
       try {
-        const { data } = await http.delete(ENDPOINTS.USER.BY_ID(idPerson));
+        const { data } = await http.delete(ENDPOINTS.USER.BY_ID(user.idPerson));
         if (data?.httpStatusCode && data.httpStatusCode !== 200) {
           notify({ title: 'Delete failed', text: data?.message || 'Operation failed', type: 'error' });
           return;
         }
-        state.users = state.users.filter(u => u.idPerson !== idPerson);
+        state.users = state.users.filter(u => u.idPerson !== user.idPerson);
         notify({ title: 'User Deleted', text: 'User has been successfully deleted.', type: 'success', duration: 3000 });
       } catch (err) {
         notify({ title: 'Delete failed', text: err?.response?.data?.message || err?.message || 'Unexpected error', type: 'error' });
@@ -278,7 +336,12 @@ export default {
       await fetchUsers();
     });
 
-    return { state, v$, filteredUserTypes, addUser, deleteUser, clearNewUserForm, fetchUsers };
+    return {
+      state, v$, filteredUserTypes,
+      addUser, deleteUser, clearNewUserForm,
+      currentUserId, canDelete,
+      currentRole, isSuperadmin, canViewDetails,
+    };
   },
 };
 </script>
@@ -288,57 +351,76 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #F1DEC9;
-  height: 100vh;
-}
-.main {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  padding-top: 8vh;
-  margin: 5%;
+  min-height: 100vh;
 }
 
-.newUser-section{
+.main {
   display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: space-around;
-  min-width: 40%;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 32px 24px;
+  margin: 0;
+}
+
+.newUser-section {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(420px, 1fr);
+  column-gap: 48px;
+  row-gap: 24px;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  align-items: start;
 }
 
 .creating-form {
-  width: 50%;
-  max-width: 720px;
+  width: 100%;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px 20px;
-  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.user-list {
+h1 {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 40%;
-  margin-left: 10px;
+  justify-content: center;
+  color: #2a2a2a;
+  margin: 0 0 8px;
 }
 
-.registration-btn{
-  text-decoration: none;
-  background-color: #8D7B68;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-weight: bold;
-  color: white;
-  margin: 10px;
+.input-form {
+  display: flex;
+  flex-direction: column;
+  margin: 5px 0;
+}
+
+.input-form label {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #2a2a2a;
+}
+
+.input-form input[type="text"],
+.input-form input[type="password"],
+.input-form select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+}
+
+.input-form select {
   cursor: pointer;
+}
+
+.error-message {
+  color: #cc1f1a;
+  margin: 6px 0;
+  font-size: 0.9rem;
 }
 
 .registration-class{
@@ -348,92 +430,139 @@ export default {
   width: 100%;
 }
 
-.input-form {
+.registration-btn{
+  text-decoration: none;
+  background-color: #8D7B68;
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+}
+
+.user-list {
   display: flex;
   flex-direction: column;
-  margin: 5px;
+  width: 100%;
 }
 
-.input-form label {
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: black;
+.user-list > h1 { margin: 0 0 10px; }
+
+.users-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  padding: 14px;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
-.input-form input[type="text"],
-.input-form input[type="password"]{
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-h1 {
+.users {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  justify-content: center;
-  color: black;
-}
-
-.input-form select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: white;
-  color: black;
-}
-
-.error-message {
-  color: red;
-  margin: 10px 0;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
 }
 
 .element {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 12px;
   align-items: center;
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #C8B6A6;
-  border-radius: 5px;
-  font-weight: bold;
-  font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 12px 14px;
+  background-color: #f8f5f2;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  transition: box-shadow .2s ease, transform .2s ease, background-color .2s ease;
 }
 
-.service-list ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  max-width: 800px;
+.element:hover {
+  background-color: #f5efe9;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.service-list {
-  height: 200%;
-  width: 100%;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
+.info { display: grid; gap: 6px; }
+.line { display: flex; align-items: center; gap: 8px; }
+.label { color: #6b6b6b; font-weight: 600; min-width: 48px; }
+.value { color: #2c2c2c; font-weight: 700; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #e9e3dc;
+  color: #5a4b3a;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
-.service-label {
-  font-weight: bold;
-  color: black;
-  align-self: center;
-  margin-bottom: 5px;
-}
+.badge--admin { background:#ffe9d9; color:#8a3d00; }
+.badge--employee { background:#e7f3ff; color:#004a92; }
+.badge--superadmin { background:#ffe4e4; color:#b83232; }
 
+.actions {
+  display: grid;
+  grid-template-columns: 120px 120px;
+  gap: 10px;
+  justify-items: end;
+}
 
 .btn {
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
   border-radius: 10px;
   border: 1px solid #D3C1AC;
   background-color: #444444;
   color: #FFFFFF;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.05s ease;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
+.btn:link,
+.btn:visited,
+.btn:hover,
+.btn:active,
+.btn:focus {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.btn:hover { background-color: #3a3a3a; }
+.btn:active { transform: translateY(1px); }
+
+.btn--disabled,
+.btn:disabled {
+  background-color: #9a9a9a;
+  border-color: #bdbdbd;
+  color: #ececec;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+@media (max-width: 980px) {
+  .newUser-section {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 24px;
+    width: min(720px, 100%);
+  }
+  .main {
+    align-items: flex-start;
+    min-height: auto;
+  }
+}
 </style>

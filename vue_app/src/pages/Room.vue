@@ -349,9 +349,68 @@ export default {
 </script>
 
 <style scoped>
-.room-component { display: flex; flex-direction: column; background-color: #F1DEC9; height: 100vh; }
-.new-room-button { font-weight: bold; font-size: 20px; padding: 0.5rem 3rem; background-color: #A4907C; color: white; text-decoration: none; border-radius: 4px; white-space: nowrap; }
-.header.number,.header.capacity,.header.type,.header.status,.header.action { display: flex; justify-content: center; flex-basis: 10%; }
-.observer { height: 10px; margin-bottom: 20px; }
+.room-component {
+  display: flex;
+  flex-direction: column;
+  background-color: #F1DEC9;
+  min-height: 100vh;
+}
+
+.main-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 0;
+}
+.search-select, .search-input { margin-right: 10px; }
+
+.new-room-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid #D3C1AC;
+  background-color: #444444;
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: background-color .2s ease, transform .05s ease;
+  box-sizing: border-box;
+}
+.new-room-button:hover  { background-color: #3a3a3a; }
+.new-room-button:active { transform: translateY(1px); }
+
+
+.table-headers {
+  display: grid;
+  grid-template-columns: 120px 120px 1.2fr 1.2fr 240px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin: 8px 16px 0;
+  color: #3b3b3b;
+  font-weight: 700;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header.number, .header.capacity {
+  justify-content: center;
+}
+
+.header.type, .header.status, .header.action {
+  justify-content: flex-start;
+}
+
+.observer {
+  height: 10px;
+  margin-bottom: 20px;
+}
 .flex { display: flex; } .gap-3 { gap: 0.75rem; } .items-center { align-items: center; }
 </style>
+

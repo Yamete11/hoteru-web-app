@@ -115,7 +115,9 @@ namespace hoteru_be.Controllers
                     MethodResultDTO.BadRequest("Validation failed", errors));
             }
             var hotelId = User.GetHotelId();
-            var result = await _commands.UpdateUser(hotelId, dto, ct);
+            var currentRole = User.GetRole();
+            var currentPersonId = User.GetPersonId();
+            var result = await _commands.UpdateUser(hotelId, currentRole, currentPersonId, dto, ct);
             return StatusCode((int)result.HttpStatusCode, result);
         }
 
