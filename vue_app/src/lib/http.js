@@ -1,15 +1,17 @@
-import axios from 'axios';
+import axios from "axios";
+
+const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 
 const http = axios.create({
-    baseURL: (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, ''),
+    baseURL: base || '/api',
     timeout: 15000,
     withCredentials: true,
-});
-
+})
 export function setAuthToken(token) {
-    if (token) http.defaults.headers.common.Authorization = `Bearer ${token}`;
-    else delete http.defaults.headers.common.Authorization;
+    if (token) http.defaults.headers.common.Authorization = `Bearer ${token}`
+    else delete http.defaults.headers.common.Authorization
 }
+
 
 http.interceptors.request.use((config) => {
     const url = String(config.url || '').toLowerCase();

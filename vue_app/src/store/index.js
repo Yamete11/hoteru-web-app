@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import axios from 'axios';
+import { setAuthToken } from '@/lib/http'
 import { auth, users } from '@/api';
 
 function base64UrlToJson(b64url) {
@@ -56,14 +56,9 @@ export default createStore({
     },
     mutations: {
         setToken(state, token) {
-            state.token = token;
-            if (token) {
-                localStorage.setItem('token', token);
-                axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-            } else {
-                localStorage.removeItem('token');
-                delete axios.defaults.headers.common.Authorization;
-            }
+            state.token = token
+            localStorage[token ? 'setItem' : 'removeItem']('token', token)
+            setAuthToken(token)
         },
         setUserData(state, val) {
             state.userData = val
