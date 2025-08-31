@@ -35,9 +35,14 @@ export default {
   methods: {
     async logout() {
       try {
-        await this.$store.dispatch('logout');
-      } finally {
-        this.$router.replace('/');
+        await this.$store.dispatch('logout')
+      } catch (e) {
+        try {
+          const { logout } = await import('@/api/auth')
+          await logout()
+        } finally {
+          window.location.assign('/')
+        }
       }
     }
     ,

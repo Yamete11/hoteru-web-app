@@ -13,3 +13,7 @@ export async function logout() {
     const { data } = await http.post(`${ENDPOINTS.AUTH.LOGIN}/logout`)
     return data
 }
+export async function me() {
+    const { data } = await http.get(`${ENDPOINTS.AUTH.LOGIN}/me`)
+    return data
+}

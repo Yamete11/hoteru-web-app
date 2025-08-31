@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using hoteru_be.Context;
 using hoteru_be.Services.Commands;
 using hoteru_be.Services.Queries;
@@ -125,18 +126,26 @@ namespace hoteru_be
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKeys = signingKeys,
-
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
-
                     ValidateAudience = true,
                     ValidAudience = Configuration["Jwt:Audience"],
-
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
-
                     RoleClaimType = ClaimTypes.Role,
                     NameClaimType = ClaimTypes.Name
+                };
+                opt.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (string.IsNullOrEmpty(context.Token) &&
+                            context.Request.Cookies.TryGetValue("access_token", out var token))
+                        {
+                            context.Token = token;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }

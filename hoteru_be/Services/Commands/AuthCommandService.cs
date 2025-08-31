@@ -36,7 +36,7 @@ namespace hoteru_be.Services.Commands
         {
             using var rng = RandomNumberGenerator.Create();
             var bytes = new byte[64];
-            rng.GetBytes(bytes); 
+            rng.GetBytes(bytes);
             return Convert.ToBase64String(bytes);
         }
         private static string Hash(string raw) =>
@@ -70,6 +70,7 @@ namespace hoteru_be.Services.Commands
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.IdPerson.ToString()),
+                new(ClaimTypes.NameIdentifier, user.IdPerson.ToString()),
                 new(ClaimTypes.Name, user.LoginName),
                 new(ClaimTypes.Role, user.UserType.Title),
                 new("role", user.UserType.Title),
@@ -77,7 +78,6 @@ namespace hoteru_be.Services.Commands
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
-
 
             var keysArr = _config.GetSection("Jwt:Keys").Get<string[]>();
             var currentKey = (keysArr != null && keysArr.Length > 0) ? keysArr[0] : _config["Jwt:Key"]
@@ -95,7 +95,6 @@ namespace hoteru_be.Services.Commands
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-           
             var refreshDays = int.TryParse(_config["Jwt:RefreshTokenDays"], out var d) ? d : 14;
             var rawRefresh = GenerateRefreshRaw();
             var rt = new RefreshToken
@@ -109,7 +108,6 @@ namespace hoteru_be.Services.Commands
             };
             _context.RefreshTokens.Add(rt);
             await _context.SaveChangesAsync(ct);
-
 
             return MethodResultDTO<AuthResponseDTO>.Ok(
                 new AuthResponseDTO { Token = accessToken, ExpiresAtUtc = token.ValidTo },
@@ -134,13 +132,14 @@ namespace hoteru_be.Services.Commands
 
             rt.RevokedUtc = now;
 
+            var refreshDays = int.TryParse(_config["Jwt:RefreshTokenDays"], out var d) ? d : 14;
             var newRaw = GenerateRefreshRaw();
             var newRt = new RefreshToken
             {
                 IdPerson = rt.IdPerson,
                 TokenHash = Hash(newRaw),
                 CreatedUtc = now,
-                ExpiresUtc = now.AddDays(14),
+                ExpiresUtc = now.AddDays(refreshDays),
                 CreatedByIp = ip,
                 UserAgent = userAgent
             };
@@ -152,7 +151,6 @@ namespace hoteru_be.Services.Commands
                 .Include(u => u.Person)
                 .SingleAsync(u => u.IdPerson == rt.IdPerson, ct);
 
-            var key = _config["Jwt:Key"]!;
             var issuer = _config["Jwt:Issuer"];
             var audience = _config["Jwt:Audience"];
             var minutes = int.TryParse(_config["Jwt:AccessTokenMinutes"], out var m) ? m : 30;
@@ -160,6 +158,7 @@ namespace hoteru_be.Services.Commands
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.IdPerson.ToString()),
+                new(ClaimTypes.NameIdentifier, user.IdPerson.ToString()),
                 new(ClaimTypes.Name, user.LoginName),
                 new(ClaimTypes.Role, user.UserType.Title),
                 new("hotelId", user.Person.IdHotel.ToString()),
@@ -167,8 +166,12 @@ namespace hoteru_be.Services.Commands
                 new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
 
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            var keysArr = _config.GetSection("Jwt:Keys").Get<string[]>();
+            var currentKey = (keysArr != null && keysArr.Length > 0) ? keysArr[0] : _config["Jwt:Key"]
+                             ?? throw new InvalidOperationException("Jwt key is missing");
+            var sk = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(currentKey)) { KeyId = "k0" };
+            var creds = new SigningCredentials(sk, SecurityAlgorithms.HmacSha256);
+
             var jwt = new JwtSecurityToken(issuer, audience, claims, now, now.AddMinutes(minutes), creds);
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
 
