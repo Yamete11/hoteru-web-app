@@ -203,7 +203,9 @@ export default {
   gap: 12px;
   padding: 10px 16px 0;
 }
-.search-select, .search-input { margin-right: 10px; }
+.search-select, .search-input {
+  margin-right: 10px;
+}
 
 .table-headers {
   display: grid;
@@ -215,12 +217,24 @@ export default {
   color: #3b3b3b;
   font-weight: 700;
 }
-.header { display: flex; align-items: center; justify-content: center; }
-.header.name   { justify-content: flex-start; }
-.header.action { justify-content: flex-end; }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header.name   {
+  justify-content: flex-start;
+}
+.header.action {
+  justify-content: flex-end;
+}
 
-.observer { height: 10px; margin-bottom: 20px; }
+.observer {
+  height: 10px; margin-bottom: 20px;
+}
 
-.date-range-container { display: flex; gap: 1rem; }
+.date-range-container {
+  display: flex; gap: 1rem;
+}
 </style>
 

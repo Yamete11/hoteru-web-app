@@ -1,7 +1,6 @@
 ﻿using hoteru_be.Context;
 using hoteru_be.DTOs;
 using hoteru_be.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -24,6 +23,8 @@ namespace hoteru_be.Services.Commands
 
         public async Task<MethodResultDTO> PostGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default)
         {
+            _logger.LogInformation("Attempting to add new guest for hotel {HotelId} with email {Email}", hotelId, guestDTO.Email);
+
             var errors = new Dictionary<string, List<string>>();
 
             var emailLower = guestDTO.Email.Trim().ToLowerInvariant();
@@ -45,7 +46,11 @@ namespace hoteru_be.Services.Commands
                 errors.Add("IdGuestStatus", new() { "Invalid guest status." });
             }
 
-            if (errors.Any()) return MethodResultDTO.Unprocessable("Validation failed", errors);
+            if (errors.Any())
+            {
+                _logger.LogWarning("Validation failed while creating guest for hotel {HotelId}. Errors: {@Errors}", hotelId, errors);
+                return MethodResultDTO.Unprocessable("Validation failed", errors);
+            }
 
             var person = new Person
             {
@@ -67,15 +72,23 @@ namespace hoteru_be.Services.Commands
             _context.Guests.Add(guest);
             await _context.SaveChangesAsync(ct);
 
+            _logger.LogInformation("Guest {GuestId} created successfully in hotel {HotelId}", guest.IdPerson, hotelId);
+
             return MethodResultDTO.Created("Created");
         }
 
         public async Task<MethodResultDTO> UpdateGuest(int hotelId, GuestDTO guestDTO, CancellationToken ct = default)
         {
+            _logger.LogInformation("Attempting to update guest {GuestId} in hotel {HotelId}", guestDTO.IdPerson, hotelId);
+
             var guest = await _context.Guests.Include(g => g.Person)
                 .FirstOrDefaultAsync(g => g.IdPerson == guestDTO.IdPerson && g.Person.IdHotel == hotelId, ct);
 
-            if (guest is null) return MethodResultDTO.NotFound("Guest not found");
+            if (guest is null)
+            {
+                _logger.LogWarning("Guest {GuestId} not found in hotel {HotelId}", guestDTO.IdPerson, hotelId);
+                return MethodResultDTO.NotFound("Guest not found");
+            }
 
             var errors = new Dictionary<string, List<string>>();
 
@@ -98,7 +111,11 @@ namespace hoteru_be.Services.Commands
                 errors.Add("IdGuestStatus", new() { "Invalid guest status." });
             }
 
-            if (errors.Any()) return MethodResultDTO.Unprocessable("Validation failed", errors);
+            if (errors.Any())
+            {
+                _logger.LogWarning("Validation failed while updating guest {GuestId} in hotel {HotelId}. Errors: {@Errors}", guestDTO.IdPerson, hotelId, errors);
+                return MethodResultDTO.Unprocessable("Validation failed", errors);
+            }
 
             guest.TelNumber = tel;
             guest.Passport = passport;
@@ -109,22 +126,35 @@ namespace hoteru_be.Services.Commands
 
             await _context.SaveChangesAsync(ct);
 
+            _logger.LogInformation("Guest {GuestId} updated successfully in hotel {HotelId}", guestDTO.IdPerson, hotelId);
+
             return MethodResultDTO.Ok("Updated");
         }
 
         public async Task<MethodResultDTO> DeleteGuest(int hotelId, int idPerson, CancellationToken ct = default)
         {
+            _logger.LogInformation("Attempting to delete guest {GuestId} in hotel {HotelId}", idPerson, hotelId);
+
             var guest = await _context.Guests.Include(g => g.Person)
                 .SingleOrDefaultAsync(g => g.IdPerson == idPerson && g.Person.IdHotel == hotelId, ct);
 
-            if (guest is null) return MethodResultDTO.NotFound("Guest not found");
+            if (guest is null)
+            {
+                _logger.LogWarning("Guest {GuestId} not found in hotel {HotelId}", idPerson, hotelId);
+                return MethodResultDTO.NotFound("Guest not found");
+            }
 
             if (await _context.Reservations.AsNoTracking().AnyAsync(r => r.IdGuest == idPerson, ct))
+            {
+                _logger.LogWarning("Cannot delete guest {GuestId} in hotel {HotelId} because they have reservations", idPerson, hotelId);
                 return MethodResultDTO.Conflict("Guest has reservations.");
+            }
 
             _context.Guests.Remove(guest);
             _context.Persons.Remove(guest.Person);
             await _context.SaveChangesAsync(ct);
+
+            _logger.LogInformation("Guest {GuestId} deleted successfully from hotel {HotelId}", idPerson, hotelId);
 
             return MethodResultDTO.Ok("Deleted");
         }

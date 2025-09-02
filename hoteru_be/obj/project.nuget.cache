@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uih6DT1mZjE=",
+  "dgSpecHash": "8SD+sr25FC4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Glebasher\\Desktop\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
+  "projectFilePath": "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Glebasher\\.nuget\\packages\\bouncycastle.cryptography\\2.2.1\\bouncycastle.cryptography.2.2.1.nupkg.sha512",
     "C:\\Users\\Glebasher\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Net.Mail;
@@ -10,10 +11,12 @@ namespace hoteru_be.Services.Commands
     public class EmailCommandService : IEmailCommandService
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<EmailCommandService> _logger;
 
-        public EmailCommandService(IConfiguration configuration)
+        public EmailCommandService(IConfiguration configuration, ILogger<EmailCommandService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task SendEmailAsync(string email, string subject, string message, CancellationToken ct)
@@ -25,7 +28,7 @@ namespace hoteru_be.Services.Commands
 
             try
             {
-                var client = new SmtpClient(smtpServer, smtpPort)
+                using var client = new SmtpClient(smtpServer, smtpPort)
                 {
                     EnableSsl = true,
                     Credentials = new NetworkCredential(mail, pw)
@@ -33,11 +36,12 @@ namespace hoteru_be.Services.Commands
 
                 var mailMessage = new MailMessage(mail, email, subject, message);
                 await client.SendMailAsync(mailMessage);
+
+                _logger.LogInformation("Email sent to {Email} with subject {Subject}", email, subject);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"SMTP error: {ex.Message}");
-                Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+                _logger.LogError(ex, "Failed to send email to {Email} with subject {Subject}", email, subject);
                 throw;
             }
         }

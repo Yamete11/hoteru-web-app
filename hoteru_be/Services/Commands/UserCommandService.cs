@@ -82,12 +82,7 @@ namespace hoteru_be.Services.Commands
             }
         }
 
-        public async Task<MethodResultDTO> UpdateUser(
-    int hotelId,
-    string currentRole,
-    int currentPersonId,
-    UpdateUserDTO dto,
-    CancellationToken ct = default)
+        public async Task<MethodResultDTO> UpdateUser(int hotelId, string currentRole, int currentPersonId, UpdateUserDTO dto, CancellationToken ct = default)
         {
             var login = (dto.LoginName ?? string.Empty).Trim();
             var email = (dto.Email ?? string.Empty).Trim();

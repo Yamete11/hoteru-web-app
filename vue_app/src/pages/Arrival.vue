@@ -209,15 +209,33 @@ export default {
   font-weight: 700;
 }
 
-.header { display: flex; align-items: center; justify-content: center; }
-.header.name   { justify-content: flex-start; }
-.header.action { justify-content: flex-end; }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header.name   {
+  justify-content: flex-start;
+}
+.header.action {
+  justify-content: flex-end;
+}
 
-.observer { height: 10px; margin-bottom: 20px; }
+.observer {
+  height: 10px;
+  margin-bottom: 20px;
+}
 
-.date-range-container { display: flex; gap: 1rem; }
-.search-select, .search-input { margin-right: 10px; }
+.date-range-container {
+  display: flex;
+  gap: 1rem;
+}
+.search-select, .search-input {
+  margin-right: 10px;
+}
 
-.main-bot { margin-top: 8px; }
+.main-bot {
+  margin-top: 8px;
+}
 </style>
 
