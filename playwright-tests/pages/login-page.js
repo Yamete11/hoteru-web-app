@@ -29,7 +29,8 @@ class LoginPage {
     }
 
     async isLoginButtonVisible() {
-        return await this.loginButton.isVisible();
+        await this.loginButton.waitFor({ state: 'visible', timeout: 10000 });
+        return true;
     }
 }
 

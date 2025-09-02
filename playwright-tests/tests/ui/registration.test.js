@@ -10,13 +10,17 @@ test('Successful registration redirects to login page', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await registrationPage.goto();
-
     await registrationPage.fillRegistrationForm(testData.newRegistrationUser);
+
     await registrationPage.submitForm();
 
     await registrationPage.assertRedirectToLogin();
-    expect(await loginPage.isLoginButtonVisible()).toBeTruthy();
 
+    const visible = await loginPage.isLoginButtonVisible();
+    expect(visible).toBeTruthy();
+});
+
+test.afterAll(async () => {
     await deleteHotelByTitle(testData.newRegistrationUser.companyName);
 });
 

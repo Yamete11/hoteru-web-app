@@ -6,43 +6,49 @@ class NewReservationPage {
         this.dateInInput = page.getByTestId('date-in');
         this.dateOutInput = page.getByTestId('date-out');
 
-        this.capacityInput = page.getByTestId('capacity');
+        this.capacityInput = page.getByTestId('capacity-input');
         this.roomTypeSelect = page.getByTestId('room-type-select');
         this.roomSelect = page.getByTestId('room-select');
+        this.addRoomButton = page.getByTestId('add-room-btn');
 
         this.guestSelect = page.getByTestId('guest-select');
+        this.addGuestButton = page.getByTestId('add-guest-btn');
 
         this.depositInput = page.getByTestId('deposit-input');
         this.depositSelect = page.getByTestId('deposit-select');
         this.addDepositButton = page.getByTestId('add-deposit-btn');
 
         this.serviceSelect = page.getByTestId('service-select');
-        this.addServiceButton = page.getByRole('button', { name: 'Add' });
+        this.addServiceButton = page.getByTestId('add-service-btn');
 
         this.submitButton = page.getByTestId('submit-button');
         this.cancelButton = page.getByTestId('cancel-button');
     }
 
-    async fillReservationForm(inDate, outDate, capacity, roomType, room, guest, depositSum, depositType, service) {
-        await this.dateInInput.fill(inDate);
-        await this.dateOutInput.fill(outDate);
-        await this.capacityInput.fill(capacity.toString());
+    async fillReservationForm(capacity, roomType, room, guest, depositSum, depositType, service) {
 
-        await this.roomTypeSelect.selectOption(roomType);
-        await this.roomSelect.selectOption(room);
+        await this.capacityInput.waitFor({ state: 'visible' });
+        await this.capacityInput.click({ clickCount: 2 });
+        await this.capacityInput.press('Backspace');
+        await this.capacityInput.type(String(capacity));
 
-        await this.guestSelect.selectOption(guest);
+        await this.roomTypeSelect.selectOption({ label: roomType });
+        await this.roomSelect.waitFor({ state: 'visible' });
+        await this.roomSelect.selectOption({ label: room });
+        await this.addRoomButton.click();
 
-        if (depositSum && depositType) {
-            await this.addDepositButton.click();
-            await this.depositInput.fill(depositSum.toString());
-            await this.depositSelect.selectOption(depositType);
-        }
 
-        if (service) {
-            await this.serviceSelect.selectOption(service);
-            await this.addServiceButton.click();
-        }
+        await this.guestSelect.selectOption({ label: guest });
+        await this.addGuestButton.click();
+
+        await this.addDepositButton.click();
+
+        await this.depositInput.fill(String(depositSum));
+        await this.depositSelect.selectOption({ label: depositType });
+
+        await this.serviceSelect.selectOption({ label:  service });
+        await this.addServiceButton.click();
+
     }
 
 

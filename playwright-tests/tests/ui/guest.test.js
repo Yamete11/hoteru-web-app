@@ -38,7 +38,8 @@ test('Create new Guest', async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
+    const sidebar = new SideBar(page);
     const guestPage = new GuestPage(page);
-    await guestPage.enterSearchQuery(testData.guestName)
-    await guestPage.deleteGuest()
+    await sidebar.clickButton('guests');
+    await guestPage.deleteGuestByName(testData.guestName);
 });

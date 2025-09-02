@@ -12,7 +12,7 @@ module.exports = {
     editServicePrice: '1',
     editServiceDescription: 'editDescription',
 
-    roomNumber: '501',
+    roomNumber: '999',
     roomCapacity: '2',
     roomPrice: '100',
     roomType: '1',
@@ -25,15 +25,13 @@ module.exports = {
     guestPassport: 'test123',
     guestStatus: '2',
 
-    reservationInDate: '2025-07-01',
-    reservationOutDate: '2025-07-25',
-    reservationCapacity: 2,
+    reservationCapacity: '2',
     reservationRoomType: "Regular",
     reservationRoom: '104 - Capacity: 4',
-    reservationGuest: '14',
+    reservationGuest: 'Anna Nowak, PL111111',
     reservationDepositSum: 100,
-    reservationDepositType: '2',
-    reservationService: 'Spa: 120.5',
+    reservationDepositType: 'Cash',
+    reservationService: 'Spa: 120',
 
     newUser: {
         name: 'Volodya',

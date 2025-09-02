@@ -26,8 +26,6 @@ test('Create new Reservation', async ({ page }) => {
     await navbar.openNewReservation();
 
     await newReservationPage.fillReservationForm(
-        testData.reservationInDate,
-        testData.reservationOutDate,
         testData.reservationCapacity,
         testData.reservationRoomType,
         testData.reservationRoom,

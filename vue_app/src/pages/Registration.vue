@@ -191,13 +191,12 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, email, maxLength } from '@vuelidate/validators';
 import axios from 'axios';
 import {useRouter} from "vue-router/dist/vue-router";
-import {useStore} from "vuex";
+import { ENDPOINTS as API } from '@/config/api';
 
 
 export default {
   name: "Registration",
   setup() {
-    const store = useStore();
 
     const router = useRouter();
     const state = reactive({
@@ -238,28 +237,23 @@ export default {
     const v$ = useVuelidate(rules, state);
 
 
-    async function addCompany(){
+    async function addCompany() {
       v$.value.$validate();
-      console.log(state.formData)
-      console.log(v$.value.$error)
-      if (!v$.value.$error) {
-        try {
-          const response = await axios.post(API.REGISTRATION.HOTEL, state.formData);
-          console.log('Success:', response.data);
-          if (response.data.httpStatusCode && response.data.httpStatusCode !== 200) {
-            state.errors = response.data.errors || {};
-            console.log('Error', response.data.message);
-          } else {
-            await router.push('/');
-          }
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.errors) {
-            state.errors = error.response.data.errors;
-          }
-          console.log('Error', error);
+      if (v$.value.$error) return;
+
+      try {
+        const { status, data } = await axios.post(API.REGISTRATION.HOTEL, state.formData);
+
+        if (status === 201) {
+          await router.replace('/');
+        } else {
+          state.errors = data?.errors || {};
         }
+      } catch (error) {
+        state.errors = error?.response?.data?.errors || {};
       }
     }
+
     return { state, addCompany, v$ };
   }
 }

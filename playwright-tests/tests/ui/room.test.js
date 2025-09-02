@@ -38,8 +38,11 @@ test('Create new Room', async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
+    const sidebar = new SideBar(page);
     const roomPage = new RoomPage(page);
-    await roomPage.deleteRoom();
+    await sidebar.clickButton('rooms');
+    await roomPage.deleteRoomByNumber(testData.roomNumber).catch(() => {});
 });
+
 
 

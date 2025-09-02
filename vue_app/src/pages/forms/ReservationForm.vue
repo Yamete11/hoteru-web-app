@@ -1,60 +1,60 @@
 <template>
-  <div class="reservation-component">
+  <div class="reservation-component" data-testid="reservation-component">
     <navbar />
     <sidebar />
 
     <div class="main">
-      <h1 class="page-title">
+      <h1 class="page-title" data-testid="reservation-title">
         {{ state.isCreate ? 'New Reservation' : `${state.detailsType} Details` }}
       </h1>
 
       <form
-          @submit.prevent="onSubmit"
-          class="creating-form"
-          :data-testid="state.isCreate ? 'reservation-create-form' : 'reservation-details-form'"
+        @submit.prevent="onSubmit"
+        class="creating-form"
+        :data-testid="state.isCreate ? 'reservation-create-form' : 'reservation-details-form'"
       >
-        <div v-if="state.isCreate" class="tab-switcher">
+        <div v-if="state.isCreate" class="tab-switcher" data-testid="tab-switcher">
           <span :class="{ active: !uiForm.confirmed }" @click="uiForm.confirmed = false" data-testid="arrival-tab">Arrival</span>
           <span> - </span>
           <span :class="{ active: uiForm.confirmed }" @click="uiForm.confirmed = true" data-testid="reservation-tab">Reservation</span>
         </div>
 
-        <div class="date-inputs">
+        <div class="date-inputs" data-testid="date-inputs">
           <div class="input-form">
             <label>In: </label>
             <input
-                v-model="uiForm.in"
-                class="input"
-                type="date"
-                :readonly="!state.isEditing && !state.isCreate"
-                @input="touchField('in')"
-                data-testid="date-in"
+              v-model="uiForm.in"
+              class="input"
+              type="date"
+              :readonly="!state.isEditing && !state.isCreate"
+              @input="touchField('in')"
+              data-testid="date-in"
             />
-            <span class="error-message" v-if="v$.uiForm.in.$error">
+            <span class="error-message" v-if="v$.uiForm.in.$error" data-testid="date-in-error">
               {{ v$.uiForm.in.$errors[0]?.$message || 'The field is required*' }}
             </span>
-            <span class="error-message" v-if="state.errors.In">{{ state.errors.In[0] }}</span>
+            <span class="error-message" v-if="state.errors.In" data-testid="date-in-api-error">{{ state.errors.In[0] }}</span>
           </div>
 
           <div class="input-form">
             <label>Out: </label>
             <input
-                v-model="uiForm.out"
-                class="input"
-                type="date"
-                :min="minOutDate"
-                :readonly="!state.isEditing && !state.isCreate"
-                @input="touchField('out')"
-                data-testid="date-out"
+              v-model="uiForm.out"
+              class="input"
+              type="date"
+              :min="minOutDate"
+              :readonly="!state.isEditing && !state.isCreate"
+              @input="touchField('out')"
+              data-testid="date-out"
             />
-            <span class="error-message" v-if="v$.uiForm.out.$error">
+            <span class="error-message" v-if="v$.uiForm.out.$error" data-testid="date-out-error">
               {{ v$.uiForm.out.$errors[0]?.$message || 'The out date must be after the in date*' }}
             </span>
-            <span class="error-message" v-if="state.errors.Out">{{ state.errors.Out[0] }}</span>
+            <span class="error-message" v-if="state.errors.Out" data-testid="date-out-api-error">{{ state.errors.Out[0] }}</span>
           </div>
         </div>
 
-        <div class="guest">
+        <div class="guest" data-testid="room-section">
           <label>Room information</label>
 
           <template v-if="!state.roomAttached && (state.isEditing || state.isCreate)">
@@ -62,47 +62,47 @@
               <div class="input-form">
                 <label>Capacity: </label>
                 <input
-                    v-model.number="uiForm.capacity"
-                    class="input"
-                    type="number"
-                    placeholder="Enter room capacity"
-                    :readonly="!state.isEditing && !state.isCreate"
-                    @input="touchField('capacity')"
-                    data-testid="capacity-input"
+                  v-model.number="uiForm.capacity"
+                  class="input"
+                  type="number"
+                  placeholder="Enter room capacity"
+                  :readonly="!state.isEditing && !state.isCreate"
+                  @input="touchField('capacity')"
+                  data-testid="capacity-input"
                 />
-                <span class="error-message" v-if="v$.uiForm.capacity.$error">
+                <span class="error-message" v-if="v$.uiForm.capacity.$error" data-testid="capacity-error">
                   {{ v$.uiForm.capacity.$errors[0]?.$message || 'The capacity must be from 1 to 40*' }}
                 </span>
-                <span class="error-message" v-if="state.errors.Capacity">{{ state.errors.Capacity[0] }}</span>
+                <span class="error-message" v-if="state.errors.Capacity" data-testid="capacity-api-error">{{ state.errors.Capacity[0] }}</span>
               </div>
 
               <div class="input-form">
                 <label>Type: </label>
                 <template v-if="!state.isEditing && !state.isCreate">
-                  <input class="input" type="text" :value="selectedRoomTypeTitle" readonly />
+                  <input class="input" type="text" :value="selectedRoomTypeTitle" readonly data-testid="room-type-readonly" />
                 </template>
                 <template v-else>
                   <select
-                      v-model.number="uiForm.idRoomType"
-                      class="input"
-                      @change="touchField('idRoomType')"
-                      data-testid="room-type-select"
+                    v-model.number="uiForm.idRoomType"
+                    class="input"
+                    @change="touchField('idRoomType')"
+                    data-testid="room-type-select"
                   >
                     <option disabled :value="0">Select type</option>
                     <option
-                        v-for="roomType in state.roomTypes"
-                        :key="roomType.idType"
-                        :value="Number(roomType.idType)"
-                        data-testid="room-type-option"
+                      v-for="roomType in state.roomTypes"
+                      :key="roomType.idType"
+                      :value="Number(roomType.idType)"
+                      data-testid="room-type-option"
                     >
                       {{ roomType.title }}
                     </option>
                   </select>
                 </template>
-                <span class="error-message" v-if="v$.uiForm.idRoomType.$error">
+                <span class="error-message" v-if="v$.uiForm.idRoomType.$error" data-testid="room-type-error">
                   {{ v$.uiForm.idRoomType.$errors[0]?.$message || 'The field is required*' }}
                 </span>
-                <span class="error-message" v-if="state.errors.IdRoomType">{{ state.errors.IdRoomType[0] }}</span>
+                <span class="error-message" v-if="state.errors.IdRoomType" data-testid="room-type-api-error">{{ state.errors.IdRoomType[0] }}</span>
               </div>
             </div>
 
@@ -111,242 +111,245 @@
 
               <template v-if="canPickRoom">
                 <select
-                    v-model.number="state.tempRoomId"
-                    class="input"
-                    data-testid="room-select"
+                  v-model.number="state.tempRoomId"
+                  class="input"
+                  data-testid="room-select"
                 >
                   <option disabled :value="0">Select a room</option>
                   <option
-                      v-for="room in sortedFilteredRooms"
-                      :key="room.idRoom"
-                      :value="Number(room.idRoom)"
-                      data-testid="room-option"
+                    v-for="room in sortedFilteredRooms"
+                    :key="room.idRoom"
+                    :value="Number(room.idRoom)"
+                    data-testid="room-option"
                   >
                     {{ room.number }} - Capacity: {{ room.capacity }}
                   </option>
                 </select>
 
-                <span class="error-message" v-if="v$.uiForm.idRoom.$error && canPickRoom">
+                <span class="error-message" v-if="v$.uiForm.idRoom.$error && canPickRoom" data-testid="room-select-error">
                   {{ v$.uiForm.idRoom.$errors[0]?.$message || 'The field is required*' }}
                 </span>
-                <span class="error-message" v-if="state.errors.IdRoom">{{ state.errors.IdRoom[0] }}</span>
+                <span class="error-message" v-if="state.errors.IdRoom" data-testid="room-select-api-error">{{ state.errors.IdRoom[0] }}</span>
 
                 <button
-                    class="form-btn"
-                    type="button"
-                    @click.prevent="addRoom"
-                    :disabled="!state.tempRoomId || !canPickRoom"
-                    data-testid="add-room-btn"
+                  class="form-btn"
+                  type="button"
+                  @click.prevent="addRoom"
+                  :disabled="!state.tempRoomId || !canPickRoom"
+                  data-testid="add-room-btn"
                 >
                   Add room
                 </button>
               </template>
 
               <template v-else>
-                <div class="muted">Enter capacity and choose a room type to see available rooms.</div>
+                <div class="muted" data-testid="room-hint">Enter capacity and choose a room type to see available rooms.</div>
               </template>
             </div>
 
           </template>
 
           <template v-else>
-            <div class="card guest-card">
+            <div class="card guest-card" data-testid="selected-room-card">
               <div class="guest-row">
-                <span class="guest-name">Room #{{ selectedRoom?.number }}</span>
-                <span class="guest-passport">Capacity: {{ selectedRoom?.capacity }}</span>
+                <span class="guest-name" data-testid="selected-room-number">Room #{{ selectedRoom?.number }}</span>
+                <span class="guest-passport" data-testid="selected-room-capacity">Capacity: {{ selectedRoom?.capacity }}</span>
               </div>
               <div class="guest-row muted">
-                <span v-if="selectedRoom?.type">Type: {{ selectedRoom.type }}</span>
-                <span v-if="selectedRoom?.price">Price/night: {{ selectedRoom.price }}</span>
+                <span v-if="selectedRoom?.type" data-testid="selected-room-type">Type: {{ selectedRoom.type }}</span>
+                <span v-if="selectedRoom?.price" data-testid="selected-room-price">Price/night: {{ selectedRoom.price }}</span>
               </div>
             </div>
 
             <button
-                v-if="state.isEditing || state.isCreate"
-                class="form-btn danger"
-                type="button"
-                @click.prevent="removeRoom"
-                data-testid="remove-room-btn"
+              v-if="state.isEditing || state.isCreate"
+              class="form-btn danger"
+              type="button"
+              @click.prevent="removeRoom"
+              data-testid="remove-room-btn"
             >
               Remove room
             </button>
           </template>
         </div>
 
-        <div class="guest">
+        <div class="guest" data-testid="guest-section">
           <label>Guest personal information</label>
           <div class="input-form">
             <template v-if="state.isEditing || state.isCreate">
               <template v-if="!state.guestAttached">
                 <label>Guest Selection:</label>
                 <select
-                    v-model.number="state.tempGuestId"
-                    class="input"
-                    data-testid="guest-select"
+                  v-model.number="state.tempGuestId"
+                  class="input"
+                  data-testid="guest-select"
                 >
                   <option disabled :value="0">Select a guest</option>
                   <option
-                      v-for="guest in state.guests"
-                      :key="guest.idPerson"
-                      :value="Number(guest.idPerson)"
-                      data-testid="guest-option"
+                    v-for="guest in state.guests"
+                    :key="guest.idPerson"
+                    :value="Number(guest.idPerson)"
+                    data-testid="guest-option"
                   >
                     {{ guest.name }} {{ guest.surname }}, {{ guest.passport }}
                   </option>
                 </select>
 
-                <span class="error-message" v-if="v$.uiForm.idGuest.$error">
+                <span class="error-message" v-if="v$.uiForm.idGuest.$error" data-testid="guest-select-error">
                   {{ v$.uiForm.idGuest.$errors[0]?.$message || 'The field is required*' }}
                 </span>
-                <span class="error-message" v-if="state.errors.IdGuest">{{ state.errors.IdGuest[0] }}</span>
+                <span class="error-message" v-if="state.errors.IdGuest" data-testid="guest-select-api-error">{{ state.errors.IdGuest[0] }}</span>
 
                 <button
-                    class="form-btn"
-                    type="button"
-                    @click.prevent="addGuest"
-                    :disabled="!state.tempGuestId"
+                  class="form-btn"
+                  type="button"
+                  @click.prevent="addGuest"
+                  :disabled="!state.tempGuestId"
+                  data-testid="add-guest-btn"
                 >
                   Add guest
                 </button>
               </template>
 
               <template v-else>
-                <div class="card guest-card">
+                <div class="card guest-card" data-testid="selected-guest-card">
                   <div class="guest-row">
-                    <span class="guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
-                    <span class="guest-passport">{{ selectedGuest?.passport }}</span>
+                    <span class="guest-name" data-testid="selected-guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
+                    <span class="guest-passport" data-testid="selected-guest-passport">{{ selectedGuest?.passport }}</span>
                   </div>
                   <div class="guest-row muted">
-                    <span v-if="selectedGuest?.email">✉️ {{ selectedGuest.email }}</span>
+                    <span v-if="selectedGuest?.email" data-testid="selected-guest-email">✉️ {{ selectedGuest.email }}</span>
                   </div>
                 </div>
-                <button class="form-btn danger" type="button" @click.prevent="removeGuest">Remove guest</button>
+                <button class="form-btn danger" type="button" @click.prevent="removeGuest" data-testid="remove-guest-btn">Remove guest</button>
               </template>
             </template>
 
             <template v-else>
-              <div class="card guest-card">
+              <div class="card guest-card" data-testid="readonly-guest-card">
                 <div class="guest-row">
-                  <span class="guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
-                  <span class="guest-passport">{{ selectedGuest?.passport }}</span>
+                  <span class="guest-name" data-testid="readonly-guest-name">{{ selectedGuest?.name }} {{ selectedGuest?.surname }}</span>
+                  <span class="guest-passport" data-testid="readonly-guest-passport">{{ selectedGuest?.passport }}</span>
                 </div>
                 <div class="guest-row muted">
-                  <span v-if="selectedGuest?.email">✉️ {{ selectedGuest.email }}</span>
+                  <span v-if="selectedGuest?.email" data-testid="readonly-guest-email">✉️ {{ selectedGuest.email }}</span>
                 </div>
               </div>
             </template>
           </div>
         </div>
 
-        <div class="guest">
+        <div class="guest" data-testid="deposit-section">
           <label>Deposit</label>
           <div class="input-form">
             <template v-if="!state.isEditing && !state.isCreate && !state.hasDeposit">
-              <label>There is no deposit.</label>
+              <label data-testid="no-deposit-label">There is no deposit.</label>
             </template>
 
             <template v-else-if="state.hasDeposit">
               <label>Deposit sum: </label>
               <input
-                  v-model.number="uiForm.depositSum"
-                  class="input"
-                  type="number"
-                  :readonly="!state.isEditing && !state.isCreate"
-                  @input="touchField('depositSum')"
-                  data-testid="deposit-input"
+                v-model.number="uiForm.depositSum"
+                class="input"
+                type="number"
+                :readonly="!state.isEditing && !state.isCreate"
+                @input="touchField('depositSum')"
+                data-testid="deposit-input"
               />
-              <span class="error-message" v-if="v$.uiForm.depositSum.$error">
+              <span class="error-message" v-if="v$.uiForm.depositSum.$error" data-testid="deposit-input-error">
                 {{ v$.uiForm.depositSum.$errors[0]?.$message || 'Deposit sum is required*' }}
               </span>
-              <span class="error-message" v-if="state.errors.DepositSum">{{ state.errors.DepositSum[0] }}</span>
+              <span class="error-message" v-if="state.errors.DepositSum" data-testid="deposit-input-api-error">{{ state.errors.DepositSum[0] }}</span>
 
               <label>Choose type: </label>
               <template v-if="!state.isEditing && !state.isCreate">
-                <input class="input" type="text" :value="selectedDepositTypeTitle" readonly />
+                <input class="input" type="text" :value="selectedDepositTypeTitle" readonly data-testid="deposit-type-readonly" />
               </template>
               <template v-else>
                 <select
-                    v-model.number="uiForm.idDepositType"
-                    class="input"
-                    @change="touchField('idDepositType')"
-                    data-testid="deposit-select"
+                  v-model.number="uiForm.idDepositType"
+                  class="input"
+                  @change="touchField('idDepositType')"
+                  data-testid="deposit-select"
                 >
                   <option disabled :value="0">Select type</option>
                   <option
-                      v-for="type in state.depositTypes"
-                      :key="type.idType"
-                      :value="Number(type.idType)"
-                      data-testid="deposit-option"
+                    v-for="type in state.depositTypes"
+                    :key="type.idType"
+                    :value="Number(type.idType)"
+                    data-testid="deposit-option"
                   >
                     {{ type.title }}
                   </option>
                 </select>
               </template>
 
-              <span class="error-message" v-if="v$.uiForm.idDepositType.$error">
+              <span class="error-message" v-if="v$.uiForm.idDepositType.$error" data-testid="deposit-select-error">
                 {{ v$.uiForm.idDepositType.$errors[0]?.$message || 'Deposit type is required*' }}
               </span>
-              <span class="error-message" v-if="state.errors.IdDepositType">{{ state.errors.IdDepositType[0] }}</span>
+              <span class="error-message" v-if="state.errors.IdDepositType" data-testid="deposit-select-api-error">{{ state.errors.IdDepositType[0] }}</span>
             </template>
 
             <template v-else>
-              <label>There is no deposit.</label>
+              <label data-testid="no-deposit-label">There is no deposit.</label>
             </template>
 
             <button
-                v-if="state.isEditing || state.isCreate"
-                @click.prevent="toggleDeposit"
-                :class="state.hasDeposit ? 'form-btn danger' : 'form-btn'"
-                data-testid="add-deposit-btn"
-                type="button"
+              v-if="state.isEditing || state.isCreate"
+              @click.prevent="toggleDeposit"
+              :class="state.hasDeposit ? 'form-btn danger' : 'form-btn'"
+              data-testid="add-deposit-btn"
+              type="button"
             >
               {{ state.hasDeposit ? 'Remove deposit' : 'Add deposit' }}
             </button>
           </div>
         </div>
 
-        <div class="guest">
+        <div class="guest" data-testid="services-section">
           <label>Service option</label>
           <div class="input-form">
-            <label v-if="state.isEditing || state.isCreate">Choose a service</label>
-            <label v-else-if="uiForm.services.length > 0">Added services</label>
-            <label v-else>There are no services</label>
+            <label v-if="state.isEditing || state.isCreate" data-testid="service-select-label">Choose a service</label>
+            <label v-else-if="uiForm.services.length > 0" data-testid="service-list-label">Added services</label>
+            <label v-else data-testid="service-empty-label">There are no services</label>
 
             <select
-                v-if="state.isEditing || state.isCreate"
-                v-model="state.selectedService"
-                class="input"
-                data-testid="service-select"
+              v-if="state.isEditing || state.isCreate"
+              v-model="state.selectedService"
+              class="input"
+              data-testid="service-select"
             >
               <option disabled value="0">Select a service</option>
               <option
-                  v-for="service in state.services"
-                  :key="service.idService"
-                  :value="service"
-                  data-testid="service-option"
+                v-for="service in state.services"
+                :key="service.idService"
+                :value="service"
+                data-testid="service-option"
               >
                 {{ service.title }}: {{ service.sum }}
               </option>
             </select>
             <button
-                v-if="state.isEditing || state.isCreate"
-                @click.prevent="addService"
-                class="form-btn"
-                type="button"
+              v-if="state.isEditing || state.isCreate"
+              @click.prevent="addService"
+              class="form-btn"
+              type="button"
+              data-testid="add-service-btn"
             >
               Add
             </button>
 
-            <div class="service-list" v-if="uiForm.services.length > 0">
+            <div class="service-list" v-if="uiForm.services.length > 0" data-testid="added-services">
               <ul class="added-services-list">
-                <li class="element" v-for="(service, index) in uiForm.services" :key="index">
-                  <span class="service-title">{{ service.title }}: {{ service.sum }}</span>
+                <li class="element" v-for="(service, index) in uiForm.services" :key="index" data-testid="added-service-item">
+                  <span class="service-title" data-testid="added-service-title">{{ service.title }}: {{ service.sum }}</span>
                   <div class="service-actions">
                     <button
-                        class="btn"
-                        v-if="state.isEditing || state.isCreate"
-                        @click.prevent="removeService(index)"
-                        type="button"
+                      class="btn"
+                      v-if="state.isEditing || state.isCreate"
+                      @click.prevent="removeService(index)"
+                      type="button"
+                      :data-testid="'remove-service-btn-' + index"
                     >
                       Remove
                     </button>
@@ -358,7 +361,7 @@
           </div>
         </div>
 
-        <div class="guest">
+        <div class="guest" data-testid="summary-section">
           <label>Summary</label>
           <div class="input-form">
             <div class="summary-row">
@@ -377,13 +380,36 @@
           </div>
         </div>
 
-        <div class="registration-class">
+        <div class="registration-class" data-testid="actions">
           <router-link class="registration-btn" :to="state.isCreate ? '/arrivals' : '/arrivals'" data-testid="cancel-button">Cancel</router-link>
 
           <template v-if="!state.isCreate">
-            <button v-if="!state.isEditing && uiForm.confirmed" class="registration-btn" type="button" @click="confirmReservation">Close</button>
-            <button v-else-if="!state.isEditing && !uiForm.confirmed" class="registration-btn" type="button" @click="confirmReservation">Confirm</button>
-            <button class="registration-btn" type="button" @click="toggleEdit">{{ state.isEditing ? 'Save' : 'Edit' }}</button>
+            <button
+              v-if="!state.isEditing && uiForm.confirmed"
+              class="registration-btn"
+              type="button"
+              @click="confirmReservation"
+              data-testid="close-button"
+            >
+              Close
+            </button>
+            <button
+              v-else-if="!state.isEditing && !uiForm.confirmed"
+              class="registration-btn"
+              type="button"
+              @click="confirmReservation"
+              data-testid="confirm-button"
+            >
+              Confirm
+            </button>
+            <button
+              class="registration-btn"
+              type="button"
+              @click="toggleEdit"
+              :data-testid="state.isEditing ? 'save-button' : 'edit-button'"
+            >
+              {{ state.isEditing ? 'Save' : 'Edit' }}
+            </button>
           </template>
 
           <button v-else class="registration-btn" type="submit" data-testid="submit-button">Confirm</button>
@@ -392,6 +418,7 @@
     </div>
   </div>
 </template>
+
 
 
 <script>

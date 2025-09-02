@@ -29,8 +29,18 @@ class RoomPage {
         await expect(this.roomCapacity.last()).toHaveText(String(capacity));
     }
 
-    async deleteRoom(){
-        await this.deleteRoomButton.last().click();
+    async deleteRoomByNumber(number) {
+        await this.fillSearchInput(String(number));
+        await this.page.waitForTimeout(400);
+
+        const row = this.page
+            .locator('.item-div')
+            .filter({ has: this.page.getByTestId('room-number').filter({ hasText: String(number) }) });
+
+        await row.first().waitFor({ state: 'visible', timeout: 3000 });
+        await row.getByTestId('delete-room-button').click();
+
+        await row.first().waitFor({ state: 'detached', timeout: 3000 }).catch(() => {});
     }
 
     async openDetails(){

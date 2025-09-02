@@ -2,7 +2,7 @@ import { request } from '@playwright/test';
 
 export async function deleteHotelByTitle(hotelTitle) {
     const context = await request.newContext({
-        baseURL: 'http://localhost:8080',
+        baseURL: 'https://localhost:44384',
         ignoreHTTPSErrors: true
     });
 

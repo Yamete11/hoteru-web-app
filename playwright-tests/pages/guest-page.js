@@ -26,11 +26,17 @@ class GuestPage {
 
     async enterSearchQuery(query) {
         await this.searchInput.fill(query);
+        await this.page.waitForTimeout(400);
     }
 
-    async deleteGuest() {
-        await this.deleteGuestButton.first().waitFor({ state: 'visible' });
-        await this.deleteGuestButton.first().click();
+    async deleteGuestByName(name) {
+        await this.enterSearchQuery(name);
+
+        await this.guestItemName.last().waitFor({ state: 'visible', timeout: 3000 });
+
+        await this.deleteGuestButton.last().click();
+
+        await this.guestItemName.last().waitFor({ state: 'detached', timeout: 3000 }).catch(() => {});
     }
 
 }

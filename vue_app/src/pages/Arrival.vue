@@ -98,30 +98,46 @@ export default {
   computed: {
     filteredReservations() {
       if (this.searchField === "date") {
+        const from = this.dateFrom ? new Date(this.dateFrom) : null;
+        const to   = this.dateTo   ? new Date(this.dateTo)   : null;
+
         return this.reservations.filter(res => {
-          const dateIn = new Date(res.in);
+          const dateIn  = new Date(res.in);
           const dateOut = new Date(res.out);
-          const from = this.dateFrom ? new Date(this.dateFrom) : null;
-          const to = this.dateTo ? new Date(this.dateTo) : null;
-          return (!from || dateIn >= from) && (!to || dateOut <= to);
+          return (
+            (!from || (dateIn >= from && dateOut >= from)) &&
+            (!to   || (dateIn <= to   && dateOut <= to))
+          );
         });
       }
-      const field = this.searchField === "roomNumber" ? "room" : this.searchField;
-      const q = this.searchQuery.toLowerCase();
-      return this.reservations.filter(res => String(res?.[field] ?? "").toLowerCase().startsWith(q));
+
+      const q = (this.searchQuery || "").toLowerCase();
+      return this.reservations.filter(res => {
+        const value = res?.[this.searchField];
+        return String(value ?? "").toLowerCase().startsWith(q);
+      });
     },
   },
 
+
   watch: {
     searchQuery() {
+      if (this.searchField === "date") return;
       this.page = 1;
       this._debouncedFetch();
     },
-    searchField() {
+    searchField(newVal) {
       this.page = 1;
-      this._debouncedFetch();
+      if (newVal === "date") {
+        this.searchQuery = "";
+        this._debouncedFetch?.cancel?.();
+        this.fetchReservations();
+      } else {
+        this._debouncedFetch();
+      }
     },
   },
+
 
   methods: {
     deleteReservation(idReservation) {

@@ -46,6 +46,10 @@ class RegistrationPage {
         await this.postcodeInput.fill(postcode);
     }
 
+    async submitFormAndWait() {
+        await this.submitButton.click()
+    }
+
     async submitForm() {
         await this.submitButton.click();
     }
@@ -55,7 +59,7 @@ class RegistrationPage {
     }
 
     async assertRedirectToLogin() {
-        await this.page.waitForURL('http://localhost:5173/');
+        await this.page.waitForURL(/http:\/\/localhost:5173\/(#\/)?(\?.*)?$/);
     }
 
     async getErrorMessages() {

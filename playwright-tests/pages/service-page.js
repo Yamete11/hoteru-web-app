@@ -18,7 +18,7 @@ class ServicePage {
     }
 
     async openDetails(){
-        await this.serviceItemDetailsButton.last().click()
+        await this.serviceItemDetailsButton.last().click();
     }
 
     async assertValues(title, price, description) {
@@ -28,13 +28,18 @@ class ServicePage {
     }
 
     async enterSearch(text){
-        await this.searchInput.fill(text)
+        await this.searchInput.fill(text);
     }
 
-    async deleteService(){
-        await this.serviceItemDeleteButton.last().click();
-    }
 
+    async deleteServiceByTitle(title) {
+        await this.enterSearch(title);
+        const row = this.page.locator('.item-div').filter({ has: this.page.getByTestId('service-item-title').filter({ hasText: title }) });
+        await expect(row).toBeVisible({ timeout: 5000 });
+
+        await this.serviceItemDeleteButton.click();
+        await expect(row).toHaveCount(0, { timeout: 5000 });
+    }
 }
 
 module.exports = ServicePage;

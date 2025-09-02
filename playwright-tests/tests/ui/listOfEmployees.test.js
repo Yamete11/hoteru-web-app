@@ -16,9 +16,12 @@ test.beforeEach(async ({ page }) => {
 test('Check my account login', async ({ page }) => {
     const navbar = new Navbar(page);
     const myAccount = new MyAccount(page);
+
     await navbar.openMyAccount();
 
-    await expect(await myAccount.getLoginValue()).toBe(testData.validUsername);
+    await expect(myAccount.inputLogin).not.toHaveValue('');
+
+    await expect(myAccount.inputLogin).toHaveValue(testData.validUsername);
 });
 
 test('Creating new user', async ({ page }) => {
