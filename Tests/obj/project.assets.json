@@ -9213,23 +9213,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Glebasher\\.nuget\\packages\\": {},
+    "C:\\Users\\user\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\Tests\\Tests.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Desktop\\diplom\\hoteru-web-app\\Tests\\Tests.csproj",
       "projectName": "Tests",
-      "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\Tests\\Tests.csproj",
-      "packagesPath": "C:\\Users\\Glebasher\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\Tests\\obj\\",
+      "projectPath": "C:\\Users\\user\\Desktop\\diplom\\hoteru-web-app\\Tests\\Tests.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\user\\Desktop\\diplom\\hoteru-web-app\\Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Glebasher\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -9244,8 +9244,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {
-              "projectPath": "C:\\Users\\Glebasher\\Desktop\\hoteru\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj"
+            "C:\\Users\\user\\Desktop\\diplom\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj": {
+              "projectPath": "C:\\Users\\user\\Desktop\\diplom\\hoteru-web-app\\hoteru_be\\hoteru_be.csproj"
             }
           }
         }
